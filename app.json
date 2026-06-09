@@ -55,11 +55,11 @@
         "origin": false
       },
       "eas": {
-        "projectId": "your-eas-project-id"
+        "projectId": "b74d1f11-4573-43d0-8449-8a36783d8606"
       }
     },
     "updates": {
-      "url": "https://u.expo.dev/your-eas-project-id"
+      "url": "https://u.expo.dev/b74d1f11-4573-43d0-8449-8a36783d8606"
     },
     "runtimeVersion": {
       "policy": "appVersion"
