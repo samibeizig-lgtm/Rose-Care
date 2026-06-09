@@ -31,41 +31,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: 📦 Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: 🔧 Setup EAS CLI
         run: npm install -g eas-cli
-
-      - name: 🔐 Login to Expo
-        run: eas login --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: 🏗️ Build Android APK
         run: |
           eas build \
             --platform android \
             --profile ${{ github.event.inputs.profile || 'preview' }} \
-            --non-interactive \
-            --json \
-            --output build-output.json
+            --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 📤 Upload APK as artifact
+      - name: 📤 Upload artifact si APK local
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rose-care-android-apk
+          name: rose-care-build-info
           path: |
             *.apk
-            build-output.json
+            *.aab
+          if-no-files-found: ignore
           retention-days: 30
 
-      - name: 💬 Comment build URL
+      - name: 💬 Comment build URL sur PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
@@ -74,5 +67,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ **Build Android terminé !** Téléchargez l\'APK dans les artefacts de ce workflow.'
+              body: '✅ **Build Android lancé sur EAS !** Suivez la progression sur https://expo.dev'
             })
