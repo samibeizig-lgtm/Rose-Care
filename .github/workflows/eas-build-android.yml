@@ -1,0 +1,78 @@
+name: 🤖 Build Android APK (Rose Care)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - claude/pregnancy-companion-app-k8dnnh
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - development
+          - production
+
+jobs:
+  build-android:
+    name: 📱 Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🔧 Setup EAS CLI
+        run: npm install -g eas-cli
+
+      - name: 🔐 Login to Expo
+        run: eas login --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🏗️ Build Android APK
+        run: |
+          eas build \
+            --platform android \
+            --profile ${{ github.event.inputs.profile || 'preview' }} \
+            --non-interactive \
+            --json \
+            --output build-output.json
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📤 Upload APK as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rose-care-android-apk
+          path: |
+            *.apk
+            build-output.json
+          retention-days: 30
+
+      - name: 💬 Comment build URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ **Build Android terminé !** Téléchargez l\'APK dans les artefacts de ce workflow.'
+            })
