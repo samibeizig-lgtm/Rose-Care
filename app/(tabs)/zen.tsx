@@ -8,7 +8,9 @@ import {
   Animated,
   Easing,
   Dimensions,
+  Alert,
 } from 'react-native';
+import * as Speech from 'expo-speech';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,6 +41,31 @@ export default function ZenScreen() {
   const breathOpacity = useRef(new Animated.Value(0.6)).current;
   const affirmFade = useRef(new Animated.Value(1)).current;
   const soundRef = useRef<Audio.Sound | null>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [isSpeaking, setIsSpeaking] = useState<string | null>(null);
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+  }, []);
+
+  const speakScript = async (sessionId: string, text: string) => {
+    try {
+      const speaking = await Speech.isSpeakingAsync();
+      if (speaking) {
+        await Speech.stop();
+        if (isSpeaking === sessionId) { setIsSpeaking(null); return; }
+      }
+      setIsSpeaking(sessionId);
+      Speech.speak(text, {
+        language: 'fr-FR',
+        pitch: 0.9,
+        rate: 0.85,
+        onDone: () => setIsSpeaking(null),
+        onStopped: () => setIsSpeaking(null),
+        onError: () => setIsSpeaking(null),
+      });
+    } catch { setIsSpeaking(null); }
+  };
 
   useEffect(() => {
     Audio.setAudioModeAsync({
@@ -238,7 +265,7 @@ export default function ZenScreen() {
         ))}
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView showsVerticalScrollIndicator={false} style={{ opacity: fadeAnim }}>
 
         {/* BREATHING TAB */}
         {activeTab === 'respiration' && (
@@ -395,10 +422,26 @@ export default function ZenScreen() {
                 {selectedExercise === session.id && (
                   <View style={styles.hypnoseScript}>
                     <Text style={styles.hypnoseScriptLabel}>Séance guidée :</Text>
-                    <Text style={styles.hypnoseScriptText}>{session.script}</Text>
+                    <TouchableOpacity onPress={() => speakScript(session.id, session.script)} activeOpacity={0.8}>
+                      <Text style={[styles.hypnoseScriptText, isSpeaking === session.id && { opacity: 0.7 }]}>{session.script}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.voiceBtn, isSpeaking === session.id && styles.voiceBtnActive]}
+                      onPress={() => speakScript(session.id, session.script)}
+                    >
+                      <Ionicons
+                        name={isSpeaking === session.id ? 'stop-circle-outline' : 'volume-high-outline'}
+                        size={18}
+                        color={isSpeaking === session.id ? '#FFFFFF' : Colors.primary}
+                        style={{ marginRight: 8 }}
+                      />
+                      <Text style={[styles.voiceBtnText, isSpeaking === session.id && { color: '#FFFFFF' }]}>
+                        {isSpeaking === session.id ? 'Arrêter la lecture' : 'Écouter ce texte'}
+                      </Text>
+                    </TouchableOpacity>
                     <View style={styles.hypnoseTip}>
                       <Ionicons name="headset-outline" size={16} color={Colors.primary} style={{ marginRight: 6 }} />
-                      <Text style={styles.hypnoseTipText}>Fermez les yeux et lisez lentement, ou faites-vous lire ce texte à voix haute.</Text>
+                      <Text style={styles.hypnoseTipText}>Appuyez sur "Écouter" pour une voix douce en français.</Text>
                     </View>
                   </View>
                 )}
@@ -539,7 +582,7 @@ export default function ZenScreen() {
         )}
 
         <View style={{ height: 40 }} />
-      </ScrollView>
+      </Animated.ScrollView>
     </SafeAreaView>
   );
 }
@@ -954,6 +997,28 @@ const styles = StyleSheet.create({
     color: Colors.primaryDeep,
     flex: 1,
     lineHeight: 18,
+  },
+  voiceBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.lilac,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginTop: 12,
+    marginBottom: 8,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    alignSelf: 'flex-start',
+  },
+  voiceBtnActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  voiceBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.primary,
   },
   musicNote: {
     backgroundColor: Colors.lilac,

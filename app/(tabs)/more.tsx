@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   Dimensions,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,16 +21,13 @@ const WAVE_H = 50;
 
 export default function MoreScreen() {
   const router = useRouter();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+  }, []);
 
   const menuSections = [
-    {
-      title: 'Clinique La Rose',
-      color: Colors.primary,
-      gradient: Colors.gradient.primary as [string, string],
-      route: '/clinic',
-      icon: 'business-outline' as const,
-      description: 'Contact, gynécologues, événements',
-    },
     {
       title: 'Dossier CNAM',
       color: Colors.primaryDeep,
@@ -39,36 +37,20 @@ export default function MoreScreen() {
       description: 'Prise en charge, congé maternité',
     },
     {
-      title: 'Trousse Bébé & Valise Maman',
-      color: Colors.primaryLight,
-      gradient: [Colors.primaryLight, Colors.primarySoft] as [string, string],
-      route: '/essentials',
-      icon: 'bag-outline' as const,
-      description: 'Listes de préparation complètes',
+      title: 'Urgences & SOS',
+      color: Colors.error,
+      gradient: ['#C0392B', '#E74C3C'] as [string, string],
+      route: null,
+      icon: 'medkit-outline' as const,
+      description: 'Contacts d\'urgence rapides',
     },
     {
-      title: 'Mes Échographies',
-      color: Colors.zen,
-      gradient: Colors.gradient.zen as [string, string],
-      route: '/ultrasound',
-      icon: 'images-outline' as const,
-      description: 'Galerie de vos échographies',
-    },
-    {
-      title: 'Calendrier Menstruel',
-      color: Colors.accentDark,
-      gradient: [Colors.accentDark, Colors.primaryLight] as [string, string],
-      route: '/menstrual',
-      icon: 'calendar-outline' as const,
-      description: 'Suivi du cycle, ovulation',
-    },
-    {
-      title: 'Journal de Grossesse',
+      title: 'Rose Care',
       color: Colors.primarySoft,
       gradient: Colors.gradient.soft as [string, string],
-      route: '/journal',
-      icon: 'book-outline' as const,
-      description: 'Notes et souvenirs',
+      route: null,
+      icon: 'heart-outline' as const,
+      description: 'À propos de l\'application',
     },
   ];
 
@@ -99,7 +81,7 @@ export default function MoreScreen() {
       </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
+        <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }]}>
 
           {/* Menu Grid */}
           <View style={styles.menuGrid}>
@@ -107,7 +89,7 @@ export default function MoreScreen() {
               <TouchableOpacity
                 key={idx}
                 style={styles.menuCard}
-                onPress={() => router.push(item.route as any)}
+                onPress={() => item.route && router.push(item.route as any)}
               >
                 <LinearGradient colors={item.gradient} style={styles.menuCardGrad}>
                   <View style={styles.menuIconWrap}>
@@ -162,7 +144,7 @@ export default function MoreScreen() {
               </View>
             </LinearGradient>
           </View>
-        </View>
+        </Animated.View>
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>

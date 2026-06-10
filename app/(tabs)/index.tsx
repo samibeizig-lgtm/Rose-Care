@@ -272,12 +272,7 @@ export default function HomeScreen() {
                 </View>
               </View>
             </>
-          ) : (
-            <TouchableOpacity style={styles.setupChip} onPress={openProfileEdit}>
-              <Ionicons name="person-add-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
-              <Text style={styles.setupChipText}>Configurer mon profil</Text>
-            </TouchableOpacity>
-          )}
+          ) : null}
 
           {/* Wave */}
           <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
@@ -288,13 +283,15 @@ export default function HomeScreen() {
         {/* ─── White content ─── */}
         <Animated.View style={[styles.content, cardStyle]}>
 
-          {/* Modifier profil (accessible quand profil déjà configuré) */}
-          {currentWeek > 0 && (
-            <TouchableOpacity style={styles.editProfileRow} onPress={openProfileEdit}>
-              <Ionicons name="person-circle-outline" size={20} color={Colors.primary} />
-              <Text style={styles.editProfileText}>Modifier mon profil</Text>
-              <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} style={{ marginLeft: 'auto' }} />
-            </TouchableOpacity>
+          {/* Statistique grossesse motivationnelle */}
+          {daysLeft !== null && daysLeft > 0 && (
+            <View style={styles.pregnancyStatCard}>
+              <Ionicons name="heart" size={18} color={Colors.rose} style={{ marginRight: 10 }} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.pregnancyStatText}>Courage ! Il ne reste que</Text>
+                <Text style={styles.pregnancyStatDays}>{daysLeft} jours avant la naissance 🌸</Text>
+              </View>
+            </View>
           )}
 
           <Text style={styles.sectionLabel}>AUJOURD'HUI</Text>
@@ -417,7 +414,7 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* ─── Drawer ─── */}
-      <DrawerMenu visible={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <DrawerMenu visible={drawerOpen} onClose={() => setDrawerOpen(false)} onOpenProfile={openProfileEdit} />
 
       {/* ─── Profile edit modal ─── */}
       <Modal visible={profileModalVisible} transparent animationType="slide" onRequestClose={() => setProfileModalVisible(false)}>
@@ -532,18 +529,20 @@ const styles = StyleSheet.create({
 
   content: { paddingHorizontal: 20, backgroundColor: '#FFFFFF' },
 
-  editProfileRow: {
+  pregnancyStatCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: Colors.lilac,
+    backgroundColor: Colors.roseLight,
     borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     marginTop: 16,
     marginBottom: 4,
+    borderWidth: 1,
+    borderColor: Colors.rose + '40',
   },
-  editProfileText: { fontSize: 14, fontWeight: '600', color: Colors.primary, flex: 1 },
+  pregnancyStatText: { fontSize: 12, color: Colors.roseDark, fontWeight: '500' },
+  pregnancyStatDays: { fontSize: 15, fontWeight: '800', color: Colors.roseDark },
 
   sectionLabel: {
     fontSize: 11,

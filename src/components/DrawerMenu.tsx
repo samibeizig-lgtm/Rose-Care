@@ -14,6 +14,7 @@ const DRAWER_W = width * 0.72;
 interface DrawerMenuProps {
   visible: boolean;
   onClose: () => void;
+  onOpenProfile?: () => void;
 }
 
 const MENU_ITEMS = [
@@ -47,7 +48,7 @@ const MENU_ITEMS = [
   },
 ];
 
-export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
+export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMenuProps) {
   const router = useRouter();
   const slideX = useRef(new Animated.Value(-DRAWER_W)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
@@ -115,6 +116,22 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                 <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
               </TouchableOpacity>
             ))}
+
+            <Text style={[styles.drawerSectionLabel, { marginTop: 20 }]}>MON COMPTE</Text>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => { onClose(); setTimeout(() => onOpenProfile?.(), 300); }}
+              activeOpacity={0.7}
+            >
+              <LinearGradient colors={['#6B21A8', '#9333EA']} style={styles.menuIconGrad}>
+                <Ionicons name="person-outline" size={20} color="#FFFFFF" />
+              </LinearGradient>
+              <View style={styles.menuItemText}>
+                <Text style={styles.menuItemLabel}>Configurer mon profil</Text>
+                <Text style={styles.menuItemSub}>Nom, prénom, date de naissance</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+            </TouchableOpacity>
           </View>
 
           <View style={styles.drawerFooter}>

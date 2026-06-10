@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
-  TouchableOpacity, Dimensions, Modal, TextInput, Alert,
+  TouchableOpacity, Dimensions, Modal, TextInput, Alert, Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -92,6 +92,11 @@ interface FertileWindow {
 export default function FertiliteScreen() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+  }, []);
   const [calcModalVisible, setCalcModalVisible] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [cycleLength, setCycleLength] = useStorage(STORAGE_KEYS.CYCLE_LENGTH, '28');
@@ -176,7 +181,7 @@ export default function FertiliteScreen() {
         </Svg>
       </LinearGradient>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body}>
+      <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body} style={{ opacity: fadeAnim }}>
 
         {/* Cycle phases */}
         {activeSection === 0 && (
@@ -323,7 +328,7 @@ export default function FertiliteScreen() {
         )}
 
         <View style={{ height: 24 }} />
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Calculator Modal */}
       <Modal visible={calcModalVisible} animationType="slide" presentationStyle="pageSheet">

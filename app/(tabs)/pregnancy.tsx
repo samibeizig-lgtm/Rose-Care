@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ScrollView,
   View,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,6 +39,11 @@ export default function PregnancyScreen() {
   const [ddpInput, setDdpInput] = useState('');
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+  }, []);
 
   useEffect(() => {
     if (lastPeriodDate) {
@@ -113,7 +119,7 @@ export default function PregnancyScreen() {
           </Svg>
         </LinearGradient>
 
-        <View style={styles.content}>
+        <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }]}>
 
           {/* DDP Card */}
           <View style={styles.ddpCard}>
@@ -248,7 +254,7 @@ export default function PregnancyScreen() {
           </View>
 
           <View style={{ height: 24 }} />
-        </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -474,7 +480,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
   },
   weekCard: {
     width: (width - 60) / 5,

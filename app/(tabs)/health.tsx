@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -9,11 +9,14 @@ import {
   Modal,
   Dimensions,
   Alert,
+  Animated,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
+import * as Notifications from 'expo-notifications';
 import Colors from '../../src/theme/colors';
 import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { format } from 'date-fns';
@@ -23,40 +26,70 @@ import { LineChart } from 'react-native-chart-kit';
 const { width } = Dimensions.get('window');
 const WAVE_H = 50;
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  } as any),
+});
+
 interface HealthRecord {
   id: string;
   date: string;
-  type: 'weight' | 'bp' | 'glucose' | 'mood' | 'symptoms';
+  type: 'weight' | 'bp' | 'glucose' | 'mood' | 'symptoms' | 'temperature';
   value: string;
   value2?: string;
   note?: string;
 }
 
-interface Appointment {
+interface Echographie {
   id: string;
   date: string;
+  week: string;
   title: string;
-  doctor?: string;
-  location?: string;
   note?: string;
-  done: boolean;
+}
+
+interface Medication {
+  id: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+  time: string;
+  note?: string;
+  active: boolean;
 }
 
 const MOOD_OPTIONS = ['😊 Bien', '😴 Fatiguée', '🤢 Nausées', '😰 Anxieuse', '💪 Énergique', '😢 Triste', '🥰 Heureuse'];
+const FREQUENCY_OPTIONS = ['1x par jour', '2x par jour', '3x par jour', 'Le matin', 'Le soir', 'Avant les repas', 'Après les repas'];
 
 export default function HealthScreen() {
   const [records, setRecords] = useStorage<HealthRecord[]>(STORAGE_KEYS.HEALTH_RECORDS, []);
-  const [appointments, setAppointments] = useStorage<Appointment[]>(STORAGE_KEYS.APPOINTMENTS, []);
-  const [activeTab, setActiveTab] = useState<'suivi' | 'rdv' | 'conseils'>('suivi');
+  const [echographies, setEchographies] = useStorage<Echographie[]>('echographies', []);
+  const [medications, setMedications] = useStorage<Medication[]>('medications', []);
+  const [activeTab, setActiveTab] = useState<'suivi' | 'echographies' | 'traitement' | 'conseils'>('suivi');
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalType, setModalType] = useState<'weight' | 'bp' | 'glucose' | 'mood' | 'appointment' | 'symptoms'>('weight');
+  const [modalType, setModalType] = useState<'weight' | 'bp' | 'glucose' | 'mood' | 'symptoms' | 'temperature' | 'echographie' | 'medication'>('weight');
   const [inputValue, setInputValue] = useState('');
   const [inputValue2, setInputValue2] = useState('');
   const [inputNote, setInputNote] = useState('');
   const [selectedMood, setSelectedMood] = useState('');
-  const [rdvDate, setRdvDate] = useState('');
-  const [rdvTitle, setRdvTitle] = useState('');
-  const [rdvDoctor, setRdvDoctor] = useState('');
+  const [echoDate, setEchoDate] = useState('');
+  const [echoWeek, setEchoWeek] = useState('');
+  const [echoTitle, setEchoTitle] = useState('');
+  const [medName, setMedName] = useState('');
+  const [medDosage, setMedDosage] = useState('');
+  const [medFrequency, setMedFrequency] = useState(FREQUENCY_OPTIONS[0]);
+  const [medTime, setMedTime] = useState('08:00');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+    Notifications.requestPermissionsAsync().catch(() => {});
+  }, []);
 
   const openModal = (type: typeof modalType) => {
     setModalType(type);
@@ -64,27 +97,60 @@ export default function HealthScreen() {
     setInputValue2('');
     setInputNote('');
     setSelectedMood('');
-    setRdvDate('');
-    setRdvTitle('');
-    setRdvDoctor('');
+    setEchoDate('');
+    setEchoWeek('');
+    setEchoTitle('');
+    setMedName('');
+    setMedDosage('');
+    setMedFrequency(FREQUENCY_OPTIONS[0]);
+    setMedTime('08:00');
     setModalVisible(true);
   };
 
+  const scheduleNotification = async (med: Medication) => {
+    try {
+      const [h, m] = med.time.split(':').map(Number);
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: `💊 Médicament : ${med.name}`,
+          body: `Rappel : ${med.dosage} — ${med.frequency}`,
+        },
+        trigger: { hour: h, minute: m, repeats: true } as any,
+      });
+    } catch {}
+  };
+
   const saveRecord = () => {
-    if (modalType === 'appointment') {
-      if (!rdvTitle || !rdvDate) {
-        Alert.alert('Erreur', 'Veuillez remplir la date et le titre du rendez-vous.');
+    if (modalType === 'echographie') {
+      if (!echoTitle || !echoDate) {
+        Alert.alert('Erreur', 'Veuillez remplir la date et le titre.');
         return;
       }
-      const newAppt: Appointment = {
+      const newEcho: Echographie = {
         id: Date.now().toString(),
-        date: rdvDate,
-        title: rdvTitle,
-        doctor: rdvDoctor,
-        note: inputNote,
-        done: false,
+        date: echoDate,
+        week: echoWeek,
+        title: echoTitle,
+        note: inputNote || undefined,
       };
-      setAppointments([...appointments, newAppt].sort((a, b) => a.date.localeCompare(b.date)));
+      setEchographies([newEcho, ...echographies]);
+    } else if (modalType === 'medication') {
+      if (!medName || !medDosage) {
+        Alert.alert('Erreur', 'Veuillez remplir le nom et le dosage.');
+        return;
+      }
+      const newMed: Medication = {
+        id: Date.now().toString(),
+        name: medName,
+        dosage: medDosage,
+        frequency: medFrequency,
+        time: medTime,
+        note: inputNote || undefined,
+        active: true,
+      };
+      setMedications([newMed, ...medications]);
+      scheduleNotification(newMed);
+      Alert.alert('✅ Traitement ajouté', `Rappel programmé à ${medTime} — ${medFrequency}`);
     } else {
       const value = modalType === 'mood' ? selectedMood : inputValue;
       if (!value) return;
@@ -101,8 +167,15 @@ export default function HealthScreen() {
     setModalVisible(false);
   };
 
-  const toggleAppointmentDone = (id: string) => {
-    setAppointments(appointments.map(a => a.id === id ? { ...a, done: !a.done } : a));
+  const toggleMedication = (id: string) => {
+    setMedications(medications.map(m => m.id === id ? { ...m, active: !m.active } : m));
+  };
+
+  const deleteMedication = (id: string) => {
+    Alert.alert('Supprimer', 'Supprimer ce traitement ?', [
+      { text: 'Annuler' },
+      { text: 'Supprimer', style: 'destructive', onPress: () => setMedications(medications.filter(m => m.id !== id)) },
+    ]);
   };
 
   const getLastRecord = (type: HealthRecord['type']) => {
@@ -121,7 +194,7 @@ export default function HealthScreen() {
       value: getLastRecord('weight')?.value,
       unit: 'kg',
       gradient: Colors.gradient.health as [string, string],
-      normal: '(+1-2kg/mois en T2-T3)',
+      normal: '+1-2kg/mois T2-T3',
     },
     {
       type: 'bp' as const,
@@ -130,7 +203,7 @@ export default function HealthScreen() {
       value: getLastRecord('bp') ? `${getLastRecord('bp')!.value}/${getLastRecord('bp')!.value2}` : undefined,
       unit: 'mmHg',
       gradient: [Colors.primaryDeep, Colors.primary] as [string, string],
-      normal: 'Normale < 140/90',
+      normal: '< 140/90 mmHg',
     },
     {
       type: 'glucose' as const,
@@ -139,7 +212,16 @@ export default function HealthScreen() {
       value: getLastRecord('glucose')?.value,
       unit: 'mg/dL',
       gradient: [Colors.primary, Colors.primarySoft] as [string, string],
-      normal: 'À jeun < 92 mg/dL',
+      normal: 'À jeun < 92',
+    },
+    {
+      type: 'temperature' as const,
+      icon: 'thermometer-outline' as const,
+      title: 'Température',
+      value: getLastRecord('temperature')?.value,
+      unit: '°C',
+      gradient: ['#EF4444', '#F97316'] as [string, string],
+      normal: 'Normale 36.5–37.5',
     },
     {
       type: 'mood' as const,
@@ -221,27 +303,31 @@ export default function HealthScreen() {
           </Svg>
         </LinearGradient>
         <View style={styles.tabsRow}>
-          {(['suivi', 'rdv', 'conseils'] as const).map(tab => (
+          {([
+            { id: 'suivi', label: 'Suivi', icon: 'bar-chart-outline' },
+            { id: 'echographies', label: 'Échos', icon: 'images-outline' },
+            { id: 'traitement', label: 'Traitement', icon: 'medical-outline' },
+            { id: 'conseils', label: 'Conseils', icon: 'bulb-outline' },
+          ] as const).map(tab => (
             <TouchableOpacity
-              key={tab}
-              style={[styles.tab, activeTab === tab && styles.tabActive]}
-              onPress={() => setActiveTab(tab)}
+              key={tab.id}
+              style={[styles.tab, activeTab === tab.id && styles.tabActive]}
+              onPress={() => setActiveTab(tab.id)}
             >
               <Ionicons
-                name={tab === 'suivi' ? 'bar-chart-outline' : tab === 'rdv' ? 'calendar-outline' : 'bulb-outline'}
-                size={14}
-                color={activeTab === tab ? Colors.white : Colors.textSecondary}
-                style={{ marginRight: 4 }}
+                name={tab.icon}
+                size={13}
+                color={activeTab === tab.id ? Colors.white : Colors.textSecondary}
               />
-              <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                {tab === 'suivi' ? 'Suivi' : tab === 'rdv' ? 'Rendez-vous' : 'Conseils'}
+              <Text style={[styles.tabText, activeTab === tab.id && styles.tabTextActive]}>
+                {tab.label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <Animated.ScrollView showsVerticalScrollIndicator={false} style={{ opacity: fadeAnim }}>
         {activeTab === 'suivi' && (
           <View style={styles.content}>
             {/* Health Cards */}
@@ -452,34 +538,79 @@ export default function HealthScreen() {
           </View>
         )}
 
-        {activeTab === 'rdv' && (
+        {activeTab === 'echographies' && (
           <View style={styles.content}>
-            <TouchableOpacity style={styles.addRdvBtn} onPress={() => openModal('appointment')}>
+            <TouchableOpacity style={styles.addRdvBtn} onPress={() => openModal('echographie')}>
               <LinearGradient colors={Colors.gradient.primary} style={styles.addRdvGradient}>
                 <Ionicons name="add-circle-outline" size={22} color={Colors.white} />
-                <Text style={styles.addRdvText}>Ajouter un rendez-vous</Text>
+                <Text style={styles.addRdvText}>Ajouter une échographie</Text>
               </LinearGradient>
             </TouchableOpacity>
 
-            {appointments.length === 0 ? (
+            {echographies.length === 0 ? (
               <View style={styles.emptyState}>
-                <Ionicons name="calendar-outline" size={56} color={Colors.mauve} />
-                <Text style={styles.emptyText}>Aucun rendez-vous planifié</Text>
-                <Text style={styles.emptySubtext}>Ajoutez vos consultations et échographies</Text>
+                <Ionicons name="images-outline" size={56} color={Colors.mauve} />
+                <Text style={styles.emptyText}>Aucune échographie enregistrée</Text>
+                <Text style={styles.emptySubtext}>Notez la date, la semaine et vos observations</Text>
               </View>
             ) : (
-              appointments.map((appt) => (
-                <View key={appt.id} style={[styles.apptCard, appt.done && styles.apptCardDone]}>
-                  <TouchableOpacity onPress={() => toggleAppointmentDone(appt.id)} style={styles.apptCheck}>
-                    <View style={[styles.checkCircle, appt.done && styles.checkCircleDone]}>
-                      {appt.done && <Ionicons name="checkmark" size={14} color={Colors.white} />}
+              echographies.map((echo) => (
+                <View key={echo.id} style={styles.echoCard}>
+                  <View style={styles.echoIconBox}>
+                    <Ionicons name="scan-outline" size={28} color={Colors.primary} />
+                  </View>
+                  <View style={styles.echoInfo}>
+                    <Text style={styles.echoTitle}>{echo.title}</Text>
+                    <Text style={styles.echoMeta}>📅 {echo.date}{echo.week ? ` · SA ${echo.week}` : ''}</Text>
+                    {echo.note && <Text style={styles.echoNote}>{echo.note}</Text>}
+                  </View>
+                </View>
+              ))
+            )}
+          </View>
+        )}
+
+        {activeTab === 'traitement' && (
+          <View style={styles.content}>
+            <View style={styles.traitementInfo}>
+              <Ionicons name="information-circle-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
+              <Text style={styles.traitementInfoText}>Les rappels seront programmés à l'heure choisie. Consultez toujours votre médecin.</Text>
+            </View>
+
+            <TouchableOpacity style={styles.addRdvBtn} onPress={() => openModal('medication')}>
+              <LinearGradient colors={['#059669', '#10B981']} style={styles.addRdvGradient}>
+                <Ionicons name="add-circle-outline" size={22} color={Colors.white} />
+                <Text style={styles.addRdvText}>Ajouter un traitement</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {medications.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Ionicons name="medical-outline" size={56} color={Colors.mauve} />
+                <Text style={styles.emptyText}>Aucun traitement enregistré</Text>
+                <Text style={styles.emptySubtext}>Ajoutez vos médicaments avec rappel</Text>
+              </View>
+            ) : (
+              medications.map((med) => (
+                <View key={med.id} style={[styles.medCard, !med.active && { opacity: 0.5 }]}>
+                  <View style={[styles.medIconBox, { backgroundColor: med.active ? '#D1FAE5' : Colors.border }]}>
+                    <Ionicons name="medical-outline" size={22} color={med.active ? '#059669' : Colors.textMuted} />
+                  </View>
+                  <View style={styles.medInfo}>
+                    <Text style={styles.medName}>{med.name}</Text>
+                    <Text style={styles.medDosage}>{med.dosage} · {med.frequency}</Text>
+                    <View style={styles.medTimeRow}>
+                      <Ionicons name="alarm-outline" size={13} color={Colors.textMuted} />
+                      <Text style={styles.medTime}>{med.time}</Text>
                     </View>
-                  </TouchableOpacity>
-                  <View style={styles.apptInfo}>
-                    <Text style={[styles.apptTitle, appt.done && styles.apptTitleDone]}>{appt.title}</Text>
-                    <Text style={styles.apptDate}>📅 {appt.date}</Text>
-                    {appt.doctor && <Text style={styles.apptDoctor}>👨‍⚕️ {appt.doctor}</Text>}
-                    {appt.note && <Text style={styles.apptNote}>{appt.note}</Text>}
+                  </View>
+                  <View style={styles.medActions}>
+                    <TouchableOpacity onPress={() => toggleMedication(med.id)} style={styles.medToggle}>
+                      <Ionicons name={med.active ? 'pause-circle-outline' : 'play-circle-outline'} size={22} color={med.active ? '#059669' : Colors.textMuted} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => deleteMedication(med.id)} style={styles.medDelete}>
+                      <Ionicons name="trash-outline" size={18} color={Colors.error} />
+                    </TouchableOpacity>
                   </View>
                 </View>
               ))
@@ -507,7 +638,7 @@ export default function HealthScreen() {
         )}
 
         <View style={{ height: 40 }} />
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Modal */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet">
@@ -517,8 +648,10 @@ export default function HealthScreen() {
               {modalType === 'weight' ? 'Ajouter le Poids' :
                modalType === 'bp' ? 'Ajouter la Tension' :
                modalType === 'glucose' ? 'Ajouter la Glycémie' :
+               modalType === 'temperature' ? 'Ajouter la Température' :
                modalType === 'mood' ? 'Comment vous sentez-vous ?' :
-               modalType === 'appointment' ? 'Nouveau Rendez-vous' :
+               modalType === 'echographie' ? 'Nouvelle Échographie' :
+               modalType === 'medication' ? 'Nouveau Traitement' :
                'Symptômes du jour'}
             </Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
@@ -625,37 +758,120 @@ export default function HealthScreen() {
               </>
             )}
 
-            {modalType === 'appointment' && (
+            {modalType === 'temperature' && (
               <>
-                <Text style={styles.inputLabel}>Titre du rendez-vous *</Text>
+                <Text style={styles.inputLabel}>Température (°C)</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="decimal-pad"
+                  placeholder="Ex: 37.2"
+                  placeholderTextColor={Colors.textMuted}
+                  value={inputValue}
+                  onChangeText={setInputValue}
+                  autoFocus
+                />
+                <View style={styles.bpInfo}>
+                  <Text style={styles.bpInfoText}>🟢 Normale : 36.5–37.5°C</Text>
+                  <Text style={styles.bpInfoText}>🟡 Légère fièvre : 37.5–38°C</Text>
+                  <Text style={styles.bpInfoText}>🔴 Fièvre : &gt; 38°C → Consulter</Text>
+                </View>
+              </>
+            )}
+
+            {modalType === 'echographie' && (
+              <>
+                <Text style={styles.inputLabel}>Titre *</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Ex: Échographie morphologique"
                   placeholderTextColor={Colors.textMuted}
-                  value={rdvTitle}
-                  onChangeText={setRdvTitle}
+                  value={echoTitle}
+                  onChangeText={setEchoTitle}
                   autoFocus
                 />
-                <Text style={styles.inputLabel}>Date et heure *</Text>
+                <Text style={styles.inputLabel}>Date *</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Ex: 15/07/2024 à 10h30"
+                  placeholder="Ex: 15/07/2024"
                   placeholderTextColor={Colors.textMuted}
-                  value={rdvDate}
-                  onChangeText={setRdvDate}
+                  value={echoDate}
+                  onChangeText={setEchoDate}
                 />
-                <Text style={styles.inputLabel}>Médecin / Clinique</Text>
+                <Text style={styles.inputLabel}>Semaine d'aménorrhée</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Ex: Dr. Amira Ben Salem - Clinique La Rose"
+                  placeholder="Ex: 22"
+                  keyboardType="number-pad"
                   placeholderTextColor={Colors.textMuted}
-                  value={rdvDoctor}
-                  onChangeText={setRdvDoctor}
+                  value={echoWeek}
+                  onChangeText={setEchoWeek}
+                />
+                <Text style={styles.inputLabel}>Observations</Text>
+                <TextInput
+                  style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+                  multiline
+                  placeholder="Mesures, position, sexe, remarques..."
+                  placeholderTextColor={Colors.textMuted}
+                  value={inputNote}
+                  onChangeText={setInputNote}
                 />
               </>
             )}
 
-            {modalType !== 'appointment' && (
+            {modalType === 'medication' && (
+              <>
+                <Text style={styles.inputLabel}>Nom du médicament *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ex: Acide folique"
+                  placeholderTextColor={Colors.textMuted}
+                  value={medName}
+                  onChangeText={setMedName}
+                  autoFocus
+                />
+                <Text style={styles.inputLabel}>Dosage *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ex: 400 mcg / 1 comprimé"
+                  placeholderTextColor={Colors.textMuted}
+                  value={medDosage}
+                  onChangeText={setMedDosage}
+                />
+                <Text style={styles.inputLabel}>Fréquence</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                    {FREQUENCY_OPTIONS.map(f => (
+                      <TouchableOpacity
+                        key={f}
+                        style={[styles.freqChip, medFrequency === f && styles.freqChipActive]}
+                        onPress={() => setMedFrequency(f)}
+                      >
+                        <Text style={[styles.freqChipText, medFrequency === f && styles.freqChipTextActive]}>{f}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+                <Text style={styles.inputLabel}>Heure du rappel</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ex: 08:00"
+                  placeholderTextColor={Colors.textMuted}
+                  value={medTime}
+                  onChangeText={setMedTime}
+                />
+                <Text style={styles.inputLabel}>Note (optionnel)</Text>
+                <TextInput
+                  style={[styles.input, { height: 60, textAlignVertical: 'top' }]}
+                  multiline
+                  placeholder="Instructions particulières..."
+                  placeholderTextColor={Colors.textMuted}
+                  value={inputNote}
+                  onChangeText={setInputNote}
+                />
+              </>
+            )}
+
+            {modalType !== 'echographie' && modalType !== 'medication' && (
               <>
                 <Text style={styles.inputLabel}>Note (optionnel)</Text>
                 <TextInput
@@ -708,26 +924,27 @@ const styles = StyleSheet.create({
   tabsRow: {
     flexDirection: 'row',
     backgroundColor: Colors.surface,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
-    gap: 8,
+    gap: 6,
   },
   tab: {
     flex: 1,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 7,
+    borderRadius: 16,
     alignItems: 'center',
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'center',
     backgroundColor: Colors.background,
+    gap: 2,
   },
   tabActive: {
     backgroundColor: Colors.primary,
   },
   tabText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
     color: Colors.textSecondary,
   },
@@ -1117,4 +1334,87 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.white,
   },
+  echoCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    shadowColor: Colors.primaryDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  echoIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: Colors.lilac,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    flexShrink: 0,
+  },
+  echoInfo: { flex: 1 },
+  echoTitle: { fontSize: 15, fontWeight: '700', color: Colors.text, marginBottom: 4 },
+  echoMeta: { fontSize: 13, color: Colors.textSecondary, marginBottom: 4 },
+  echoNote: { fontSize: 12, color: Colors.textLight, fontStyle: 'italic' },
+  medCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    shadowColor: Colors.primaryDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  medIconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 13,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    flexShrink: 0,
+  },
+  medInfo: { flex: 1 },
+  medName: { fontSize: 15, fontWeight: '700', color: Colors.text },
+  medDosage: { fontSize: 13, color: Colors.textSecondary, marginTop: 2 },
+  medTimeRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  medTime: { fontSize: 12, color: Colors.textMuted },
+  medActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  medToggle: { padding: 4 },
+  medDelete: { padding: 4 },
+  traitementInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: Colors.infoLight,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.info,
+  },
+  traitementInfoText: { fontSize: 12, color: Colors.text, flex: 1, lineHeight: 18 },
+  freqChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+  },
+  freqChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  freqChipText: { fontSize: 13, color: Colors.text, fontWeight: '500' },
+  freqChipTextActive: { color: Colors.white, fontWeight: '700' },
 });

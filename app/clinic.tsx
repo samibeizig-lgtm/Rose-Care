@@ -117,10 +117,8 @@ export default function ClinicScreen() {
   const services = [
     { icon: 'flask-outline' as const, name: 'Laboratoire d\'analyses', desc: '24h/24 pour urgences' },
     { icon: 'radio-outline' as const, name: 'Imagerie médicale', desc: 'Écho 2D/3D/4D, Doppler' },
-    { icon: 'body-outline' as const, name: 'Préparation prénatale', desc: 'Sophrologie, yoga, aquabike' },
+    { icon: 'body-outline' as const, name: 'Préparation prénatale', desc: 'Sophrologie et yoga prénatal' },
     { icon: 'nutrition-outline' as const, name: 'Consultations allaitement', desc: 'Soutien et conseils IBCLC' },
-    { icon: 'heart-outline' as const, name: 'Spa maternel', desc: 'Massage prénatal certifié' },
-    { icon: 'fitness-outline' as const, name: 'Aquagym prénatale', desc: 'Piscine thérapeutique' },
     { icon: 'restaurant-outline' as const, name: 'Nutrition prénatale', desc: 'Diététicienne spécialisée' },
     { icon: 'bulb-outline' as const, name: 'Soutien psychologique', desc: 'Psychologue périnatal' },
   ];
@@ -253,13 +251,8 @@ export default function ClinicScreen() {
                     <Text style={styles.aboutTitle}>Notre Mission</Text>
                   </View>
                   <Text style={styles.aboutText}>
-                    La Clinique La Rose est spécialisée en maternité, gynécologie et néonatologie depuis 2005. Nous accompagnons les femmes dans tous les moments de leur vie reproductive, de la conception jusqu'après l'accouchement. Notre équipe multidisciplinaire est dédiée à votre bien-être et celui de votre bébé.
+                    La Clinique La Rose est spécialisée en maternité, gynécologie et néonatologie depuis plus de 40 ans. Nous accompagnons les femmes dans tous les moments de leur vie reproductive, de la conception jusqu'après l'accouchement. Notre équipe multidisciplinaire est dédiée à votre bien-être et celui de votre bébé.
                   </Text>
-                  <View style={styles.statsRow}>
-                    <View style={styles.statItem}><Text style={styles.statNum}>5000+</Text><Text style={styles.statLabel}>Naissances/an</Text></View>
-                    <View style={styles.statItem}><Text style={styles.statNum}>18</Text><Text style={styles.statLabel}>Ans d'expérience</Text></View>
-                    <View style={styles.statItem}><Text style={styles.statNum}>50+</Text><Text style={styles.statLabel}>Médecins spécialistes</Text></View>
-                  </View>
                 </LinearGradient>
               </View>
             </>
