@@ -111,7 +111,7 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    storage.get(STORAGE_KEYS.ONBOARDING_DONE).then((done) => {
+    storage.get(STORAGE_KEYS.ONBOARDING_DONE, false).then((done) => {
       if (done) router.replace('/(tabs)');
     });
   }, []);
