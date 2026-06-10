@@ -6,6 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
 import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { addDays, format, parse, isValid } from 'date-fns';
@@ -13,6 +14,7 @@ import { fr } from 'date-fns/locale';
 import DatePickerModal from '../../src/components/DatePickerModal';
 
 const { width } = Dimensions.get('window');
+const WAVE_H = 50;
 
 const cyclePhases = [
   { name: 'Menstruation', days: 'J1 – J5', icon: 'water-outline', desc: 'Début du cycle. Le corps élimine la muqueuse utérine.' },
@@ -153,6 +155,9 @@ export default function FertiliteScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
+        <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
+          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+        </Svg>
       </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body}>
@@ -420,11 +425,12 @@ export default function FertiliteScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1, backgroundColor: '#FFFFFF' },
   header: {
     paddingHorizontal: 24,
     paddingTop: 20,
-    paddingBottom: 0,
+    paddingBottom: WAVE_H,
+    overflow: 'hidden',
   },
   headerTitle: {
     fontSize: 28,

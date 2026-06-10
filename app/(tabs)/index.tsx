@@ -12,12 +12,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
 import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { getWeekData } from '../../src/data/weeklyData';
 import ProgressBar from '../../src/components/ProgressBar';
 import { differenceInWeeks, parseISO, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+
+const { width } = Dimensions.get('window');
+const WAVE_H = 56;
 
 const dailyTips = [
   'Boire 8 à 10 verres d\'eau par jour aide votre corps à former le liquide amniotique.',
@@ -95,7 +99,16 @@ const dailyInfo = [
   'Après la naissance, bébé reconnaît votre voix et votre odeur dès les premières heures.',
 ];
 
-const { width } = Dimensions.get('window');
+const MODULES = [
+  { icon: 'heart-outline', label: 'Grossesse', colors: ['#4B0082', '#7F00FF'] as [string, string], route: '/(tabs)/pregnancy' },
+  { icon: 'sparkles-outline', label: 'Fertilité', colors: ['#7F00FF', '#9933FF'] as [string, string], route: '/(tabs)/fertilite' },
+  { icon: 'pulse-outline', label: 'Santé', colors: ['#5B00B5', '#7F00FF'] as [string, string], route: '/(tabs)/health' },
+  { icon: 'leaf-outline', label: 'Zen', colors: ['#4B0082', '#5B21B6'] as [string, string], route: '/(tabs)/zen' },
+  { icon: 'bag-outline', label: 'Essentiels', colors: ['#7C3AED', '#A78BFA'] as [string, string], route: '/essentials' },
+  { icon: 'calendar-outline', label: 'Calendrier', colors: ['#5B21B6', '#7F00FF'] as [string, string], route: '/menstrual' },
+];
+
+const MODULE_W = (width - 48 - 12) / 2;
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -103,8 +116,6 @@ export default function HomeScreen() {
   const [profile] = useStorage(STORAGE_KEYS.USER_PROFILE, { name: 'Belle Maman', mode: 'pregnant' });
   const [dueDate] = useStorage(STORAGE_KEYS.DUE_DATE, '');
   const [pregnancyStart] = useStorage(STORAGE_KEYS.PREGNANCY_START, '');
-  const [babyName] = useStorage(STORAGE_KEYS.BABY_NAME, '');
-  const [appointments] = useStorage(STORAGE_KEYS.APPOINTMENTS, []);
 
   const currentWeek = pregnancyStart
     ? Math.min(40, Math.max(1, differenceInWeeks(new Date(), parseISO(pregnancyStart)) + 1))
@@ -117,7 +128,7 @@ export default function HomeScreen() {
     ? Math.max(0, Math.ceil((parseISO(dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : null;
 
-  const trimesterName = currentWeek <= 12 ? '1er Trimestre' : currentWeek <= 27 ? '2ème Trimestre' : '3ème Trimestre';
+  const trimesterName = currentWeek <= 12 ? '1er Trim.' : currentWeek <= 27 ? '2ème Trim.' : '3ème Trim.';
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -134,201 +145,239 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
       >
-        {/* Header Hero */}
-        <LinearGradient
-          colors={Colors.gradient.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.hero}
-        >
-          <View style={styles.heroTop}>
-            <View>
-              <Text style={styles.greeting}>Bonjour, {profile?.name || 'Belle Maman'} 🌸</Text>
-              <Text style={styles.heroDate}>{format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}</Text>
-            </View>
-            <TouchableOpacity style={styles.notifBtn} onPress={() => router.push('/health/add' as any)}>
-              <Ionicons name="add-circle-outline" size={32} color={Colors.white} />
-            </TouchableOpacity>
-          </View>
-
-          {currentWeek > 0 ? (
-            <>
-              <View style={styles.weekBadge}>
-                <Text style={styles.weekNumber}>Semaine {currentWeek}</Text>
-                <Text style={styles.weekTrimester}>{trimesterName}</Text>
+        {/* ─── Hero header ─── */}
+        <View style={styles.heroWrap}>
+          <LinearGradient
+            colors={Colors.gradient.primary}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.hero}
+          >
+            {/* Top row */}
+            <View style={styles.heroTop}>
+              <View>
+                <Text style={styles.greeting}>Bonjour, {profile?.name || 'Belle Maman'} 🌸</Text>
+                <Text style={styles.heroDate}>{format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}</Text>
               </View>
+              <TouchableOpacity style={styles.avatarBtn} onPress={() => router.push('/health/add' as any)}>
+                <Ionicons name="person-outline" size={22} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
 
-              {weekData && (
-                <View style={styles.heroInfo}>
-                  <Text style={styles.heroFruit}>{weekData.fruitEmoji}</Text>
-                  <View style={styles.heroInfoText}>
-                    <Text style={styles.heroTitle}>{weekData.title}</Text>
-                    <Text style={styles.heroSubtitle}>Bébé : {weekData.babyWeight} • {weekData.babyLength}</Text>
-                    <Text style={styles.heroSubtitle}>Comme une {weekData.fruitComparison}</Text>
-                  </View>
+            {/* Stats row */}
+            {currentWeek > 0 ? (
+              <View style={styles.statsRow}>
+                <View style={styles.statChip}>
+                  <Text style={styles.statValue}>S{currentWeek}</Text>
+                  <Text style={styles.statLabel}>Semaine</Text>
                 </View>
-              )}
+                <View style={styles.statDivider} />
+                <View style={styles.statChip}>
+                  <Text style={styles.statValue}>{trimesterName}</Text>
+                  <Text style={styles.statLabel}>Trimestre</Text>
+                </View>
+                {daysLeft !== null && (
+                  <>
+                    <View style={styles.statDivider} />
+                    <View style={styles.statChip}>
+                      <Text style={styles.statValue}>{daysLeft}j</Text>
+                      <Text style={styles.statLabel}>Restants</Text>
+                    </View>
+                  </>
+                )}
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.setupChip} onPress={() => router.push('/health/add' as any)}>
+                <Ionicons name="add-circle-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.setupChipText}>Configurer mon profil</Text>
+              </TouchableOpacity>
+            )}
 
-              <View style={styles.progressSection}>
+            {/* Progress bar */}
+            {currentWeek > 0 && (
+              <View style={styles.progressWrap}>
                 <View style={styles.progressLabels}>
-                  <Text style={styles.progressLabel}>Progression de la grossesse</Text>
-                  <Text style={styles.progressPercent}>{Math.round(progress * 100)}%</Text>
+                  <Text style={styles.progressLabel}>Progression grossesse</Text>
+                  <Text style={styles.progressPct}>{Math.round(progress * 100)}%</Text>
                 </View>
                 <View style={styles.progressTrack}>
                   <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
                 </View>
-                {daysLeft !== null && (
-                  <Text style={styles.daysLeft}>
-                    {daysLeft === 0 ? '🎉 C\'est le jour J !' : `${daysLeft} jours avant votre date prévue`}
-                  </Text>
-                )}
               </View>
-            </>
-          ) : (
-            <View style={styles.setupPrompt}>
-              <Text style={styles.setupText}>Configurez votre profil pour commencer le suivi</Text>
-              <TouchableOpacity style={styles.setupBtn} onPress={() => router.push('/health/add' as any)}>
-                <Text style={styles.setupBtnText}>Commencer →</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </LinearGradient>
+            )}
+          </LinearGradient>
 
+          {/* Wave at bottom of hero */}
+          <Svg
+            width={width}
+            height={WAVE_H}
+            style={{ marginTop: -1 }}
+            viewBox={`0 0 ${width} ${WAVE_H}`}
+          >
+            <Path
+              d={`M0,0 Q${width * 0.5},${WAVE_H} ${width},0 L${width},${WAVE_H} L0,${WAVE_H} Z`}
+              fill="#FFFFFF"
+            />
+          </Svg>
+        </View>
+
+        {/* ─── White content ─── */}
         <View style={styles.content}>
 
-          {/* Conseil du jour */}
-          <View style={styles.dailyCard}>
-            <LinearGradient colors={Colors.gradient.card} style={styles.dailyCardGrad}>
-              <View style={styles.dailyTitleRow}>
-                <View style={styles.dailyIconBox}>
-                  <Ionicons name="bulb-outline" size={18} color={Colors.primaryDeep} />
-                </View>
-                <Text style={styles.dailyTitle}>Conseil du jour</Text>
-              </View>
-              <Text style={styles.dailyText}>{dailyTips[dayIndex]}</Text>
-            </LinearGradient>
+          {/* Modules grid */}
+          <Text style={styles.sectionLabel}>MODULES</Text>
+          <View style={styles.modulesGrid}>
+            {MODULES.map((mod) => (
+              <TouchableOpacity
+                key={mod.label}
+                style={styles.moduleCard}
+                onPress={() => router.push(mod.route as any)}
+                activeOpacity={0.82}
+              >
+                <LinearGradient
+                  colors={mod.colors}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.moduleGrad}
+                >
+                  <View style={styles.moduleIconWrap}>
+                    <Ionicons name={mod.icon as any} size={28} color="#FFFFFF" />
+                  </View>
+                  <Text style={styles.moduleLabel}>{mod.label}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
           </View>
 
-          {/* Exercice respiration du jour */}
-          <View style={styles.breathCard}>
-            <LinearGradient colors={Colors.gradient.soft} style={styles.breathCardGrad}>
-              <View style={styles.dailyTitleRow}>
-                <View style={[styles.dailyIconBox, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+          {/* Conseil du jour */}
+          <Text style={styles.sectionLabel}>AUJOURD'HUI</Text>
+
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={[styles.iconCircle, { backgroundColor: Colors.lilac }]}>
+                <Ionicons name="bulb-outline" size={18} color={Colors.primaryDeep} />
+              </View>
+              <Text style={styles.cardTitle}>Conseil du jour</Text>
+            </View>
+            <Text style={styles.cardText}>{dailyTips[dayIndex]}</Text>
+          </View>
+
+          {/* Exercice respiration */}
+          <TouchableOpacity
+            style={styles.breathCard}
+            onPress={() => router.push('/(tabs)/zen' as any)}
+            activeOpacity={0.9}
+          >
+            <LinearGradient colors={Colors.gradient.soft} style={styles.breathGrad}>
+              <View style={styles.cardHeader}>
+                <View style={[styles.iconCircle, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
                   <Ionicons name={breathingDaily[breathIndex].icon} size={18} color={Colors.white} />
                 </View>
-                <Text style={[styles.dailyTitle, { color: Colors.white }]}>Exercice respiration du jour</Text>
+                <Text style={[styles.cardTitle, { color: Colors.white }]}>Exercice du jour</Text>
+                <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.7)" style={{ marginLeft: 'auto' }} />
               </View>
               <Text style={styles.breathTitle}>{breathingDaily[breathIndex].title}</Text>
               <Text style={styles.breathDesc}>{breathingDaily[breathIndex].desc}</Text>
-              <TouchableOpacity
-                style={styles.breathBtn}
-                onPress={() => router.push('/(tabs)/zen' as any)}
-              >
-                <Ionicons name="play-circle-outline" size={16} color={Colors.white} style={{ marginRight: 6 }} />
-                <Text style={styles.breathBtnText}>Pratiquer maintenant</Text>
-              </TouchableOpacity>
             </LinearGradient>
-          </View>
+          </TouchableOpacity>
 
-          {/* Information du jour */}
-          <View style={styles.infoCard}>
-            <View style={styles.infoTitleRow}>
-              <Ionicons name="information-circle-outline" size={20} color={Colors.primary} />
-              <Text style={styles.infoTitle}>Information du jour</Text>
-            </View>
-            <Text style={styles.infoText}>{dailyInfo[infoIndex]}</Text>
-          </View>
-
-          {/* Week Tip */}
-          {weekData && (
-            <View style={styles.tipCard}>
-              <LinearGradient colors={Colors.gradient.card} style={styles.tipGradient}>
-                <View style={styles.tipTitleRow}>
-                  <Ionicons name="bulb-outline" size={18} color={Colors.primaryDark} />
-                  <Text style={styles.tipTitle}>Conseil de la semaine {currentWeek}</Text>
-                </View>
-                <Text style={styles.tipText}>{weekData.nutritionTip}</Text>
-              </LinearGradient>
-            </View>
-          )}
-
-          {/* Baby Development Teaser */}
-          {weekData && (
-            <TouchableOpacity
-              style={styles.devCard}
-              onPress={() => router.push(`/pregnancy/week/${currentWeek}` as any)}
-            >
-              <LinearGradient colors={Colors.gradient.soft} style={styles.devGradient}>
-                <View style={styles.devHeader}>
-                  <Text style={styles.devTitle}>Développement de bébé</Text>
-                  <Ionicons name="arrow-forward" size={18} color={Colors.white} />
-                </View>
-                <Text style={styles.devEmoji}>{weekData.fruitEmoji}</Text>
-                <Text style={styles.devText}>{weekData.babyDevelopment[0]}</Text>
-                <Text style={styles.devMore}>Voir tous les détails</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          )}
-
-          {/* Emotional Note */}
-          {weekData && (
-            <View style={styles.emotionCard}>
-              <View style={styles.emotionTitleRow}>
-                <Ionicons name="heart-outline" size={18} color={Colors.primary} />
-                <Text style={styles.emotionTitle}>Message pour toi</Text>
+          {/* Info du jour */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <View style={[styles.iconCircle, { backgroundColor: Colors.infoLight }]}>
+                <Ionicons name="information-circle-outline" size={18} color={Colors.info} />
               </View>
-              <Text style={styles.emotionText}>{weekData.emotionalNote}</Text>
+              <Text style={styles.cardTitle}>Le saviez-vous ?</Text>
             </View>
-          )}
-
-          {/* Next Appointment Reminder */}
-          <View style={styles.reminderCard}>
-            <View style={styles.reminderIcon}>
-              <Ionicons name="calendar-outline" size={22} color={Colors.primary} />
-            </View>
-            <View style={styles.reminderText}>
-              <Text style={styles.reminderTitle}>Prochain rendez-vous</Text>
-              <Text style={styles.reminderSubtitle}>
-                {currentWeek < 14 ? 'Bilan du 1er trimestre' :
-                  currentWeek < 22 ? 'Échographie morphologique' :
-                    currentWeek < 28 ? 'Test glycémie (HGPO)' :
-                      currentWeek < 32 ? 'Écho 3ème trimestre' :
-                        'Consultation mensuelle'}
-              </Text>
-            </View>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/health' as any)}>
-              <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
-            </TouchableOpacity>
+            <Text style={styles.cardText}>{dailyInfo[infoIndex]}</Text>
           </View>
 
-          {/* Trimester Progress */}
-          {currentWeek > 0 && (
-            <View style={styles.trimesterCard}>
-              <Text style={styles.sectionTitle}>Progression par trimestre</Text>
-              <ProgressBar
-                progress={Math.min(1, currentWeek / 12)}
-                color={Colors.primary}
-                label="1er Trimestre (S1-S12)"
-                showPercent
-              />
-              <View style={{ height: 12 }} />
-              <ProgressBar
-                progress={currentWeek <= 12 ? 0 : Math.min(1, (currentWeek - 12) / 15)}
-                color={Colors.primaryLight}
-                label="2ème Trimestre (S13-S27)"
-                showPercent
-              />
-              <View style={{ height: 12 }} />
-              <ProgressBar
-                progress={currentWeek <= 27 ? 0 : Math.min(1, (currentWeek - 27) / 13)}
-                color={Colors.mauve}
-                label="3ème Trimestre (S28-S40)"
-                showPercent
-              />
-            </View>
+          {/* Week tip & baby dev */}
+          {weekData && (
+            <>
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.iconCircle, { backgroundColor: Colors.lilac }]}>
+                    <Ionicons name="sparkles-outline" size={18} color={Colors.primaryDeep} />
+                  </View>
+                  <Text style={styles.cardTitle}>Semaine {currentWeek}</Text>
+                </View>
+                <Text style={styles.cardText}>{weekData.nutritionTip}</Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.devCard}
+                onPress={() => router.push(`/pregnancy/week/${currentWeek}` as any)}
+                activeOpacity={0.9}
+              >
+                <LinearGradient colors={Colors.gradient.primary} style={styles.devGrad}>
+                  <View style={styles.devRow}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.devTitle}>Développement de bébé</Text>
+                      <Text style={styles.devSub}>{weekData.babyWeight} · {weekData.babyLength}</Text>
+                      <Text style={styles.devText}>{weekData.babyDevelopment[0]}</Text>
+                    </View>
+                    <Text style={styles.devEmoji}>{weekData.fruitEmoji}</Text>
+                  </View>
+                  <View style={styles.devFooter}>
+                    <Text style={styles.devMore}>Voir tous les détails</Text>
+                    <Ionicons name="arrow-forward" size={14} color="rgba(255,255,255,0.7)" />
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.iconCircle, { backgroundColor: Colors.roseLight }]}>
+                    <Ionicons name="heart-outline" size={18} color={Colors.roseDark} />
+                  </View>
+                  <Text style={styles.cardTitle}>Message pour toi</Text>
+                </View>
+                <Text style={[styles.cardText, { fontStyle: 'italic' }]}>{weekData.emotionalNote}</Text>
+              </View>
+            </>
           )}
 
-          <View style={{ height: 20 }} />
+          {/* Prochain RDV */}
+          <Text style={styles.sectionLabel}>RENDEZ-VOUS</Text>
+          <TouchableOpacity
+            style={styles.reminderCard}
+            onPress={() => router.push('/(tabs)/health' as any)}
+            activeOpacity={0.85}
+          >
+            <View style={styles.reminderLeft}>
+              <View style={[styles.iconCircle, { backgroundColor: Colors.lilac, width: 48, height: 48, borderRadius: 24 }]}>
+                <Ionicons name="calendar-outline" size={22} color={Colors.primary} />
+              </View>
+              <View style={styles.reminderInfo}>
+                <Text style={styles.reminderTitle}>Prochain rendez-vous</Text>
+                <Text style={styles.reminderSub}>
+                  {currentWeek < 14 ? 'Bilan du 1er trimestre' :
+                    currentWeek < 22 ? 'Échographie morphologique' :
+                      currentWeek < 28 ? 'Test glycémie (HGPO)' :
+                        currentWeek < 32 ? 'Écho 3ème trimestre' :
+                          'Consultation mensuelle'}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
+          </TouchableOpacity>
+
+          {/* Trimester progress */}
+          {currentWeek > 0 && (
+            <>
+              <Text style={styles.sectionLabel}>PROGRESSION</Text>
+              <View style={styles.card}>
+                <ProgressBar progress={Math.min(1, currentWeek / 12)} color={Colors.primary} label="1er Trimestre (S1–S12)" showPercent />
+                <View style={{ height: 12 }} />
+                <ProgressBar progress={currentWeek <= 12 ? 0 : Math.min(1, (currentWeek - 12) / 15)} color={Colors.primaryLight} label="2ème Trimestre (S13–S27)" showPercent />
+                <View style={{ height: 12 }} />
+                <ProgressBar progress={currentWeek <= 27 ? 0 : Math.min(1, (currentWeek - 27) / 13)} color={Colors.mauve} label="3ème Trimestre (S28–S40)" showPercent />
+              </View>
+            </>
+          )}
+
+          <View style={{ height: 24 }} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -338,376 +387,305 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#FFFFFF',
+  },
+
+  /* Hero */
+  heroWrap: {
+    overflow: 'visible',
   },
   hero: {
-    padding: 24,
-    paddingBottom: 32,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 24,
   },
   heroTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 16,
+    alignItems: 'center',
+    marginBottom: 18,
   },
   greeting: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: Colors.white,
   },
   heroDate: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.75)',
     marginTop: 2,
     textTransform: 'capitalize',
   },
-  notifBtn: {
-    padding: 4,
-  },
-  weekBadge: {
+  avatarBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.28)',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.13)',
     borderRadius: 16,
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+  },
+  statChip: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  statLabel: {
+    fontSize: 11,
+    color: 'rgba(255,255,255,0.75)',
+    marginTop: 2,
+  },
+  statDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+  },
+  setupChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     alignSelf: 'flex-start',
     marginBottom: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.28)',
   },
-  weekNumber: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: Colors.white,
+  setupChipText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
-  weekTrimester: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.85)',
-    fontWeight: '500',
-  },
-  heroInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  heroFruit: {
-    fontSize: 48,
-    marginRight: 16,
-  },
-  heroInfoText: {
-    flex: 1,
-  },
-  heroTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.white,
-    marginBottom: 4,
-  },
-  heroSubtitle: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.85)',
-    marginBottom: 2,
-  },
-  progressSection: {
+  progressWrap: {
     marginTop: 4,
   },
   progressLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 7,
   },
   progressLabel: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
-    fontWeight: '500',
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.85)',
   },
-  progressPercent: {
-    fontSize: 13,
-    color: Colors.white,
+  progressPct: {
+    fontSize: 12,
     fontWeight: '700',
+    color: '#FFFFFF',
   },
   progressTrack: {
-    height: 8,
+    height: 7,
     backgroundColor: 'rgba(255,255,255,0.22)',
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressFill: {
-    height: 8,
+    height: 7,
     backgroundColor: Colors.lavender,
     borderRadius: 4,
   },
-  daysLeft: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
-    marginTop: 8,
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  setupPrompt: {
-    alignItems: 'center',
-    paddingVertical: 16,
-  },
-  setupText: {
-    color: 'rgba(255,255,255,0.9)',
-    fontSize: 15,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  setupBtn: {
-    backgroundColor: 'rgba(255,255,255,0.22)',
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.38)',
-  },
-  setupBtnText: {
-    color: Colors.white,
-    fontWeight: '700',
-    fontSize: 15,
-  },
+
+  /* Content */
   content: {
-    padding: 20,
+    paddingHorizontal: 20,
+    backgroundColor: '#FFFFFF',
   },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 14,
-    marginTop: 4,
-    letterSpacing: 0.2,
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.textMuted,
+    letterSpacing: 1.2,
+    marginTop: 20,
+    marginBottom: 12,
   },
-  dailyCard: {
-    borderRadius: 20,
+
+  /* Modules grid */
+  modulesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  moduleCard: {
+    width: MODULE_W,
+    borderRadius: 18,
     overflow: 'hidden',
-    marginBottom: 16,
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  moduleGrad: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    alignItems: 'flex-start',
+  },
+  moduleIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  moduleLabel: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+
+  /* White cards */
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 14,
     shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 8,
     elevation: 3,
   },
-  dailyCardGrad: {
-    padding: 20,
-  },
-  dailyTitleRow: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     marginBottom: 10,
   },
-  dailyIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: Colors.lilac,
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dailyTitle: {
+  cardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.primaryDark,
-    letterSpacing: 0.3,
+    color: Colors.text,
   },
-  dailyText: {
+  cardText: {
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 22,
   },
+
+  /* Breathing card */
   breathCard: {
     borderRadius: 20,
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 14,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.22,
     shadowRadius: 12,
     elevation: 6,
   },
-  breathCardGrad: {
-    padding: 20,
+  breathGrad: {
+    padding: 18,
   },
   breathTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
     color: Colors.white,
-    marginBottom: 6,
+    marginBottom: 5,
   },
   breathDesc: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.85)',
+    color: 'rgba(255,255,255,0.82)',
     lineHeight: 20,
-    marginBottom: 14,
   },
-  breathBtn: {
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  breathBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.white,
-  },
-  infoCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.mauve,
-    shadowColor: Colors.primaryDeep,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  infoTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 10,
-  },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.primary,
-  },
-  infoText: {
-    fontSize: 14,
-    color: Colors.text,
-    lineHeight: 22,
-  },
-  tipCard: {
+
+  /* Dev card */
+  devCard: {
     borderRadius: 20,
     overflow: 'hidden',
-    marginBottom: 16,
+    marginBottom: 14,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  devGrad: {
+    padding: 18,
+  },
+  devRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  devTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.white,
+    marginBottom: 3,
+  },
+  devSub: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.75)',
+    marginBottom: 6,
+  },
+  devText: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.9)',
+    lineHeight: 20,
+  },
+  devEmoji: {
+    fontSize: 44,
+    marginLeft: 12,
+  },
+  devFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  devMore: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+    fontStyle: 'italic',
+  },
+
+  /* Reminder card */
+  reminderCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 16,
+    marginBottom: 14,
     shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 8,
     elevation: 3,
   },
-  tipGradient: {
-    padding: 20,
-  },
-  tipTitleRow: {
+  reminderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    gap: 12,
+    flex: 1,
   },
-  tipTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.primaryDark,
-  },
-  tipText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 21,
-  },
-  devCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 16,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  devGradient: {
-    padding: 20,
-  },
-  devHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  devTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.white,
-  },
-  devEmoji: {
-    fontSize: 40,
-    marginBottom: 8,
-  },
-  devText: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.95)',
-    lineHeight: 21,
-    marginBottom: 8,
-  },
-  devMore: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
-    fontStyle: 'italic',
-  },
-  emotionCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.primary,
-    shadowColor: Colors.primaryDeep,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  emotionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  emotionTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.primary,
-  },
-  emotionText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-    fontStyle: 'italic',
-  },
-  reminderCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: Colors.primaryDeep,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  reminderIcon: {
-    width: 44,
-    height: 44,
-    backgroundColor: Colors.lilac,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  reminderText: {
+  reminderInfo: {
     flex: 1,
   },
   reminderTitle: {
@@ -715,19 +693,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.text,
   },
-  reminderSubtitle: {
+  reminderSub: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     marginTop: 2,
-  },
-  trimesterCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: Colors.primaryDeep,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
   },
 });

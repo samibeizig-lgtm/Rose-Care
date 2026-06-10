@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
 import { pregnancyWeeks } from '../../src/data/weeklyData';
 import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
@@ -20,6 +21,7 @@ import { fr } from 'date-fns/locale';
 import DatePickerModal from '../../src/components/DatePickerModal';
 
 const { width } = Dimensions.get('window');
+const WAVE_H = 50;
 
 const TRIMESTER_COLORS: Record<1 | 2 | 3, [string, string]> = {
   1: [Colors.primaryDark, Colors.primary],
@@ -106,6 +108,9 @@ export default function PregnancyScreen() {
               <Text style={styles.currentWeekBtnText}>Ma semaine actuelle (S{currentWeek})</Text>
             </TouchableOpacity>
           )}
+          <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
+            <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+          </Svg>
         </LinearGradient>
 
         <View style={styles.content}>
@@ -252,13 +257,12 @@ export default function PregnancyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#FFFFFF',
   },
   header: {
     padding: 24,
-    paddingBottom: 32,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+    paddingBottom: 32 + WAVE_H,
+    overflow: 'hidden',
   },
   headerTitle: {
     fontSize: 26,

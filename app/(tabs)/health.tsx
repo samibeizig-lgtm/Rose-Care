@@ -13,6 +13,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
 import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { format } from 'date-fns';
@@ -20,6 +21,7 @@ import { fr } from 'date-fns/locale';
 import { LineChart } from 'react-native-chart-kit';
 
 const { width } = Dimensions.get('window');
+const WAVE_H = 50;
 
 interface HealthRecord {
   id: string;
@@ -214,6 +216,9 @@ export default function HealthScreen() {
             <Ionicons name="medkit-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
             <Text style={styles.headerTitle}>Suivi Santé</Text>
           </View>
+          <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
+            <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+          </Svg>
         </LinearGradient>
         <View style={styles.tabsRow}>
           {(['suivi', 'rdv', 'conseils'] as const).map(tab => (
@@ -680,14 +685,16 @@ export default function HealthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#FFFFFF',
   },
   tabsHeader: {
     backgroundColor: Colors.surface,
   },
   headerGradient: {
     paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingTop: 18,
+    paddingBottom: 18 + WAVE_H,
+    overflow: 'hidden',
   },
   headerRow: {
     flexDirection: 'row',

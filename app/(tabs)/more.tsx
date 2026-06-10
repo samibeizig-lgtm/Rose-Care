@@ -12,9 +12,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
 
 const { width } = Dimensions.get('window');
+const WAVE_H = 50;
 
 export default function MoreScreen() {
   const router = useRouter();
@@ -91,6 +93,9 @@ export default function MoreScreen() {
             <Text style={styles.headerSubtitle}>Tout ce dont vous avez besoin</Text>
           </View>
         </View>
+        <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
+          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+        </Svg>
       </LinearGradient>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -167,13 +172,12 @@ export default function MoreScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#FFFFFF',
   },
   header: {
     padding: 24,
-    paddingBottom: 24,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+    paddingBottom: 24 + WAVE_H,
+    overflow: 'hidden',
   },
   headerRow: {
     flexDirection: 'row',

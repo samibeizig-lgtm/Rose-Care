@@ -26,7 +26,7 @@ export const Colors = {
   gold: '#A78BFA',
   goldLight: '#F3E8FF',
 
-  background: '#FAF5FF',
+  background: '#F5F0FF',
   surface: '#FFFFFF',
   card: '#FFFFFF',
   border: '#EDE9FE',

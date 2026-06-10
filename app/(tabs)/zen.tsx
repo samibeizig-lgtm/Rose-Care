@@ -12,6 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
 import { Audio } from 'expo-av';
 import {
@@ -22,6 +23,7 @@ import {
 } from '../../src/data/zenData';
 
 const { width } = Dimensions.get('window');
+const WAVE_H = 50;
 
 export default function ZenScreen() {
   const [activeTab, setActiveTab] = useState<'respiration' | 'sons' | 'affirmations' | 'yoga'>('respiration');
@@ -211,6 +213,9 @@ export default function ZenScreen() {
             <Text style={styles.headerSubtitle}>Détente, respiration et bien-être</Text>
           </View>
         </View>
+        <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
+          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+        </Svg>
       </LinearGradient>
 
       {/* Tabs */}
@@ -524,13 +529,13 @@ export default function ZenScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#FFFFFF',
   },
   header: {
     paddingHorizontal: 24,
-    paddingVertical: 20,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+    paddingTop: 20,
+    paddingBottom: 20 + WAVE_H,
+    overflow: 'hidden',
   },
   headerRow: {
     flexDirection: 'row',
