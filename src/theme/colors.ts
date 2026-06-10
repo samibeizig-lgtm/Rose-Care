@@ -10,6 +10,11 @@ export const Colors = {
   accent: '#EDE9FE',
   accentDark: '#5B21B6',
 
+  rose: '#F472B6',
+  roseDark: '#BE185D',
+  roseLight: '#FCE7F3',
+  pink: '#F9A8D4',
+
   mauve: '#C084FC',
   lavender: '#E9D5FF',
   lilac: '#F3E8FF',

@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
-  TouchableOpacity, Dimensions,
+  TouchableOpacity, Dimensions, Modal, TextInput, Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../../src/theme/colors';
+import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
+import { addDays, format, parse, isValid } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const { width } = Dimensions.get('window');
 
@@ -60,9 +63,62 @@ const faqs = [
   { q: 'Quels examens pour un bilan de fertilité ?', a: 'Pour la femme : bilan hormonal, échographie pelvienne, bilan thyroïdien. Pour l\'homme : spermogramme. À faire en couple dès 6–12 mois sans grossesse.' },
 ];
 
+interface FertileWindow {
+  fertileStart: Date;
+  fertileEnd: Date;
+  ovulation: Date;
+  nextPeriod: Date;
+}
+
 export default function FertiliteScreen() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState(0);
+  const [calcModalVisible, setCalcModalVisible] = useState(false);
+  const [cycleLength, setCycleLength] = useStorage(STORAGE_KEYS.CYCLE_LENGTH, '28');
+  const [lastPeriodDate, setLastPeriodDate] = useStorage(STORAGE_KEYS.LAST_PERIOD_DATE, '');
+  const [cycleLengthInput, setCycleLengthInput] = useState('28');
+  const [lastPeriodInput, setLastPeriodInput] = useState('');
+  const [result, setResult] = useState<FertileWindow | null>(null);
+
+  useEffect(() => {
+    setCycleLengthInput(cycleLength || '28');
+    setLastPeriodInput(lastPeriodDate || '');
+    if (lastPeriodDate) {
+      computeResult(lastPeriodDate, cycleLength || '28');
+    }
+  }, [cycleLength, lastPeriodDate]);
+
+  const computeResult = (periodDate: string, length: string) => {
+    try {
+      const parsed = parse(periodDate, 'dd/MM/yyyy', new Date());
+      if (!isValid(parsed)) return;
+      const len = parseInt(length, 10);
+      if (isNaN(len) || len < 21 || len > 45) return;
+      const ovulation = addDays(parsed, len - 14);
+      const fertileStart = addDays(ovulation, -5);
+      const fertileEnd = addDays(ovulation, 1);
+      const nextPeriod = addDays(parsed, len);
+      setResult({ fertileStart, fertileEnd, ovulation, nextPeriod });
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleCalculate = async () => {
+    const len = parseInt(cycleLengthInput, 10);
+    if (isNaN(len) || len < 21 || len > 45) {
+      Alert.alert('Durée invalide', 'Entrez une durée entre 21 et 45 jours.');
+      return;
+    }
+    const parsed = parse(lastPeriodInput, 'dd/MM/yyyy', new Date());
+    if (!isValid(parsed)) {
+      Alert.alert('Date invalide', 'Entrez la date au format JJ/MM/AAAA.');
+      return;
+    }
+    await setCycleLength(cycleLengthInput);
+    await setLastPeriodDate(lastPeriodInput);
+    computeResult(lastPeriodInput, cycleLengthInput);
+  };
 
   const sections = ['Cycle', 'Conseils', 'Traitements', 'FAQ'];
 
@@ -113,14 +169,35 @@ export default function FertiliteScreen() {
               </View>
             ))}
 
-            {/* Ovulation calculator teaser */}
-            <LinearGradient colors={['#4C1D95', '#6D28D9']} style={styles.calcCard}>
-              <Ionicons name="calculator-outline" size={28} color={Colors.white} style={{ marginBottom: 10 }} />
-              <Text style={styles.calcTitle}>Calculer ma fenêtre fertile</Text>
-              <Text style={styles.calcDesc}>
-                Notez le premier jour de vos règles dans l'onglet Santé pour calculer votre ovulation automatiquement.
-              </Text>
-            </LinearGradient>
+            {/* Ovulation calculator */}
+            <TouchableOpacity onPress={() => setCalcModalVisible(true)} activeOpacity={0.9}>
+              <LinearGradient colors={['#4C1D95', '#6D28D9']} style={styles.calcCard}>
+                <Ionicons name="calculator-outline" size={28} color={Colors.white} style={{ marginBottom: 10 }} />
+                <Text style={styles.calcTitle}>Calculer ma fenêtre fertile</Text>
+                {result ? (
+                  <View style={styles.calcResultPreview}>
+                    <View style={styles.calcResultRow}>
+                      <Ionicons name="sparkles-outline" size={14} color={Colors.lavender} style={{ marginRight: 6 }} />
+                      <Text style={styles.calcResultText}>
+                        Fertile : {format(result.fertileStart, 'dd/MM', { locale: fr })} → {format(result.fertileEnd, 'dd/MM', { locale: fr })}
+                      </Text>
+                    </View>
+                    <View style={styles.calcResultRow}>
+                      <Ionicons name="ellipse-outline" size={14} color={Colors.pink} style={{ marginRight: 6 }} />
+                      <Text style={styles.calcResultText}>
+                        Ovulation : {format(result.ovulation, 'dd MMMM', { locale: fr })}
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <Text style={styles.calcDesc}>Entrez vos données pour calculer votre ovulation et fenêtre fertile.</Text>
+                )}
+                <View style={styles.calcBtn}>
+                  <Text style={styles.calcBtnText}>{result ? 'Modifier les données' : 'Ouvrir le calculateur'}</Text>
+                  <Ionicons name="arrow-forward" size={14} color={Colors.primaryDeep} style={{ marginLeft: 6 }} />
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -214,6 +291,113 @@ export default function FertiliteScreen() {
 
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      {/* Calculator Modal */}
+      <Modal visible={calcModalVisible} animationType="slide" presentationStyle="pageSheet">
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setCalcModalVisible(false)} style={styles.modalClose}>
+              <Ionicons name="arrow-back" size={22} color={Colors.primary} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Calculateur fertile</Text>
+            <View style={{ width: 40 }} />
+          </View>
+
+          <ScrollView style={styles.modalBody} keyboardShouldPersistTaps="handled">
+            <View style={styles.modalSection}>
+              <Ionicons name="calendar-outline" size={40} color={Colors.primary} style={{ alignSelf: 'center', marginBottom: 12 }} />
+              <Text style={styles.modalIntro}>
+                Entrez la date de vos dernières règles et la durée moyenne de votre cycle pour calculer votre fenêtre fertile.
+              </Text>
+            </View>
+
+            <Text style={styles.inputLabel}>Date des dernières règles *</Text>
+            <View style={styles.inputRow}>
+              <Ionicons name="calendar-outline" size={18} color={Colors.textLight} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="JJ/MM/AAAA"
+                placeholderTextColor={Colors.textMuted}
+                value={lastPeriodInput}
+                onChangeText={setLastPeriodInput}
+                keyboardType="numeric"
+              />
+            </View>
+
+            <Text style={styles.inputLabel}>Durée de votre cycle (jours)</Text>
+            <View style={styles.inputRow}>
+              <Ionicons name="repeat-outline" size={18} color={Colors.textLight} style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="28"
+                placeholderTextColor={Colors.textMuted}
+                value={cycleLengthInput}
+                onChangeText={setCycleLengthInput}
+                keyboardType="number-pad"
+              />
+            </View>
+            <Text style={styles.cycleHint}>Entre 21 et 45 jours (moyenne : 28 jours)</Text>
+
+            <TouchableOpacity style={styles.calcSubmitBtn} onPress={handleCalculate}>
+              <LinearGradient colors={['#4C1D95', '#6D28D9']} style={styles.calcSubmitGrad}>
+                <Ionicons name="calculator-outline" size={18} color={Colors.white} style={{ marginRight: 8 }} />
+                <Text style={styles.calcSubmitText}>Calculer</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {result && (
+              <View style={styles.resultsCard}>
+                <LinearGradient colors={Colors.gradient.card} style={styles.resultsGrad}>
+                  <Text style={styles.resultsTitle}>Vos résultats</Text>
+
+                  <View style={styles.resultItem}>
+                    <View style={[styles.resultDot, { backgroundColor: Colors.rose }]} />
+                    <View style={styles.resultContent}>
+                      <Text style={styles.resultLabel}>Fenêtre fertile</Text>
+                      <Text style={styles.resultValue}>
+                        {format(result.fertileStart, 'dd MMMM', { locale: fr })} → {format(result.fertileEnd, 'dd MMMM yyyy', { locale: fr })}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.resultDivider} />
+
+                  <View style={styles.resultItem}>
+                    <View style={[styles.resultDot, { backgroundColor: Colors.primary }]} />
+                    <View style={styles.resultContent}>
+                      <Text style={styles.resultLabel}>Jour d'ovulation estimé</Text>
+                      <Text style={styles.resultValue}>
+                        {format(result.ovulation, 'EEEE dd MMMM yyyy', { locale: fr })}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.resultDivider} />
+
+                  <View style={styles.resultItem}>
+                    <View style={[styles.resultDot, { backgroundColor: Colors.mauve }]} />
+                    <View style={styles.resultContent}>
+                      <Text style={styles.resultLabel}>Prochaines règles prévues</Text>
+                      <Text style={styles.resultValue}>
+                        {format(result.nextPeriod, 'dd MMMM yyyy', { locale: fr })}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.resultNote}>
+                    <Ionicons name="information-circle-outline" size={15} color={Colors.textSecondary} style={{ marginRight: 6, marginTop: 1 }} />
+                    <Text style={styles.resultNoteText}>
+                      Ces dates sont des estimations basées sur un cycle régulier. Consultez un médecin pour un suivi personnalisé.
+                    </Text>
+                  </View>
+                </LinearGradient>
+              </View>
+            )}
+
+            <View style={{ height: 40 }} />
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -307,8 +491,35 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 4,
   },
-  calcTitle: { fontSize: 17, fontWeight: '600', color: Colors.white, marginBottom: 8 },
-  calcDesc: { fontSize: 13, color: 'rgba(233,213,255,0.85)', textAlign: 'center', lineHeight: 20 },
+  calcTitle: { fontSize: 17, fontWeight: '600', color: Colors.white, marginBottom: 12 },
+  calcDesc: { fontSize: 13, color: 'rgba(233,213,255,0.85)', textAlign: 'center', lineHeight: 20, marginBottom: 16 },
+  calcResultPreview: {
+    width: '100%',
+    gap: 8,
+    marginBottom: 16,
+  },
+  calcResultRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  calcResultText: {
+    fontSize: 14,
+    color: 'rgba(233,213,255,0.95)',
+    fontWeight: '500',
+  },
+  calcBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  calcBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: Colors.primaryDeep,
+  },
   tipCard: {
     flexDirection: 'row',
     backgroundColor: Colors.white,
@@ -410,5 +621,161 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
+  },
+  // Modal
+  modalContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  modalClose: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  modalBody: {
+    padding: 20,
+  },
+  modalSection: {
+    marginBottom: 24,
+  },
+  modalIntro: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    paddingHorizontal: 14,
+  },
+  inputIcon: {
+    marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: Colors.text,
+  },
+  cycleHint: {
+    fontSize: 12,
+    color: Colors.textMuted,
+    marginTop: 6,
+    marginLeft: 4,
+  },
+  calcSubmitBtn: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginTop: 24,
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  calcSubmitGrad: {
+    padding: 16,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  calcSubmitText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.white,
+  },
+  resultsCard: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginTop: 24,
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  resultsGrad: {
+    padding: 20,
+  },
+  resultsTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.primaryDark,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  resultItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 12,
+  },
+  resultDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginTop: 5,
+    marginRight: 14,
+    flexShrink: 0,
+  },
+  resultContent: { flex: 1 },
+  resultLabel: {
+    fontSize: 12,
+    color: Colors.textMuted,
+    marginBottom: 4,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  resultValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  resultDivider: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginHorizontal: 0,
+  },
+  resultNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: Colors.lilac,
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 16,
+  },
+  resultNoteText: {
+    flex: 1,
+    fontSize: 12,
+    color: Colors.textSecondary,
+    lineHeight: 18,
   },
 });

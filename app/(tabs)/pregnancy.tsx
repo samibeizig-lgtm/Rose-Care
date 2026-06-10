@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  FlatList,
+  TextInput,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,8 +15,9 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../../src/theme/colors';
 import { pregnancyWeeks } from '../../src/data/weeklyData';
-import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
-import { differenceInWeeks, parseISO } from 'date-fns';
+import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
+import { differenceInWeeks, parseISO, addDays, parse, isValid, format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const { width } = Dimensions.get('window');
 
@@ -28,7 +30,16 @@ const TRIMESTER_COLORS: Record<1 | 2 | 3, [string, string]> = {
 export default function PregnancyScreen() {
   const router = useRouter();
   const [selectedTrimester, setSelectedTrimester] = useState<1 | 2 | 3 | null>(null);
-  const [pregnancyStart] = useStorage(STORAGE_KEYS.PREGNANCY_START, '');
+  const [pregnancyStart, setPregnancyStart] = useStorage(STORAGE_KEYS.PREGNANCY_START, '');
+  const [lastPeriodDate, setLastPeriodDate] = useStorage(STORAGE_KEYS.LAST_PERIOD_DATE, '');
+  const [showDDPInput, setShowDDPInput] = useState(false);
+  const [ddpInput, setDdpInput] = useState('');
+
+  useEffect(() => {
+    if (lastPeriodDate) {
+      setDdpInput(lastPeriodDate);
+    }
+  }, [lastPeriodDate]);
 
   const currentWeek = pregnancyStart
     ? Math.min(40, Math.max(1, differenceInWeeks(new Date(), parseISO(pregnancyStart)) + 1))
@@ -38,21 +49,30 @@ export default function PregnancyScreen() {
     ? pregnancyWeeks.filter(w => w.trimester === selectedTrimester)
     : pregnancyWeeks;
 
-  const conceptionTips = [
-    { icon: '🌡️', title: 'Température basale', desc: 'Mesurez chaque matin pour détecter l\'ovulation' },
-    { icon: '💊', title: 'Acide folique', desc: '400µg/jour avant conception et 1er trimestre' },
-    { icon: '🏃‍♀️', title: 'Mode de vie sain', desc: 'Arrêtez tabac, alcool, limitez le café' },
-    { icon: '💆‍♀️', title: 'Réduire le stress', desc: 'Le cortisol perturbe l\'ovulation' },
-    { icon: '🥦', title: 'Alimentation', desc: 'Légumes verts, protéines, oméga-3' },
-    { icon: '🩺', title: 'Bilan préconceptionnel', desc: 'Consultez votre gynécologue avant' },
-  ];
+  const handleSaveDDP = async () => {
+    const parsed = parse(ddpInput, 'dd/MM/yyyy', new Date());
+    if (!isValid(parsed)) {
+      Alert.alert('Date invalide', 'Veuillez entrer la date au format JJ/MM/AAAA');
+      return;
+    }
+    const isoDate = parsed.toISOString();
+    const dueDate = addDays(parsed, 280);
+    await setPregnancyStart(isoDate);
+    await setLastPeriodDate(ddpInput);
+    await storage.set(STORAGE_KEYS.DUE_DATE, dueDate.toISOString());
+    setShowDDPInput(false);
+    Alert.alert('Enregistré', `Début de grossesse : Semaine 1\nDate prévue d'accouchement : ${format(dueDate, 'dd MMMM yyyy', { locale: fr })}`);
+  };
 
-  const fertilityInfo = [
-    { icon: 'calendar-outline' as const, title: 'Jours fertiles', desc: 'Généralement 5 jours avant et 1 jour après l\'ovulation' },
-    { icon: 'flask-outline' as const, title: 'Bilan de fertilité', desc: 'Spermogramme + bilan hormonal si difficultés après 12 mois' },
-    { icon: 'medical-outline' as const, title: 'FIV & AMP', desc: 'Techniques d\'Assistance Médicale à la Procréation disponibles' },
-    { icon: 'business-outline' as const, title: 'Clinique La Rose', desc: 'Consultez nos spécialistes en fertilité' },
-  ];
+  const dueDate = pregnancyStart
+    ? addDays(parseISO(pregnancyStart), 280)
+    : null;
+
+  const trimesterName = currentWeek <= 12
+    ? '1er Trimestre'
+    : currentWeek <= 27
+      ? '2ème Trimestre'
+      : '3ème Trimestre';
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -65,7 +85,8 @@ export default function PregnancyScreen() {
           style={styles.header}
         >
           <Text style={styles.headerTitle}>Ma Grossesse</Text>
-          <Text style={styles.headerSubtitle}>De la conception à l'accouchement</Text>
+          <Text style={styles.headerSubtitle}>Suivi semaine par semaine</Text>
+
           {currentWeek > 0 && (
             <TouchableOpacity
               style={styles.currentWeekBtn}
@@ -79,35 +100,74 @@ export default function PregnancyScreen() {
 
         <View style={styles.content}>
 
-          {/* Conception Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Conception & Fertilité</Text>
-            <Text style={styles.sectionSubtitle}>Conseils pour concevoir naturellement</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-              {conceptionTips.map((tip, idx) => (
-                <View key={idx} style={styles.tipCard}>
-                  <Text style={styles.tipIcon}>{tip.icon}</Text>
-                  <Text style={styles.tipTitle}>{tip.title}</Text>
-                  <Text style={styles.tipDesc}>{tip.desc}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
+          {/* DDP Card */}
+          <View style={styles.ddpCard}>
+            <View style={styles.ddpHeader}>
+              <View style={styles.ddpIconBox}>
+                <Ionicons name="calendar-outline" size={20} color={Colors.primary} />
+              </View>
+              <View style={styles.ddpInfo}>
+                <Text style={styles.ddpLabel}>Date des dernières règles</Text>
+                {lastPeriodDate ? (
+                  <Text style={styles.ddpValue}>{lastPeriodDate}</Text>
+                ) : (
+                  <Text style={styles.ddpEmpty}>Non renseignée</Text>
+                )}
+              </View>
+              <TouchableOpacity style={styles.ddpEditBtn} onPress={() => setShowDDPInput(!showDDPInput)}>
+                <Ionicons name={showDDPInput ? 'chevron-up' : 'create-outline'} size={18} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
 
-          {/* Fertility Help Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Traitement de l'Infertilité</Text>
-            {fertilityInfo.map((item, idx) => (
-              <View key={idx} style={styles.fertilityRow}>
-                <View style={styles.fertilityIconWrap}>
-                  <Ionicons name={item.icon} size={22} color={Colors.primary} />
+            {showDDPInput && (
+              <View style={styles.ddpForm}>
+                <Text style={styles.ddpFormLabel}>Entrez la date de vos dernières règles</Text>
+                <View style={styles.ddpInputRow}>
+                  <Ionicons name="calendar-outline" size={16} color={Colors.textLight} style={{ marginRight: 8 }} />
+                  <TextInput
+                    style={styles.ddpInput}
+                    placeholder="JJ/MM/AAAA"
+                    placeholderTextColor={Colors.textMuted}
+                    value={ddpInput}
+                    onChangeText={setDdpInput}
+                    keyboardType="numeric"
+                  />
                 </View>
-                <View style={styles.fertilityText}>
-                  <Text style={styles.fertilityTitle}>{item.title}</Text>
-                  <Text style={styles.fertilityDesc}>{item.desc}</Text>
+                <View style={styles.ddpFormHint}>
+                  <Ionicons name="information-circle-outline" size={14} color={Colors.primarySoft} style={{ marginRight: 6 }} />
+                  <Text style={styles.ddpHintText}>
+                    La date d'accouchement est calculée à 40 semaines (280 jours) à partir des dernières règles.
+                  </Text>
+                </View>
+                <TouchableOpacity style={styles.ddpSaveBtn} onPress={handleSaveDDP}>
+                  <LinearGradient colors={Colors.gradient.primary} style={styles.ddpSaveGrad}>
+                    <Ionicons name="checkmark-circle-outline" size={16} color={Colors.white} style={{ marginRight: 6 }} />
+                    <Text style={styles.ddpSaveText}>Enregistrer</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {currentWeek > 0 && dueDate && !showDDPInput && (
+              <View style={styles.ddpStats}>
+                <View style={styles.ddpStat}>
+                  <Text style={styles.ddpStatValue}>S{currentWeek}</Text>
+                  <Text style={styles.ddpStatLabel}>{trimesterName}</Text>
+                </View>
+                <View style={styles.ddpStatDivider} />
+                <View style={styles.ddpStat}>
+                  <Text style={styles.ddpStatValue}>
+                    {Math.max(0, Math.ceil((dueDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))}j
+                  </Text>
+                  <Text style={styles.ddpStatLabel}>avant le terme</Text>
+                </View>
+                <View style={styles.ddpStatDivider} />
+                <View style={styles.ddpStat}>
+                  <Text style={styles.ddpStatValue}>{format(dueDate, 'dd/MM', { locale: fr })}</Text>
+                  <Text style={styles.ddpStatLabel}>date prévue</Text>
                 </View>
               </View>
-            ))}
+            )}
           </View>
 
           {/* Trimester Filter */}
@@ -167,6 +227,8 @@ export default function PregnancyScreen() {
               );
             })}
           </View>
+
+          <View style={{ height: 24 }} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -215,91 +277,154 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
   },
-  section: {
+  ddpCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 20,
+    padding: 18,
     marginBottom: 24,
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  ddpHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ddpIconBox: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: Colors.lilac,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  ddpInfo: {
+    flex: 1,
+  },
+  ddpLabel: {
+    fontSize: 12,
+    color: Colors.textMuted,
+    marginBottom: 2,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  ddpValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  ddpEmpty: {
+    fontSize: 14,
+    color: Colors.textLight,
+    fontStyle: 'italic',
+  },
+  ddpEditBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: Colors.lilac,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ddpForm: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  ddpFormLabel: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+    marginBottom: 10,
+    fontWeight: '500',
+  },
+  ddpInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    paddingHorizontal: 14,
+    marginBottom: 10,
+  },
+  ddpInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: Colors.text,
+  },
+  ddpFormHint: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 14,
+  },
+  ddpHintText: {
+    flex: 1,
+    fontSize: 12,
+    color: Colors.textMuted,
+    lineHeight: 18,
+  },
+  ddpSaveBtn: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  ddpSaveGrad: {
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ddpSaveText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.white,
+  },
+  ddpStats: {
+    flexDirection: 'row',
+    marginTop: 14,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    justifyContent: 'space-around',
+  },
+  ddpStat: {
+    alignItems: 'center',
+  },
+  ddpStatValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: Colors.primary,
+    marginBottom: 2,
+  },
+  ddpStatLabel: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    textAlign: 'center',
+  },
+  ddpStatDivider: {
+    width: 1,
+    backgroundColor: Colors.border,
+    alignSelf: 'stretch',
   },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '600',
     color: Colors.text,
-    marginBottom: 6,
+    marginBottom: 14,
+    marginTop: 4,
     letterSpacing: 0.2,
-  },
-  sectionSubtitle: {
-    fontSize: 13,
-    color: Colors.textSecondary,
-    marginBottom: 12,
-  },
-  horizontalScroll: {
-    marginHorizontal: -4,
-  },
-  tipCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 16,
-    marginHorizontal: 6,
-    width: 140,
-    shadowColor: Colors.primaryDeep,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  tipIcon: {
-    fontSize: 28,
-    marginBottom: 8,
-  },
-  tipTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  tipDesc: {
-    fontSize: 11,
-    color: Colors.textSecondary,
-    lineHeight: 16,
-  },
-  fertilityRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: Colors.white,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    shadowColor: Colors.primaryDeep,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 1,
-  },
-  fertilityIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.lilac,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-    flexShrink: 0,
-  },
-  fertilityText: {
-    flex: 1,
-  },
-  fertilityTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text,
-    marginBottom: 2,
-  },
-  fertilityDesc: {
-    fontSize: 12,
-    color: Colors.textSecondary,
-    lineHeight: 18,
   },
   filterRow: {
     flexDirection: 'row',

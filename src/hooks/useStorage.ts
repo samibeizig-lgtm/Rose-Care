@@ -78,4 +78,6 @@ export const STORAGE_KEYS = {
   CURRENT_WEEK: 'current_week',
   BABY_NAME: 'baby_name',
   MOM_NAME: 'mom_name',
+  CYCLE_LENGTH: 'cycle_length',
+  LAST_PERIOD_DATE: 'last_period_date',
 };

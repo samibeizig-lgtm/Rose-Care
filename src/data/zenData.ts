@@ -5,7 +5,7 @@ export interface BreathingExercise {
   duration: string;
   steps: string[];
   benefit: string;
-  icon: string;
+  ionicon: string;
 }
 
 export interface Affirmation {
@@ -18,7 +18,18 @@ export interface RelaxationSound {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  ionicon: string;
+  duration: string;
+  audioUrl: string;
+}
+
+export interface YogaPose {
+  id: string;
+  name: string;
+  trimester: number[];
+  benefit: string;
+  description: string;
+  ionicon: string;
   duration: string;
 }
 
@@ -28,7 +39,7 @@ export const breathingExercises: BreathingExercise[] = [
     title: 'Cohérence Cardiaque',
     description: 'La technique la plus efficace pour réduire le stress et calmer le système nerveux.',
     duration: '5 minutes',
-    icon: '💙',
+    ionicon: 'radio-button-on-outline',
     benefit: 'Réduit le cortisol, calme l\'anxiété, prépare au sommeil',
     steps: [
       'Asseyez-vous confortablement, dos droit',
@@ -43,7 +54,7 @@ export const breathingExercises: BreathingExercise[] = [
     title: 'Technique 4-7-8',
     description: 'Technique de respiration pour l\'endormissement et la réduction du stress.',
     duration: '4 minutes',
-    icon: '💜',
+    ionicon: 'water-outline',
     benefit: 'Aide à l\'endormissement, réduit l\'anxiété, calme les contractions',
     steps: [
       'Inspirez silencieusement par le nez pendant 4 secondes',
@@ -58,7 +69,7 @@ export const breathingExercises: BreathingExercise[] = [
     title: 'Respiration de l\'Accouchement',
     description: 'La technique de respiration pendant les contractions pour gérer la douleur.',
     duration: 'Variable',
-    icon: '🌸',
+    ionicon: 'flower-outline',
     benefit: 'Gère la douleur des contractions, apporte de l\'oxygène à bébé',
     steps: [
       'Pendant la contraction, inspirez profondément',
@@ -73,7 +84,7 @@ export const breathingExercises: BreathingExercise[] = [
     title: 'Respiration Abdominale',
     description: 'Respiration profonde du diaphragme pour détendre tout le corps.',
     duration: '10 minutes',
-    icon: '🍃',
+    ionicon: 'leaf-outline',
     benefit: 'Oxygène bébé, détend le plancher pelvien, prépare aux poussées',
     steps: [
       'Allongez-vous sur le côté gauche',
@@ -88,7 +99,7 @@ export const breathingExercises: BreathingExercise[] = [
     title: 'Sophrologie Prénatale',
     description: 'Relaxation guidée avec visualisation positive de la naissance.',
     duration: '20 minutes',
-    icon: '🌺',
+    ionicon: 'sparkles-outline',
     benefit: 'Prépare mentalement à la naissance, réduit la peur, renforce la confiance',
     steps: [
       'Installez-vous confortablement',
@@ -104,7 +115,7 @@ export const breathingExercises: BreathingExercise[] = [
     title: 'Yoga Nidra Prénatal',
     description: 'Méditation de sommeil yoga pour une relaxation profonde.',
     duration: '30 minutes',
-    icon: '🌙',
+    ionicon: 'moon-outline',
     benefit: 'Sommeil profond, régénération, connexion avec bébé',
     steps: [
       'Allongez-vous sur le côté gauche',
@@ -143,68 +154,76 @@ export const relaxationSounds: RelaxationSound[] = [
     id: 'pluie',
     title: 'Pluie douce',
     description: 'Bruit apaisant de la pluie légère',
-    icon: '🌧️',
+    ionicon: 'rainy-outline',
     duration: 'Continue',
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Rain_and_thunder.ogg',
   },
   {
     id: 'mer',
     title: 'Vagues de la mer',
     description: 'Douceur des vagues sur le sable',
-    icon: '🌊',
+    ionicon: 'water-outline',
     duration: 'Continue',
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f5/Gentle_waves_on_a_beachside_-_20130904.ogg',
   },
   {
     id: 'foret',
     title: 'Forêt enchantée',
     description: 'Oiseaux et ruisseau en forêt',
-    icon: '🌿',
+    ionicon: 'leaf-outline',
     duration: 'Continue',
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Birdsong_in_L%C3%BCbecker_Stadtwald.ogg',
   },
   {
     id: 'berceuse',
     title: 'Berceuse classique',
     description: 'Berceuse douce pour bébé et maman',
-    icon: '🎵',
+    ionicon: 'musical-note-outline',
     duration: '5 min',
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/72/Brahms_Wiegenlied_Op._49_No._4.ogg',
   },
   {
     id: 'mozart',
     title: 'Mozart pour bébé',
     description: 'Stimulation cognitive par la musique classique',
-    icon: '🎼',
+    ionicon: 'musical-notes-outline',
     duration: '30 min',
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a0/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg',
   },
   {
     id: 'battements',
     title: 'Battements cardiaques',
     description: 'Doux battements de cœur rassurants',
-    icon: '💓',
+    ionicon: 'heart-circle-outline',
     duration: 'Continue',
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/93/Blausen_0452_Heart_Sounds.ogg',
   },
   {
     id: 'blanc',
     title: 'Bruit blanc',
     description: 'Son blanc pour un sommeil profond',
-    icon: '🤍',
+    ionicon: 'radio-outline',
     duration: 'Continue',
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/60/Pink_noise.ogg',
   },
   {
     id: 'vent',
     title: 'Brise douce',
     description: 'Vent léger et apaisant',
-    icon: '💨',
+    ionicon: 'cloud-outline',
     duration: 'Continue',
+    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Wind_gusty_-_shorter.ogg',
   },
 ];
 
-export const yogaPoses = [
+export const yogaPoses: YogaPose[] = [
   {
     id: 'chat_vache',
     name: 'Chat-Vache',
     trimester: [1, 2, 3],
     benefit: 'Soulage les douleurs dorsales',
     description: 'Sur les genoux, alternez arrondi et creux du dos en coordination avec la respiration.',
-    icon: '🐱',
+    ionicon: 'body-outline',
     duration: '5 min',
   },
   {
@@ -213,7 +232,7 @@ export const yogaPoses = [
     trimester: [1, 2, 3],
     benefit: 'Ouvre les hanches, prépare à l\'accouchement',
     description: 'Assise, joignez les plantes des pieds et laissez les genoux tomber vers le sol.',
-    icon: '🦋',
+    ionicon: 'flower-outline',
     duration: '5 min',
   },
   {
@@ -222,7 +241,7 @@ export const yogaPoses = [
     trimester: [1, 2],
     benefit: 'Renforce les jambes, améliore l\'équilibre',
     description: 'Position de guerrière modifiée, jambes écartées, bras levés.',
-    icon: '⚔️',
+    ionicon: 'barbell-outline',
     duration: '3 min',
   },
   {
@@ -231,7 +250,7 @@ export const yogaPoses = [
     trimester: [1, 2, 3],
     benefit: 'Relaxation profonde, soulage le dos',
     description: 'Agenouillez-vous et posez le front au sol, bras étirés devant vous.',
-    icon: '🙇',
+    ionicon: 'person-outline',
     duration: '5-10 min',
   },
   {
@@ -240,7 +259,7 @@ export const yogaPoses = [
     trimester: [1, 2],
     benefit: 'Ouvre les hanches, soulage la sciatique',
     description: 'Étirement des fléchisseurs de hanche, une jambe pliée, l\'autre étendue derrière.',
-    icon: '🕊️',
+    ionicon: 'fitness-outline',
     duration: '5 min',
   },
 ];

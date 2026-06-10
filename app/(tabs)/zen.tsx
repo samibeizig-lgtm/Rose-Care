@@ -7,14 +7,13 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
-  Modal,
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../../src/theme/colors';
+import { Audio } from 'expo-av';
 import {
   breathingExercises,
   affirmations,
@@ -22,7 +21,7 @@ import {
   yogaPoses,
 } from '../../src/data/zenData';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function ZenScreen() {
   const [activeTab, setActiveTab] = useState<'respiration' | 'sons' | 'affirmations' | 'yoga'>('respiration');
@@ -32,16 +31,71 @@ export default function ZenScreen() {
   const [affirmationIndex, setAffirmationIndex] = useState(0);
   const [soundPlaying, setSoundPlaying] = useState<string | null>(null);
   const [breathCount, setBreathCount] = useState(0);
+  const [isLoadingSound, setIsLoadingSound] = useState(false);
 
   const breathScale = useRef(new Animated.Value(1)).current;
   const breathOpacity = useRef(new Animated.Value(0.6)).current;
   const affirmFade = useRef(new Animated.Value(1)).current;
-  const ringScale = useRef(new Animated.Value(1)).current;
+  const soundRef = useRef<Audio.Sound | null>(null);
+
+  useEffect(() => {
+    Audio.setAudioModeAsync({
+      staysActiveInBackground: true,
+      playsInSilentModeIOS: true,
+    }).catch(() => {});
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync().catch(() => {});
+      }
+    };
+  }, []);
+
+  const playSound = async (soundId: string, audioUrl: string) => {
+    try {
+      setIsLoadingSound(true);
+      // Stop any existing sound
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+      setSoundPlaying(soundId);
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: audioUrl },
+        { isLooping: true, shouldPlay: true }
+      );
+      soundRef.current = sound;
+    } catch {
+      setSoundPlaying(null);
+    } finally {
+      setIsLoadingSound(false);
+    }
+  };
+
+  const stopSound = async () => {
+    try {
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+    } catch {
+      // ignore
+    }
+    setSoundPlaying(null);
+  };
+
+  const handleSoundPress = async (soundId: string, audioUrl: string) => {
+    if (soundPlaying === soundId) {
+      await stopSound();
+    } else {
+      await playSound(soundId, audioUrl);
+    }
+  };
 
   const breathAnimation = (phase: 'inspire' | 'hold' | 'expire', duration: number, nextPhase: () => void) => {
     const toScale = phase === 'inspire' ? 1.5 : phase === 'hold' ? 1.5 : 1;
     const toOpacity = phase === 'inspire' ? 1 : phase === 'hold' ? 1 : 0.6;
-
     Animated.parallel([
       Animated.timing(breathScale, { toValue: toScale, duration, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
       Animated.timing(breathOpacity, { toValue: toOpacity, duration, useNativeDriver: true }),
@@ -52,7 +106,6 @@ export default function ZenScreen() {
     setIsBreathing(true);
     setBreathCount(0);
     let count = 0;
-
     const runCycle = () => {
       if (count >= 4) {
         setIsBreathing(false);
@@ -61,7 +114,6 @@ export default function ZenScreen() {
         breathOpacity.setValue(0.6);
         return;
       }
-
       setBreathPhase('inspire');
       breathAnimation('inspire', 4000, () => {
         setBreathPhase('hold');
@@ -75,7 +127,6 @@ export default function ZenScreen() {
         });
       });
     };
-
     runCycle();
   };
 
@@ -83,7 +134,6 @@ export default function ZenScreen() {
     setIsBreathing(true);
     setBreathCount(0);
     let count = 0;
-
     const runCycle = () => {
       if (count >= 6) {
         setIsBreathing(false);
@@ -92,7 +142,6 @@ export default function ZenScreen() {
         breathOpacity.setValue(0.6);
         return;
       }
-
       setBreathPhase('inspire');
       breathAnimation('inspire', 5000, () => {
         setBreathPhase('expire');
@@ -103,7 +152,6 @@ export default function ZenScreen() {
         });
       });
     };
-
     runCycle();
   };
 
@@ -115,9 +163,7 @@ export default function ZenScreen() {
   };
 
   const changeAffirmation = () => {
-    Animated.sequence([
-      Animated.timing(affirmFade, { toValue: 0, duration: 300, useNativeDriver: true }),
-    ]).start(() => {
+    Animated.timing(affirmFade, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
       setAffirmationIndex((prev) => (prev + 1) % affirmations.length);
       Animated.timing(affirmFade, { toValue: 1, duration: 400, useNativeDriver: true }).start();
     });
@@ -142,23 +188,23 @@ export default function ZenScreen() {
   };
 
   const currentAffirmation = affirmations[affirmationIndex];
-
   const affirmationColors = {
     courage: Colors.gradient.primary as [string, string],
     amour: [Colors.primary, Colors.mauve] as [string, string],
     confiance: [Colors.primaryDeep, Colors.primaryLight] as [string, string],
     force: Colors.gradient.zen as [string, string],
   };
+  const affirmationLabels = {
+    courage: 'Courage',
+    amour: 'Amour',
+    confiance: 'Confiance',
+    force: 'Force',
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <LinearGradient
-        colors={Colors.gradient.zen}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
+      <LinearGradient colors={Colors.gradient.zen} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
         <View style={styles.headerRow}>
           <Ionicons name="leaf-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
           <View>
@@ -177,12 +223,7 @@ export default function ZenScreen() {
             onPress={() => setActiveTab(tab)}
           >
             <Ionicons
-              name={
-                tab === 'respiration' ? 'wind-outline' :
-                tab === 'sons' ? 'musical-notes-outline' :
-                tab === 'affirmations' ? 'chatbubble-outline' :
-                'body-outline'
-              }
+              name={tab === 'respiration' ? 'wind-outline' : tab === 'sons' ? 'musical-notes-outline' : tab === 'affirmations' ? 'chatbubble-outline' : 'body-outline'}
               size={18}
               color={activeTab === tab ? Colors.primary : Colors.textLight}
             />
@@ -198,8 +239,7 @@ export default function ZenScreen() {
         {/* BREATHING TAB */}
         {activeTab === 'respiration' && (
           <View style={styles.content}>
-            {/* Live Breathing Circle */}
-            {isBreathing || selectedExercise ? (
+            {(isBreathing || selectedExercise) && (
               <View style={styles.breathingCenter}>
                 <View style={styles.breathingCircleOuter}>
                   <Animated.View
@@ -213,12 +253,8 @@ export default function ZenScreen() {
                       },
                     ]}
                   >
-                    <Text style={[styles.breathPhaseText, { color: getBreathColor() }]}>
-                      {getBreathPhaseText()}
-                    </Text>
-                    {breathCount > 0 && (
-                      <Text style={styles.breathCountText}>{breathCount} cycles</Text>
-                    )}
+                    <Text style={[styles.breathPhaseText, { color: getBreathColor() }]}>{getBreathPhaseText()}</Text>
+                    {breathCount > 0 && <Text style={styles.breathCountText}>{breathCount} cycles</Text>}
                   </Animated.View>
                 </View>
                 {isBreathing && (
@@ -228,9 +264,8 @@ export default function ZenScreen() {
                   </TouchableOpacity>
                 )}
               </View>
-            ) : null}
+            )}
 
-            {/* Quick Start */}
             {!isBreathing && (
               <View style={styles.quickBreathRow}>
                 <TouchableOpacity style={styles.quickBreathCard} onPress={startCoherence}>
@@ -250,7 +285,6 @@ export default function ZenScreen() {
               </View>
             )}
 
-            {/* Exercises List */}
             {!isBreathing && breathingExercises.map((ex) => (
               <TouchableOpacity
                 key={ex.id}
@@ -258,7 +292,9 @@ export default function ZenScreen() {
                 onPress={() => setSelectedExercise(selectedExercise === ex.id ? null : ex.id)}
               >
                 <View style={styles.exerciseHeader}>
-                  <Text style={styles.exerciseIcon}>{ex.icon}</Text>
+                  <View style={styles.exerciseIconBox}>
+                    <Ionicons name={ex.ionicon as any} size={20} color={Colors.primary} />
+                  </View>
                   <View style={styles.exerciseInfo}>
                     <Text style={styles.exerciseTitle}>{ex.title}</Text>
                     <Text style={styles.exerciseDuration}>
@@ -285,10 +321,7 @@ export default function ZenScreen() {
                       </View>
                     ))}
                     {(ex.id === 'cohérence' || ex.id === '4-7-8') && (
-                      <TouchableOpacity
-                        style={styles.startExBtn}
-                        onPress={ex.id === 'cohérence' ? startCoherence : startBreathing478}
-                      >
+                      <TouchableOpacity style={styles.startExBtn} onPress={ex.id === 'cohérence' ? startCoherence : startBreathing478}>
                         <LinearGradient colors={Colors.gradient.zen} style={styles.startExBtnGrad}>
                           <Ionicons name="play-circle-outline" size={18} color={Colors.white} style={{ marginRight: 6 }} />
                           <Text style={styles.startExBtnText}>Commencer l'exercice guidé</Text>
@@ -309,16 +342,30 @@ export default function ZenScreen() {
             <Text style={styles.sectionSubtitle}>
               Choisissez un son apaisant pour vous détendre et créer un environnement serein pour votre bébé.
             </Text>
+
+            {soundPlaying && (
+              <View style={styles.nowPlayingBar}>
+                <Ionicons name="volume-high-outline" size={16} color={Colors.primary} style={{ marginRight: 8 }} />
+                <Text style={styles.nowPlayingText}>
+                  {relaxationSounds.find(s => s.id === soundPlaying)?.title ?? ''} — en cours de lecture
+                </Text>
+                <TouchableOpacity onPress={stopSound} style={styles.stopSoundBtn}>
+                  <Ionicons name="stop-circle-outline" size={22} color={Colors.error} />
+                </TouchableOpacity>
+              </View>
+            )}
+
             <View style={styles.soundsGrid}>
               {relaxationSounds.map((sound) => (
                 <TouchableOpacity
                   key={sound.id}
                   style={[styles.soundCard, soundPlaying === sound.id && styles.soundCardActive]}
-                  onPress={() => setSoundPlaying(soundPlaying === sound.id ? null : sound.id)}
+                  onPress={() => handleSoundPress(sound.id, sound.audioUrl)}
+                  disabled={isLoadingSound}
                 >
                   {soundPlaying === sound.id ? (
                     <LinearGradient colors={Colors.gradient.soft} style={styles.soundCardGrad}>
-                      <Text style={styles.soundIcon}>{sound.icon}</Text>
+                      <Ionicons name={sound.ionicon as any} size={30} color="rgba(255,255,255,0.95)" style={{ marginBottom: 8 }} />
                       <Text style={[styles.soundTitle, { color: Colors.white }]}>{sound.title}</Text>
                       <View style={styles.soundPlayingRow}>
                         <Ionicons name="volume-high-outline" size={12} color="rgba(255,255,255,0.85)" />
@@ -327,7 +374,7 @@ export default function ZenScreen() {
                     </LinearGradient>
                   ) : (
                     <View style={styles.soundCardInner}>
-                      <Text style={styles.soundIcon}>{sound.icon}</Text>
+                      <Ionicons name={sound.ionicon as any} size={30} color={Colors.primary} style={{ marginBottom: 8 }} />
                       <Text style={styles.soundTitle}>{sound.title}</Text>
                       <Text style={styles.soundDesc}>{sound.description}</Text>
                     </View>
@@ -360,11 +407,21 @@ export default function ZenScreen() {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
               >
-                <Text style={styles.affirmationCategory}>
-                  {currentAffirmation.category === 'courage' ? '⚡ Courage' :
-                   currentAffirmation.category === 'amour' ? '❤️ Amour' :
-                   currentAffirmation.category === 'confiance' ? '🌟 Confiance' : '💪 Force'}
-                </Text>
+                <View style={styles.affirmationCategoryRow}>
+                  <Ionicons
+                    name={
+                      currentAffirmation.category === 'courage' ? 'flash-outline' :
+                      currentAffirmation.category === 'amour' ? 'heart-outline' :
+                      currentAffirmation.category === 'confiance' ? 'star-outline' : 'shield-outline'
+                    }
+                    size={14}
+                    color="rgba(255,255,255,0.8)"
+                    style={{ marginRight: 6 }}
+                  />
+                  <Text style={styles.affirmationCategory}>
+                    {affirmationLabels[currentAffirmation.category]}
+                  </Text>
+                </View>
                 <Animated.Text style={[styles.affirmationText, { opacity: affirmFade }]}>
                   "{currentAffirmation.text}"
                 </Animated.Text>
@@ -375,7 +432,6 @@ export default function ZenScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* All Affirmations */}
             <Text style={styles.allAffirmTitle}>Toutes les affirmations</Text>
             {affirmations.map((aff) => (
               <TouchableOpacity
@@ -385,7 +441,6 @@ export default function ZenScreen() {
                   const idx = affirmations.indexOf(aff);
                   Animated.timing(affirmFade, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
                     setAffirmationIndex(idx);
-                    setActiveTab('affirmations');
                     Animated.timing(affirmFade, { toValue: 1, duration: 300, useNativeDriver: true }).start();
                   });
                 }}
@@ -415,7 +470,9 @@ export default function ZenScreen() {
             {yogaPoses.map((pose) => (
               <View key={pose.id} style={styles.poseCard}>
                 <View style={styles.poseHeader}>
-                  <Text style={styles.poseIcon}>{pose.icon}</Text>
+                  <View style={styles.poseIconBox}>
+                    <Ionicons name={pose.ionicon as any} size={22} color={Colors.primary} />
+                  </View>
                   <View style={styles.poseInfo}>
                     <Text style={styles.poseName}>{pose.name}</Text>
                     <Text style={styles.poseDuration}>
@@ -534,7 +591,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 16,
   },
-  // Breathing
   breathingCenter: {
     alignItems: 'center',
     paddingVertical: 24,
@@ -631,8 +687,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
-  exerciseIcon: {
-    fontSize: 28,
+  exerciseIconBox: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: Colors.lilac,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
   },
   exerciseInfo: {
@@ -723,7 +784,26 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.white,
   },
-  // Sounds
+  nowPlayingBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.lilac,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  nowPlayingText: {
+    flex: 1,
+    fontSize: 13,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  stopSoundBtn: {
+    padding: 4,
+  },
   soundsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -748,19 +828,15 @@ const styles = StyleSheet.create({
   soundCardGrad: {
     padding: 16,
     alignItems: 'center',
-    minHeight: 110,
+    minHeight: 120,
     justifyContent: 'center',
   },
   soundCardInner: {
     padding: 16,
     alignItems: 'center',
     backgroundColor: Colors.surface,
-    minHeight: 110,
+    minHeight: 120,
     justifyContent: 'center',
-  },
-  soundIcon: {
-    fontSize: 32,
-    marginBottom: 6,
   },
   soundTitle: {
     fontSize: 13,
@@ -777,7 +853,7 @@ const styles = StyleSheet.create({
   soundPlayingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 6,
   },
   soundPlaying: {
     fontSize: 12,
@@ -806,7 +882,6 @@ const styles = StyleSheet.create({
     color: Colors.text,
     lineHeight: 22,
   },
-  // Affirmations
   affirmationBig: {
     borderRadius: 24,
     overflow: 'hidden',
@@ -823,11 +898,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  affirmationCategoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   affirmationCategory: {
     fontSize: 13,
     color: 'rgba(255,255,255,0.8)',
     fontWeight: '600',
-    marginBottom: 16,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -878,7 +957,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontStyle: 'italic',
   },
-  // Yoga
   warningCard: {
     flexDirection: 'row',
     backgroundColor: Colors.warningLight,
@@ -914,8 +992,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  poseIcon: {
-    fontSize: 28,
+  poseIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: Colors.lilac,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
   },
   poseInfo: {

@@ -11,6 +11,7 @@ export default function RootLayout() {
         <StatusBar style="light" backgroundColor={Colors.primaryDark} />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
             name="pregnancy/week/[week]"

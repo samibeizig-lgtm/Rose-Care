@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
-  Platform,
   Dimensions,
   Alert,
 } from 'react-native';
@@ -18,6 +17,7 @@ import Colors from '../../src/theme/colors';
 import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { LineChart } from 'react-native-chart-kit';
 
 const { width } = Dimensions.get('window');
 
@@ -269,39 +269,88 @@ export default function HealthScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Recent Weight Chart */}
-            {weightRecords.length > 0 && (
+            {/* Weight LineChart */}
+            {weightRecords.length >= 2 && (
               <View style={styles.chartCard}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="trending-up-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
                   <Text style={styles.chartTitle}>Évolution du Poids</Text>
                 </View>
-                {weightRecords.slice(0, 5).map((r, idx) => (
-                  <View key={r.id} style={styles.recordRow}>
-                    <Text style={styles.recordDate}>{format(new Date(r.date), 'dd/MM', { locale: fr })}</Text>
-                    <View style={styles.recordBar}>
-                      <View style={[styles.recordFill, { width: `${(parseFloat(r.value) / 100) * 100}%`, backgroundColor: Colors.primary }]} />
-                    </View>
-                    <Text style={styles.recordValue}>{r.value} kg</Text>
-                  </View>
-                ))}
+                <LineChart
+                  data={{
+                    labels: weightRecords.slice(0, 7).reverse().map(r => format(new Date(r.date), 'dd/MM', { locale: fr })),
+                    datasets: [{ data: weightRecords.slice(0, 7).reverse().map(r => parseFloat(r.value) || 0) }],
+                  }}
+                  width={width - 64}
+                  height={160}
+                  chartConfig={{
+                    backgroundColor: Colors.surface,
+                    backgroundGradientFrom: Colors.surface,
+                    backgroundGradientTo: Colors.surface,
+                    decimalPlaces: 1,
+                    color: (opacity = 1) => `rgba(109, 40, 217, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(91, 33, 182, ${opacity})`,
+                    propsForDots: { r: '5', strokeWidth: '2', stroke: Colors.primary },
+                    propsForBackgroundLines: { stroke: Colors.border },
+                  }}
+                  bezier
+                  style={{ borderRadius: 12, marginVertical: 4 }}
+                  yAxisSuffix=" kg"
+                />
+              </View>
+            )}
+            {weightRecords.length === 1 && (
+              <View style={styles.chartCard}>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="trending-up-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Évolution du Poids</Text>
+                </View>
+                <View style={styles.bpRow}>
+                  <Text style={styles.recordDate}>{format(new Date(weightRecords[0].date), 'dd/MM HH:mm', { locale: fr })}</Text>
+                  <Text style={[styles.bpValue, { color: Colors.primary }]}>{weightRecords[0].value} kg</Text>
+                </View>
+                <Text style={styles.chartHint}>Ajoutez plus de mesures pour voir l'évolution</Text>
               </View>
             )}
 
-            {/* Recent BP */}
-            {bpRecords.length > 0 && (
+            {/* BP LineChart */}
+            {bpRecords.length >= 2 && (
               <View style={styles.chartCard}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="heart-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Tension Artérielle</Text>
+                  <Text style={styles.chartTitle}>Tension Artérielle (systolique)</Text>
                 </View>
-                {bpRecords.map((r) => (
+                <LineChart
+                  data={{
+                    labels: bpRecords.slice(0, 7).reverse().map(r => format(new Date(r.date), 'dd/MM', { locale: fr })),
+                    datasets: [
+                      {
+                        data: bpRecords.slice(0, 7).reverse().map(r => parseFloat(r.value) || 0),
+                        color: (opacity = 1) => `rgba(109, 40, 217, ${opacity})`,
+                        strokeWidth: 2,
+                      },
+                    ],
+                  }}
+                  width={width - 64}
+                  height={160}
+                  chartConfig={{
+                    backgroundColor: Colors.surface,
+                    backgroundGradientFrom: Colors.surface,
+                    backgroundGradientTo: Colors.surface,
+                    decimalPlaces: 0,
+                    color: (opacity = 1) => `rgba(109, 40, 217, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(91, 33, 182, ${opacity})`,
+                    propsForDots: { r: '5', strokeWidth: '2', stroke: Colors.primary },
+                    propsForBackgroundLines: { stroke: Colors.border },
+                  }}
+                  bezier
+                  style={{ borderRadius: 12, marginVertical: 4 }}
+                  yAxisSuffix=" mmHg"
+                />
+                {bpRecords.slice(0, 5).map((r) => (
                   <View key={r.id} style={styles.bpRow}>
                     <Text style={styles.recordDate}>{format(new Date(r.date), 'dd/MM HH:mm', { locale: fr })}</Text>
-                    <Text style={[
-                      styles.bpValue,
-                      parseFloat(r.value) >= 140 ? { color: Colors.error } : { color: Colors.success },
-                    ]}>
+                    <Text style={[styles.bpValue, parseFloat(r.value) >= 140 ? { color: Colors.error } : { color: Colors.success }]}>
                       {r.value}/{r.value2} mmHg
                     </Text>
                     {parseFloat(r.value) >= 140 && <Ionicons name="warning-outline" size={16} color={Colors.warning} />}
@@ -309,26 +358,74 @@ export default function HealthScreen() {
                 ))}
               </View>
             )}
+            {bpRecords.length === 1 && (
+              <View style={styles.chartCard}>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="heart-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Tension Artérielle</Text>
+                </View>
+                <View style={styles.bpRow}>
+                  <Text style={styles.recordDate}>{format(new Date(bpRecords[0].date), 'dd/MM HH:mm', { locale: fr })}</Text>
+                  <Text style={[styles.bpValue, parseFloat(bpRecords[0].value) >= 140 ? { color: Colors.error } : { color: Colors.success }]}>
+                    {bpRecords[0].value}/{bpRecords[0].value2} mmHg
+                  </Text>
+                </View>
+                <Text style={styles.chartHint}>Ajoutez plus de mesures pour voir l'évolution</Text>
+              </View>
+            )}
 
-            {/* Glucose Records */}
-            {glucoseRecords.length > 0 && (
+            {/* Glucose LineChart */}
+            {glucoseRecords.length >= 2 && (
               <View style={styles.chartCard}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="water-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
                   <Text style={styles.chartTitle}>Glycémie</Text>
                 </View>
-                {glucoseRecords.map((r) => (
+                <LineChart
+                  data={{
+                    labels: glucoseRecords.slice(0, 7).reverse().map(r => format(new Date(r.date), 'dd/MM', { locale: fr })),
+                    datasets: [{ data: glucoseRecords.slice(0, 7).reverse().map(r => parseFloat(r.value) || 0) }],
+                  }}
+                  width={width - 64}
+                  height={160}
+                  chartConfig={{
+                    backgroundColor: Colors.surface,
+                    backgroundGradientFrom: Colors.surface,
+                    backgroundGradientTo: Colors.surface,
+                    decimalPlaces: 0,
+                    color: (opacity = 1) => `rgba(109, 40, 217, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(91, 33, 182, ${opacity})`,
+                    propsForDots: { r: '5', strokeWidth: '2', stroke: Colors.primary },
+                    propsForBackgroundLines: { stroke: Colors.border },
+                  }}
+                  bezier
+                  style={{ borderRadius: 12, marginVertical: 4 }}
+                  yAxisSuffix=" mg/dL"
+                />
+                {glucoseRecords.slice(0, 5).map((r) => (
                   <View key={r.id} style={styles.bpRow}>
                     <Text style={styles.recordDate}>{format(new Date(r.date), 'dd/MM HH:mm', { locale: fr })}</Text>
-                    <Text style={[
-                      styles.bpValue,
-                      parseFloat(r.value) > 126 ? { color: Colors.error } : { color: Colors.success },
-                    ]}>
+                    <Text style={[styles.bpValue, parseFloat(r.value) > 126 ? { color: Colors.error } : { color: Colors.success }]}>
                       {r.value} mg/dL
                     </Text>
                     {parseFloat(r.value) > 126 && <Ionicons name="warning-outline" size={16} color={Colors.warning} />}
                   </View>
                 ))}
+              </View>
+            )}
+            {glucoseRecords.length === 1 && (
+              <View style={styles.chartCard}>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="water-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Glycémie</Text>
+                </View>
+                <View style={styles.bpRow}>
+                  <Text style={styles.recordDate}>{format(new Date(glucoseRecords[0].date), 'dd/MM HH:mm', { locale: fr })}</Text>
+                  <Text style={[styles.bpValue, parseFloat(glucoseRecords[0].value) > 126 ? { color: Colors.error } : { color: Colors.success }]}>
+                    {glucoseRecords[0].value} mg/dL
+                  </Text>
+                </View>
+                <Text style={styles.chartHint}>Ajoutez plus de mesures pour voir l'évolution</Text>
               </View>
             )}
 
@@ -747,6 +844,13 @@ const styles = StyleSheet.create({
     color: Colors.text,
     width: 55,
     textAlign: 'right',
+  },
+  chartHint: {
+    fontSize: 12,
+    color: Colors.textMuted,
+    textAlign: 'center',
+    paddingVertical: 8,
+    fontStyle: 'italic',
   },
   bpRow: {
     flexDirection: 'row',
