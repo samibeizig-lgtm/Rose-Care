@@ -116,7 +116,7 @@ export default function MenstrualScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={[Colors.accentDark, Colors.primary, Colors.primaryLight]}
+        colors={['#2D1B69', '#6D28D9']}
         style={styles.header}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -180,7 +180,7 @@ export default function MenstrualScreen() {
               <View style={styles.legend}>
                 <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: Colors.primary }]} /><Text style={styles.legendText}>Règles</Text></View>
                 <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: '#4CAF50' }]} /><Text style={styles.legendText}>Fertile</Text></View>
-                <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: Colors.gold }]} /><Text style={styles.legendText}>Ovulation</Text></View>
+                <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: Colors.mauve }]} /><Text style={styles.legendText}>Ovulation</Text></View>
                 <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: Colors.primaryLight, borderWidth: 1, borderColor: Colors.primary }]} /><Text style={styles.legendText}>Prévision</Text></View>
               </View>
 
@@ -224,14 +224,14 @@ export default function MenstrualScreen() {
                 <View style={styles.predictionCard}>
                   <Text style={styles.predictionTitle}>🔮 Prévisions</Text>
                   <View style={styles.predRow}><Text style={styles.predIcon}>🩸</Text><Text style={styles.predText}>Prochaines règles : <Text style={{ fontWeight: '700', color: Colors.primary }}>{format(nextPeriod, 'dd MMMM yyyy', { locale: fr })}</Text></Text></View>
-                  {ovulationDate && <View style={styles.predRow}><Text style={styles.predIcon}>🥚</Text><Text style={styles.predText}>Ovulation prévue : <Text style={{ fontWeight: '700', color: Colors.gold }}>{format(ovulationDate, 'dd MMMM yyyy', { locale: fr })}</Text></Text></View>}
+                  {ovulationDate && <View style={styles.predRow}><Text style={styles.predIcon}>🥚</Text><Text style={styles.predText}>Ovulation prévue : <Text style={{ fontWeight: '700', color: Colors.mauve }}>{format(ovulationDate, 'dd MMMM yyyy', { locale: fr })}</Text></Text></View>}
                   {fertileStart && fertileEnd && <View style={styles.predRow}><Text style={styles.predIcon}>🌱</Text><Text style={styles.predText}>Période fertile : <Text style={{ fontWeight: '700', color: Colors.success }}>{format(fertileStart, 'dd/MM', { locale: fr })} - {format(fertileEnd, 'dd/MM yyyy', { locale: fr })}</Text></Text></View>}
                 </View>
               )}
 
               {/* Add Button */}
               <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-                <LinearGradient colors={[Colors.primary, Colors.primaryDark]} style={styles.addBtnGrad}>
+                <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.addBtnGrad}>
                   <Ionicons name="add" size={20} color={Colors.white} />
                   <Text style={styles.addBtnText}>Ajouter un cycle</Text>
                 </LinearGradient>
@@ -242,7 +242,7 @@ export default function MenstrualScreen() {
           {activeTab === 'historique' && (
             <>
               <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-                <LinearGradient colors={[Colors.primary, Colors.primaryDark]} style={styles.addBtnGrad}>
+                <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.addBtnGrad}>
                   <Ionicons name="add" size={20} color={Colors.white} />
                   <Text style={styles.addBtnText}>Ajouter un cycle</Text>
                 </LinearGradient>
@@ -307,7 +307,7 @@ export default function MenstrualScreen() {
             <Text style={styles.inputLabel}>Note</Text>
             <TextInput style={[styles.input, { height: 80 }]} multiline value={newNote} onChangeText={setNewNote} placeholder="Symptômes, notes..." />
             <TouchableOpacity style={styles.saveBtn} onPress={addCycle}>
-              <LinearGradient colors={[Colors.primary, Colors.primaryDark]} style={styles.saveBtnGrad}>
+              <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.saveBtnGrad}>
                 <Text style={styles.saveBtnText}>Enregistrer</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
   dayCell: { width: '14.28%', aspectRatio: 1, justifyContent: 'center', alignItems: 'center', borderRadius: 8, marginBottom: 2 },
   dayPeriod: { backgroundColor: Colors.primary + 'CC', borderRadius: 8 },
   dayFertile: { backgroundColor: Colors.success, borderRadius: 8 },
-  dayOvulation: { backgroundColor: Colors.gold, borderRadius: 8 },
+  dayOvulation: { backgroundColor: Colors.mauve, borderRadius: 8 },
   dayPredicted: { backgroundColor: Colors.primaryLight + '80', borderRadius: 8, borderWidth: 1, borderColor: Colors.primary },
   dayToday: { borderWidth: 2, borderColor: Colors.primary },
   dayText: { fontSize: 13, color: Colors.text },

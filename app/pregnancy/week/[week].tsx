@@ -12,12 +12,12 @@ import Colors from '../../../src/theme/colors';
 import { getWeekData } from '../../../src/data/weeklyData';
 
 const SECTION_COLORS = {
-  development: [Colors.secondary, Colors.secondaryLight] as [string, string],
-  symptoms: [Colors.primary, Colors.primaryLight] as [string, string],
+  development: ['#4C1D95', '#6D28D9'] as [string, string],
+  symptoms: ['#2D1B69', '#6D28D9'] as [string, string],
   todo: [Colors.success, '#81C784'] as [string, string],
   avoid: [Colors.error, '#EF9A9A'] as [string, string],
-  nutrition: [Colors.gold, '#FFD54F'] as [string, string],
-  medical: ['#0288D1', '#4FC3F7'] as [string, string],
+  nutrition: ['#6D28D9', '#8B5CF6'] as [string, string],
+  medical: ['#2D1B69', '#4C1D95'] as [string, string],
 };
 
 export default function WeekDetailScreen() {
@@ -31,8 +31,8 @@ export default function WeekDetailScreen() {
   if (!data) return null;
 
   const trimesterColor =
-    data.trimester === 1 ? Colors.primary :
-    data.trimester === 2 ? Colors.secondary : Colors.zen;
+    data.trimester === 1 ? Colors.primaryDeep :
+    data.trimester === 2 ? Colors.primary : Colors.primarySoft;
 
   const sections = [
     {
@@ -154,7 +154,7 @@ export default function WeekDetailScreen() {
 
         {/* Nutrition */}
         <View style={styles.infoCard}>
-          <LinearGradient colors={[Colors.gold, '#FFD54F']} style={styles.infoGradient}>
+          <LinearGradient colors={['#6D28D9', '#8B5CF6']} style={styles.infoGradient}>
             <Text style={styles.infoIcon}>🥗</Text>
             <Text style={styles.infoTitle}>Nutrition cette semaine</Text>
             <Text style={styles.infoText}>{data.nutritionTip}</Text>
@@ -368,15 +368,15 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   medicalCard: {
-    backgroundColor: Colors.infoLight,
+    backgroundColor: Colors.lilac,
     padding: 16,
     borderLeftWidth: 4,
-    borderLeftColor: Colors.info,
+    borderLeftColor: Colors.primary,
   },
   medicalTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.info,
+    color: Colors.primaryDark,
     marginBottom: 6,
   },
   medicalText: {
@@ -385,12 +385,12 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   emotionCard: {
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.lilac,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: Colors.primaryLight,
+    borderColor: Colors.border,
   },
   emotionText: {
     fontSize: 15,

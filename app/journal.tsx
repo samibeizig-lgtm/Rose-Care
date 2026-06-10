@@ -87,7 +87,7 @@ export default function JournalScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={[Colors.gold, '#F5A623', Colors.primaryLight]}
+        colors={['#2D1B69', '#6D28D9']}
         style={styles.header}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -103,7 +103,7 @@ export default function JournalScreen() {
 
           {/* Add Button */}
           <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-            <LinearGradient colors={[Colors.gold, '#E8931A']} style={styles.addBtnGrad}>
+            <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.addBtnGrad}>
               <Ionicons name="pencil" size={20} color={Colors.white} />
               <Text style={styles.addBtnText}>Nouvelle entrée</Text>
             </LinearGradient>
@@ -253,8 +253,8 @@ export default function JournalScreen() {
               {viewEntry.tags.length > 0 && (
                 <View style={styles.entryTags}>
                   {viewEntry.tags.map(tag => (
-                    <View key={tag} style={[styles.entryTag, { backgroundColor: Colors.gold + '20' }]}>
-                      <Text style={[styles.entryTagText, { color: Colors.gold }]}>{tag}</Text>
+                    <View key={tag} style={[styles.entryTag, { backgroundColor: Colors.lilac }]}>
+                      <Text style={[styles.entryTagText, { color: Colors.primaryDark }]}>{tag}</Text>
                     </View>
                   ))}
                 </View>
@@ -276,14 +276,14 @@ const styles = StyleSheet.create({
   headerSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.85)', marginBottom: 10 },
   headerCount: { fontSize: 13, fontWeight: '700', color: Colors.white, backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 14, paddingVertical: 5, borderRadius: 12 },
   content: { padding: 16 },
-  addBtn: { borderRadius: 16, overflow: 'hidden', marginBottom: 20, shadowColor: Colors.gold, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
+  addBtn: { borderRadius: 16, overflow: 'hidden', marginBottom: 20, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
   addBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, gap: 8 },
   addBtnText: { fontSize: 15, fontWeight: '700', color: Colors.white },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, marginBottom: 12 },
   promptsScroll: { marginBottom: 20 },
   promptCard: { backgroundColor: Colors.surface, borderRadius: 16, padding: 16, marginRight: 10, width: 200, borderWidth: 1, borderColor: Colors.border },
   promptText: { fontSize: 14, color: Colors.text, lineHeight: 21, marginBottom: 10 },
-  promptCta: { fontSize: 13, color: Colors.gold, fontWeight: '700' },
+  promptCta: { fontSize: 13, color: Colors.primary, fontWeight: '700' },
   emptyState: { alignItems: 'center', paddingVertical: 48 },
   emptyEmoji: { fontSize: 56, marginBottom: 16 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, marginBottom: 8 },
@@ -296,24 +296,24 @@ const styles = StyleSheet.create({
   entryDate: { fontSize: 12, color: Colors.textLight, marginTop: 2 },
   entryPreview: { fontSize: 13, color: Colors.textSecondary, lineHeight: 20 },
   entryTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
-  entryTag: { backgroundColor: Colors.accent, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
+  entryTag: { backgroundColor: Colors.lilac, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
   entryTagText: { fontSize: 11, color: Colors.primaryDark, fontWeight: '600' },
   modalContainer: { flex: 1, backgroundColor: Colors.background },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: Colors.border },
   cancelText: { fontSize: 16, color: Colors.textSecondary },
   modalTitle: { fontSize: 16, fontWeight: '700', color: Colors.text, flex: 1, textAlign: 'center' },
-  saveText: { fontSize: 16, fontWeight: '700', color: Colors.gold },
+  saveText: { fontSize: 16, fontWeight: '700', color: Colors.primary },
   modalBody: { padding: 20 },
   inputLabel: { fontSize: 14, fontWeight: '600', color: Colors.textSecondary, marginBottom: 8, marginTop: 16 },
   moodRow: { marginBottom: 4 },
   moodBtn: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginRight: 8, borderWidth: 2, borderColor: Colors.border, backgroundColor: Colors.surface },
-  moodBtnSelected: { borderColor: Colors.gold, backgroundColor: Colors.goldLight },
+  moodBtnSelected: { borderColor: Colors.primary, backgroundColor: Colors.lilac },
   moodEmoji: { fontSize: 24 },
   input: { backgroundColor: Colors.surface, borderRadius: 14, padding: 14, fontSize: 15, color: Colors.text, borderWidth: 1, borderColor: Colors.border },
   contentInput: { height: 180, textAlignVertical: 'top' },
   tagsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   tagOption: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, borderWidth: 1.5, borderColor: Colors.border, backgroundColor: Colors.surface },
-  tagOptionSelected: { backgroundColor: Colors.gold, borderColor: Colors.gold },
+  tagOptionSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   tagOptionText: { fontSize: 13, fontWeight: '600', color: Colors.textSecondary },
   viewMeta: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
   viewMood: { fontSize: 40 },
