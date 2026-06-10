@@ -1,4 +1,4 @@
-name: 🤖 Build Android APK (Rose Care)
+name: Build Android APK (Rose Care)
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
     inputs:
       profile:
-        description: 'Build profile'
-        required: true
+        description: 'Build profile (preview or development)'
+        required: false
         default: 'preview'
         type: choice
         options:
@@ -19,37 +19,43 @@ on:
 
 jobs:
   build-android:
-    name: 📱 Build Android APK (EAS Cloud)
+    name: Build Android APK via EAS Cloud
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
 
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js 24
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '20'
           cache: 'npm'
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: 🔧 Install EAS CLI
+      - name: Install EAS CLI
         run: npm install -g eas-cli@latest
 
-      - name: 🏗️ Build APK via EAS Cloud (attend la fin)
+      - name: Build APK via EAS Cloud
         id: eas_build
         run: |
           PROFILE="${{ github.event.inputs.profile }}"
-          PROFILE="${PROFILE:-preview}"
+          if [ -z "$PROFILE" ]; then
+            PROFILE="preview"
+          fi
+          echo "Building with profile: $PROFILE"
+
           BUILD_JSON=$(eas build \
             --platform android \
             --profile "$PROFILE" \
             --non-interactive \
             --wait \
             --json 2>/dev/null || true)
+
+          echo "Build output: $BUILD_JSON"
 
           APK_URL=$(echo "$BUILD_JSON" | python3 -c "
 import sys, json
@@ -63,41 +69,41 @@ try:
             print(url)
             break
 except Exception as e:
-    import sys; print('parse error:', e, file=sys.stderr)
+    print('parse error:', e, file=sys.stderr)
 " 2>/dev/null || echo "")
 
           echo "APK URL: $APK_URL"
           echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
+          echo "profile=$PROFILE" >> $GITHUB_OUTPUT
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 📥 Télécharger l'APK depuis EAS
+      - name: Download APK from EAS
         run: |
           URL="${{ steps.eas_build.outputs.apk_url }}"
+          PROFILE="${{ steps.eas_build.outputs.profile }}"
           if [ -z "$URL" ]; then
-            echo "::error::APK URL is empty — check EAS build logs"
+            echo "::error::APK URL is empty — check EAS build logs above"
             exit 1
           fi
-          PROFILE="${{ github.event.inputs.profile }}"
-          PROFILE="${PROFILE:-preview}"
-          curl -L "$URL" -o rose-care-${PROFILE}.apk
+          curl -L "$URL" -o "rose-care-${PROFILE}.apk"
           ls -lh *.apk
 
-      - name: 📤 Upload APK — téléchargeable dans Actions
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rose-care-${{ github.event.inputs.profile }}-${{ github.run_number }}
+          name: rose-care-${{ steps.eas_build.outputs.profile }}-${{ github.run_number }}
           path: "*.apk"
           if-no-files-found: error
           retention-days: 30
 
-      - name: ✅ Résumé
+      - name: Summary
         run: |
-          echo "### 📱 APK généré !" >> $GITHUB_STEP_SUMMARY
+          PROFILE="${{ steps.eas_build.outputs.profile }}"
+          echo "### APK built successfully" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          PROFILE="${{ github.event.inputs.profile }}"
-          echo "- **Profil :** ${PROFILE:-preview}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit :** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **URL EAS :** ${{ steps.eas_build.outputs.apk_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Profile:** $PROFILE" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **EAS URL:** ${{ steps.eas_build.outputs.apk_url }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "⬇️ Téléchargez l'APK dans l'onglet **Artifacts** ci-dessus." >> $GITHUB_STEP_SUMMARY
+          echo "Download the APK from the **Artifacts** section above." >> $GITHUB_STEP_SUMMARY
