@@ -1,6 +1,11 @@
 name: 🤖 Build Android APK (Rose Care)
 
 on:
+  push:
+    branches:
+      - claude/pregnancy-companion-app-k8dnnh
+    paths:
+      - 'build-trigger.txt'
   workflow_dispatch:
     inputs:
       profile:
