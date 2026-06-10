@@ -42,9 +42,11 @@ jobs:
       - name: 🏗️ Build APK via EAS Cloud (attend la fin)
         id: eas_build
         run: |
+          PROFILE="${{ github.event.inputs.profile }}"
+          PROFILE="${PROFILE:-preview}"
           BUILD_JSON=$(eas build \
             --platform android \
-            --profile ${{ github.event.inputs.profile }} \
+            --profile "$PROFILE" \
             --non-interactive \
             --wait \
             --json 2>/dev/null || true)
@@ -76,7 +78,9 @@ except Exception as e:
             echo "::error::APK URL is empty — check EAS build logs"
             exit 1
           fi
-          curl -L "$URL" -o rose-care-${{ github.event.inputs.profile }}.apk
+          PROFILE="${{ github.event.inputs.profile }}"
+          PROFILE="${PROFILE:-preview}"
+          curl -L "$URL" -o rose-care-${PROFILE}.apk
           ls -lh *.apk
 
       - name: 📤 Upload APK — téléchargeable dans Actions
@@ -91,7 +95,8 @@ except Exception as e:
         run: |
           echo "### 📱 APK généré !" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Profil :** ${{ github.event.inputs.profile }}" >> $GITHUB_STEP_SUMMARY
+          PROFILE="${{ github.event.inputs.profile }}"
+          echo "- **Profil :** ${PROFILE:-preview}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit :** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **URL EAS :** ${{ steps.eas_build.outputs.apk_url }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
