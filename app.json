@@ -48,6 +48,14 @@
           "photosPermission": "Pour sauvegarder vos échographies.",
           "cameraPermission": "Pour prendre des photos."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#7F00FF",
+          "sounds": []
+        }
       ]
     ],
     "scheme": "rosecare",
