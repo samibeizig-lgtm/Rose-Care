@@ -133,7 +133,7 @@ export default function UltrasoundScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={[Colors.zen, '#CE93D8', Colors.secondaryLight]}
+        colors={['#2D1B69', '#6D28D9']}
         style={styles.header}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -150,13 +150,13 @@ export default function UltrasoundScreen() {
           {/* Add Buttons */}
           <View style={styles.addRow}>
             <TouchableOpacity style={styles.addBtn} onPress={pickImage}>
-              <LinearGradient colors={[Colors.zen, Colors.secondary]} style={styles.addBtnGrad}>
+              <LinearGradient colors={['#4C1D95', '#6D28D9']} style={styles.addBtnGrad}>
                 <Ionicons name="images" size={22} color={Colors.white} />
                 <Text style={styles.addBtnText}>Galerie</Text>
               </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity style={styles.addBtn} onPress={takePhoto}>
-              <LinearGradient colors={[Colors.primary, Colors.primaryDark]} style={styles.addBtnGrad}>
+              <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.addBtnGrad}>
                 <Ionicons name="camera" size={22} color={Colors.white} />
                 <Text style={styles.addBtnText}>Photo</Text>
               </LinearGradient>
@@ -185,7 +185,7 @@ export default function UltrasoundScreen() {
                 Ces moments sont des souvenirs précieux.
               </Text>
               <TouchableOpacity style={styles.emptyBtn} onPress={pickImage}>
-                <LinearGradient colors={[Colors.zen, Colors.secondary]} style={styles.emptyBtnGrad}>
+                <LinearGradient colors={['#4C1D95', '#6D28D9']} style={styles.emptyBtnGrad}>
                   <Text style={styles.emptyBtnText}>Ajouter la première échographie</Text>
                 </LinearGradient>
               </TouchableOpacity>
@@ -268,7 +268,7 @@ export default function UltrasoundScreen() {
             />
 
             <TouchableOpacity style={styles.saveBtn} onPress={saveUltrasound}>
-              <LinearGradient colors={[Colors.zen, Colors.secondary]} style={styles.saveBtnGrad}>
+              <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.saveBtnGrad}>
                 <Text style={styles.saveBtnText}>Sauvegarder 🌸</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -319,13 +319,13 @@ const styles = StyleSheet.create({
   headerCount: { fontSize: 14, fontWeight: '700', color: Colors.white, backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 14, paddingVertical: 5, borderRadius: 12 },
   content: { padding: 16 },
   addRow: { flexDirection: 'row', gap: 12, marginBottom: 20 },
-  addBtn: { flex: 1, borderRadius: 16, overflow: 'hidden', shadowColor: Colors.zen, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
+  addBtn: { flex: 1, borderRadius: 16, overflow: 'hidden', shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
   addBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, gap: 8 },
   addBtnText: { fontSize: 15, fontWeight: '700', color: Colors.white },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, marginBottom: 12 },
   typesScroll: { marginBottom: 20 },
   typeCard: { backgroundColor: Colors.surface, borderRadius: 14, padding: 14, marginRight: 10, width: 130, borderWidth: 1, borderColor: Colors.border },
-  typeLabel: { fontSize: 11, color: Colors.zen, fontWeight: '700', marginBottom: 4 },
+  typeLabel: { fontSize: 11, color: Colors.primary, fontWeight: '700', marginBottom: 4 },
   typeTitle: { fontSize: 13, fontWeight: '600', color: Colors.text },
   typeWeek: { fontSize: 11, color: Colors.textLight, marginTop: 2 },
   emptyState: { alignItems: 'center', paddingVertical: 48 },
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
   input: { backgroundColor: Colors.surface, borderRadius: 14, padding: 14, fontSize: 15, color: Colors.text, borderWidth: 1, borderColor: Colors.border },
   typeSelector: { flexDirection: 'row', gap: 10 },
   typeOption: { flex: 1, padding: 10, borderRadius: 12, borderWidth: 1.5, borderColor: Colors.border, alignItems: 'center', backgroundColor: Colors.surface },
-  typeOptionSelected: { backgroundColor: Colors.zen, borderColor: Colors.zen },
+  typeOptionSelected: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   typeOptionText: { fontSize: 13, fontWeight: '700', color: Colors.textSecondary },
   saveBtn: { borderRadius: 16, overflow: 'hidden', marginTop: 24, marginBottom: 40 },
   saveBtnGrad: { padding: 16, alignItems: 'center' },
