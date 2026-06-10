@@ -58,7 +58,7 @@ export default function EssentialsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={['#2D1B69', '#6D28D9']}
+        colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]}
         style={styles.header}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -276,7 +276,7 @@ export default function EssentialsScreen() {
               {chamberDecorItems.map((cat, idx) => (
                 <View key={idx} style={styles.chambreCard}>
                   <LinearGradient
-                    colors={['#4C1D95', '#6D28D9']}
+                    colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]}
                     style={styles.chambreHeader}
                   >
                     <Ionicons name={cat.icon as any} size={20} color="rgba(255,255,255,0.9)" />

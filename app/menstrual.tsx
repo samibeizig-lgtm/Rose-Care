@@ -146,7 +146,7 @@ export default function MenstrualScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.header}>
+      <LinearGradient colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]} style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={Colors.white} />
         </TouchableOpacity>
@@ -311,7 +311,7 @@ export default function MenstrualScreen() {
               )}
 
               <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-                <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.addBtnGrad}>
+                <LinearGradient colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]} style={styles.addBtnGrad}>
                   <Ionicons name="add" size={20} color={Colors.white} />
                   <Text style={styles.addBtnText}>Ajouter un cycle</Text>
                 </LinearGradient>
@@ -322,7 +322,7 @@ export default function MenstrualScreen() {
           {activeTab === 'historique' && (
             <>
               <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
-                <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.addBtnGrad}>
+                <LinearGradient colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]} style={styles.addBtnGrad}>
                   <Ionicons name="add" size={20} color={Colors.white} />
                   <Text style={styles.addBtnText}>Ajouter un cycle</Text>
                 </LinearGradient>
@@ -423,7 +423,7 @@ export default function MenstrualScreen() {
             />
 
             <TouchableOpacity style={styles.saveBtn} onPress={addCycle}>
-              <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.saveBtnGrad}>
+              <LinearGradient colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]} style={styles.saveBtnGrad}>
                 <Text style={styles.saveBtnText}>Enregistrer</Text>
               </LinearGradient>
             </TouchableOpacity>

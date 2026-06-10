@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -88,12 +89,17 @@ export default function PregnancyScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <LinearGradient
-          colors={Colors.gradient.primary}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        <ImageBackground
+          source={require('../../assets/images/pregnancy-banner.jpg')}
           style={styles.header}
+          resizeMode="cover"
         >
+          <LinearGradient
+            colors={['rgba(157,23,77,0.50)', 'rgba(219,39,119,0.75)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
           <Text style={styles.headerTitle}>Ma Grossesse</Text>
           <Text style={styles.headerSubtitle}>Suivi semaine par semaine</Text>
 
@@ -106,7 +112,7 @@ export default function PregnancyScreen() {
               <Text style={styles.currentWeekBtnText}>Ma semaine actuelle (S{currentWeek})</Text>
             </TouchableOpacity>
           )}
-        </LinearGradient>
+        </ImageBackground>
 
         <View style={styles.content}>
 

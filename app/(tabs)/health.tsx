@@ -9,6 +9,7 @@ import {
   Modal,
   Dimensions,
   Alert,
+  ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -209,12 +210,20 @@ export default function HealthScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header + Tabs */}
       <View style={styles.tabsHeader}>
-        <LinearGradient colors={Colors.gradient.primary} style={styles.headerGradient}>
+        <ImageBackground
+          source={require('../../assets/images/health-banner.jpg')}
+          style={styles.headerGradient}
+          resizeMode="cover"
+        >
+          <LinearGradient
+            colors={['rgba(131,24,67,0.65)', 'rgba(219,39,119,0.80)']}
+            style={StyleSheet.absoluteFill}
+          />
           <View style={styles.headerRow}>
-            <Ionicons name="medkit-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
+            <Ionicons name="medkit-outline" size={22} color="rgba(255,255,255,0.9)" style={{ marginRight: 10 }} />
             <Text style={styles.headerTitle}>Suivi Santé</Text>
           </View>
-        </LinearGradient>
+        </ImageBackground>
         <View style={styles.tabsRow}>
           {(['suivi', 'rdv', 'conseils'] as const).map(tab => (
             <TouchableOpacity

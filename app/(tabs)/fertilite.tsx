@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
   TouchableOpacity, Dimensions, Modal, TextInput, Alert,
+  ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -137,7 +138,15 @@ export default function FertiliteScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.header}>
+      <ImageBackground
+        source={require('../../assets/images/fertility-banner.jpg')}
+        style={styles.header}
+        resizeMode="cover"
+      >
+        <LinearGradient
+          colors={['rgba(157,23,77,0.55)', 'rgba(219,39,119,0.80)']}
+          style={StyleSheet.absoluteFill}
+        />
         <Text style={styles.headerTitle}>Fertilité</Text>
         <Text style={styles.headerSub}>Comprendre et optimiser votre fertilité</Text>
 
@@ -153,7 +162,7 @@ export default function FertiliteScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </LinearGradient>
+      </ImageBackground>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body}>
 

@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { Circle, Path, Ellipse, G, Line } from 'react-native-svg';
@@ -117,12 +116,13 @@ export default function WelcomeScreen() {
   }, []);
 
   return (
-    <LinearGradient
-      colors={['#1E1047', '#4C1D95', '#6D28D9']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
+    <ImageBackground
+      source={require('../assets/images/welcome-bg.jpg')}
       style={styles.container}
+      resizeMode="cover"
     >
+      {/* Dark overlay for text readability */}
+      <View style={styles.overlay} />
       <StatusBar style="light" />
       <MotherBabyIllustration />
 
@@ -143,7 +143,7 @@ export default function WelcomeScreen() {
           <Text style={styles.buttonText}>Commencer</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </ImageBackground>
   );
 }
 
@@ -152,6 +152,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(90, 20, 60, 0.45)',
   },
   content: {
     alignItems: 'center',
