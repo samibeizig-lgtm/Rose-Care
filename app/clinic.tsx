@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Linking,
-  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,7 +22,7 @@ export default function ClinicScreen() {
       name: 'Dr. Amira Ben Salem',
       specialty: 'Gynécologue-Obstétricienne',
       experience: '15 ans d\'expérience',
-      icon: '👩‍⚕️',
+      gender: 'female',
       specialties: ['Grossesse à risque', 'Accouchement', 'Suivi prénatal'],
       schedule: 'Lun - Mer - Ven : 9h-13h / 15h-18h',
     },
@@ -31,7 +30,7 @@ export default function ClinicScreen() {
       name: 'Dr. Karim Mansouri',
       specialty: 'Échographiste',
       experience: '12 ans d\'expérience',
-      icon: '👨‍⚕️',
+      gender: 'male',
       specialties: ['Échographie obstétricale', '3D/4D', 'Doppler'],
       schedule: 'Mar - Jeu : 8h-16h / Sam : 8h-13h',
     },
@@ -39,7 +38,7 @@ export default function ClinicScreen() {
       name: 'Dr. Salma Trabelsi',
       specialty: 'Sage-femme coordinatrice',
       experience: '10 ans d\'expérience',
-      icon: '👩‍⚕️',
+      gender: 'female',
       specialties: ['Préparation accouchement', 'Allaitement', 'Post-partum'],
       schedule: 'Tous les jours : 8h-20h',
     },
@@ -47,7 +46,7 @@ export default function ClinicScreen() {
       name: 'Dr. Nabil Hammami',
       specialty: 'Néonatalogiste',
       experience: '18 ans d\'expérience',
-      icon: '👨‍⚕️',
+      gender: 'male',
       specialties: ['Nouveau-né', 'Prématuré', 'Réanimation néonatale'],
       schedule: 'Lun - Ven : 10h-15h',
     },
@@ -57,35 +56,35 @@ export default function ClinicScreen() {
     {
       date: 'Chaque 1er samedi du mois',
       title: 'Atelier Préparation à l\'Accouchement',
-      icon: '🤱',
+      icon: 'people-outline' as const,
       desc: 'Séance collective de 3h avec sage-femme et psychologue. Respiration, sophrologie, allaitement.',
       color: Colors.primary,
     },
     {
       date: 'Mensuel',
       title: 'Journée de la Fertilité',
-      icon: '🌱',
+      icon: 'leaf-outline' as const,
       desc: 'Consultations gratuites avec nos spécialistes en fertilité. Sur inscription.',
       color: Colors.primarySoft,
     },
     {
       date: 'Trimestriel',
       title: 'Baby Shower Solidaire',
-      icon: '🎀',
+      icon: 'ribbon-outline' as const,
       desc: 'Collecte de matériel bébé pour les familles dans le besoin. Rejoignez notre communauté.',
       color: Colors.mauve,
     },
     {
       date: 'Hebdomadaire (Mercredi 10h)',
       title: 'Yoga Prénatal',
-      icon: '🧘‍♀️',
+      icon: 'body-outline' as const,
       desc: 'Séance de yoga prénatal adaptée à chaque trimestre. Professeure certifiée.',
       color: Colors.success,
     },
     {
       date: 'Mensuel (2ème vendredi)',
       title: 'Cercle de Mamans',
-      icon: '👭',
+      icon: 'heart-outline' as const,
       desc: 'Groupe de parole pour futures et nouvelles mamans. Partage d\'expériences.',
       color: Colors.primaryLight,
     },
@@ -94,53 +93,67 @@ export default function ClinicScreen() {
   const decoRooms = [
     {
       name: 'Suite Deluxe Rose',
-      icon: '🌹',
+      icon: 'flower-outline' as const,
       features: ['Chambre privée', 'Salle de bain privée', 'Canapé pour accompagnant', 'TV', 'Minibar', 'Vue jardin'],
       color: Colors.primary,
     },
     {
       name: 'Suite Parentale Zen',
-      icon: '🌿',
+      icon: 'leaf-outline' as const,
       features: ['Ambiance zen', 'Bain de naissance disponible', 'Dimmer lights', 'Musique douce', 'Baignoire', 'Vue piscine'],
       color: Colors.primaryDeep,
     },
     {
       name: 'Chambre Confort',
-      icon: '🛏️',
+      icon: 'bed-outline' as const,
       features: ['Chambre double', 'Salle de bain partagée', 'Vue jardin ou intérieur', 'TV', 'Téléphone'],
       color: Colors.primarySoft,
     },
   ];
 
   const services = [
-    { icon: '🔬', name: 'Laboratoire d\'analyses', desc: '24h/24 pour urgences' },
-    { icon: '📡', name: 'Imagerie médicale', desc: 'Écho 2D/3D/4D, Doppler' },
-    { icon: '🧘', name: 'Préparation prénatale', desc: 'Sophrologie, yoga, aquabike' },
-    { icon: '🍼', name: 'Consultations allaitement', desc: 'Soutien et conseils IBCLC' },
-    { icon: '💆‍♀️', name: 'Spa maternel', desc: 'Massage prénatal certifié' },
-    { icon: '🏊‍♀️', name: 'Aquagym prénatale', desc: 'Piscine thérapeutique' },
-    { icon: '🍽️', name: 'Nutrition prénatale', desc: 'Diététicienne spécialisée' },
-    { icon: '🧠', name: 'Soutien psychologique', desc: 'Psychologue périnatal' },
+    { icon: 'flask-outline' as const, name: 'Laboratoire d\'analyses', desc: '24h/24 pour urgences' },
+    { icon: 'radio-outline' as const, name: 'Imagerie médicale', desc: 'Écho 2D/3D/4D, Doppler' },
+    { icon: 'body-outline' as const, name: 'Préparation prénatale', desc: 'Sophrologie, yoga, aquabike' },
+    { icon: 'nutrition-outline' as const, name: 'Consultations allaitement', desc: 'Soutien et conseils IBCLC' },
+    { icon: 'heart-outline' as const, name: 'Spa maternel', desc: 'Massage prénatal certifié' },
+    { icon: 'fitness-outline' as const, name: 'Aquagym prénatale', desc: 'Piscine thérapeutique' },
+    { icon: 'restaurant-outline' as const, name: 'Nutrition prénatale', desc: 'Diététicienne spécialisée' },
+    { icon: 'bulb-outline' as const, name: 'Soutien psychologique', desc: 'Psychologue périnatal' },
   ];
+
+  const infoRows = [
+    { icon: 'location-outline' as const, text: 'Avenue de la Bourse, Les Jardins du Lac, 1053 Tunis' },
+    { icon: 'call-outline' as const, text: '71 100 900' },
+    { icon: 'mail-outline' as const, text: 'contact@clinique-larose.com' },
+    { icon: 'globe-outline' as const, text: 'www.clinique-larose.com' },
+    { icon: 'time-outline' as const, text: 'Urgences 24h/24 - 7j/7' },
+  ];
+
+  const TABS = [
+    { id: 'info', label: 'Info', icon: 'information-circle-outline' as const },
+    { id: 'doctors', label: 'Médecins', icon: 'people-outline' as const },
+    { id: 'events', label: 'Événements', icon: 'calendar-outline' as const },
+    { id: 'deco', label: 'Décor', icon: 'bed-outline' as const },
+  ] as const;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <LinearGradient
-        colors={['#2D1B69', '#6D28D9']}
-        style={styles.header}
-      >
+      <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={Colors.white} />
         </TouchableOpacity>
-        <Text style={styles.headerEmoji}>🌹</Text>
+        <View style={styles.headerIconWrap}>
+          <Ionicons name="flower-outline" size={40} color={Colors.rose} />
+        </View>
         <Text style={styles.headerTitle}>Clinique La Rose</Text>
         <Text style={styles.headerSubtitle}>Votre maternité de référence en Tunisie</Text>
         <View style={styles.contactRow}>
-          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('tel:+21671000000')}>
+          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('tel:+21671100900')}>
             <Ionicons name="call" size={18} color={Colors.white} />
             <Text style={styles.contactBtnText}>Appeler</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('https://maps.google.com')}>
+          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('https://maps.google.com/?q=Avenue+de+la+Bourse+Les+Jardins+du+Lac+Tunis')}>
             <Ionicons name="location" size={18} color={Colors.white} />
             <Text style={styles.contactBtnText}>Localiser</Text>
           </TouchableOpacity>
@@ -149,14 +162,19 @@ export default function ClinicScreen() {
 
       {/* Tabs */}
       <View style={styles.tabs}>
-        {(['info', 'doctors', 'events', 'deco'] as const).map(tab => (
+        {TABS.map(tab => (
           <TouchableOpacity
-            key={tab}
-            style={[styles.tab, activeTab === tab && styles.tabActive]}
-            onPress={() => setActiveTab(tab)}
+            key={tab.id}
+            style={[styles.tab, activeTab === tab.id && styles.tabActive]}
+            onPress={() => setActiveTab(tab.id)}
           >
-            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-              {tab === 'info' ? 'ℹ️ Info' : tab === 'doctors' ? '👩‍⚕️ Médecins' : tab === 'events' ? '📅 Événements' : '🛏️ Décor'}
+            <Ionicons
+              name={tab.icon}
+              size={15}
+              color={activeTab === tab.id ? Colors.white : Colors.textSecondary}
+            />
+            <Text style={[styles.tabText, activeTab === tab.id && styles.tabTextActive]}>
+              {tab.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -169,21 +187,31 @@ export default function ClinicScreen() {
             <>
               {/* Contact Info */}
               <View style={styles.infoCard}>
-                <Text style={styles.infoCardTitle}>📍 Coordonnées</Text>
-                <View style={styles.infoRow}><Text style={styles.infoIcon}>📍</Text><Text style={styles.infoText}>Avenue Habib Bourguiba, Tunis 1000</Text></View>
-                <View style={styles.infoRow}><Text style={styles.infoIcon}>📞</Text><Text style={styles.infoText}>+216 71 000 000</Text></View>
-                <View style={styles.infoRow}><Text style={styles.infoIcon}>📱</Text><Text style={styles.infoText}>+216 55 000 000 (Urgences)</Text></View>
-                <View style={styles.infoRow}><Text style={styles.infoIcon}>✉️</Text><Text style={styles.infoText}>contact@clinique-larose.tn</Text></View>
-                <View style={styles.infoRow}><Text style={styles.infoIcon}>🌐</Text><Text style={styles.infoText}>www.clinique-larose.tn</Text></View>
-                <View style={styles.infoRow}><Text style={styles.infoIcon}>⏰</Text><Text style={styles.infoText}>Urgences 24h/24 - 7j/7</Text></View>
+                <View style={styles.infoCardTitleRow}>
+                  <Ionicons name="location-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
+                  <Text style={styles.infoCardTitle}>Coordonnées</Text>
+                </View>
+                {infoRows.map((row, idx) => (
+                  <View key={idx} style={[styles.infoRow, idx === infoRows.length - 1 && { borderBottomWidth: 0 }]}>
+                    <View style={styles.infoIconBox}>
+                      <Ionicons name={row.icon} size={16} color={Colors.primary} />
+                    </View>
+                    <Text style={styles.infoText}>{row.text}</Text>
+                  </View>
+                ))}
               </View>
 
               {/* Services */}
-              <Text style={styles.sectionTitle}>✨ Nos Services</Text>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="sparkles-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
+                <Text style={styles.sectionTitle}>Nos Services</Text>
+              </View>
               <View style={styles.servicesGrid}>
                 {services.map((s, idx) => (
                   <View key={idx} style={styles.serviceCard}>
-                    <Text style={styles.serviceIcon}>{s.icon}</Text>
+                    <View style={styles.serviceIconBox}>
+                      <Ionicons name={s.icon} size={22} color={Colors.primary} />
+                    </View>
                     <Text style={styles.serviceName}>{s.name}</Text>
                     <Text style={styles.serviceDesc}>{s.desc}</Text>
                   </View>
@@ -193,7 +221,10 @@ export default function ClinicScreen() {
               {/* About */}
               <View style={styles.aboutCard}>
                 <LinearGradient colors={['#F3E8FF', '#EDE9FE']} style={styles.aboutGrad}>
-                  <Text style={styles.aboutTitle}>🌹 Notre Mission</Text>
+                  <View style={styles.aboutTitleRow}>
+                    <Ionicons name="flower-outline" size={20} color={Colors.primary} style={{ marginRight: 8 }} />
+                    <Text style={styles.aboutTitle}>Notre Mission</Text>
+                  </View>
                   <Text style={styles.aboutText}>
                     La Clinique La Rose est spécialisée en maternité, gynécologie et néonatologie depuis 2005. Nous accompagnons les femmes dans tous les moments de leur vie reproductive, de la conception jusqu'après l'accouchement. Notre équipe multidisciplinaire est dédiée à votre bien-être et celui de votre bébé.
                   </Text>
@@ -209,17 +240,23 @@ export default function ClinicScreen() {
 
           {activeTab === 'doctors' && (
             <>
-              <Text style={styles.sectionTitle}>👩‍⚕️ Notre Équipe Médicale</Text>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="people-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
+                <Text style={styles.sectionTitle}>Notre Équipe Médicale</Text>
+              </View>
               {doctors.map((doc, idx) => (
                 <View key={idx} style={styles.doctorCard}>
                   <View style={styles.doctorHeader}>
                     <View style={styles.doctorAvatar}>
-                      <Text style={styles.doctorAvatarText}>{doc.icon}</Text>
+                      <Ionicons name="person-circle-outline" size={36} color={Colors.primary} />
                     </View>
                     <View style={styles.doctorInfo}>
                       <Text style={styles.doctorName}>{doc.name}</Text>
                       <Text style={styles.doctorSpecialty}>{doc.specialty}</Text>
-                      <Text style={styles.doctorExp}>⭐ {doc.experience}</Text>
+                      <View style={styles.doctorExpRow}>
+                        <Ionicons name="star-outline" size={12} color={Colors.mauve} style={{ marginRight: 4 }} />
+                        <Text style={styles.doctorExp}>{doc.experience}</Text>
+                      </View>
                     </View>
                   </View>
                   <View style={styles.doctorTags}>
@@ -233,9 +270,10 @@ export default function ClinicScreen() {
                     <Ionicons name="time-outline" size={14} color={Colors.textSecondary} />
                     <Text style={styles.doctorScheduleText}>{doc.schedule}</Text>
                   </View>
-                  <TouchableOpacity style={styles.rdvBtn} onPress={() => Linking.openURL('tel:+21671000000')}>
+                  <TouchableOpacity style={styles.rdvBtn} onPress={() => Linking.openURL('tel:+21671100900')}>
                     <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.rdvBtnGrad}>
-                      <Text style={styles.rdvBtnText}>📅 Prendre rendez-vous</Text>
+                      <Ionicons name="calendar-outline" size={15} color={Colors.white} style={{ marginRight: 6 }} />
+                      <Text style={styles.rdvBtnText}>Prendre rendez-vous</Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
@@ -245,13 +283,18 @@ export default function ClinicScreen() {
 
           {activeTab === 'events' && (
             <>
-              <Text style={styles.sectionTitle}>📅 Événements & Activités</Text>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="calendar-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
+                <Text style={styles.sectionTitle}>Événements & Activités</Text>
+              </View>
               {events.map((ev, idx) => (
                 <View key={idx} style={styles.eventCard}>
                   <View style={[styles.eventAccent, { backgroundColor: ev.color }]} />
                   <View style={styles.eventContent}>
                     <View style={styles.eventHeader}>
-                      <Text style={styles.eventIcon}>{ev.icon}</Text>
+                      <View style={[styles.eventIconBox, { backgroundColor: ev.color + '20' }]}>
+                        <Ionicons name={ev.icon} size={20} color={ev.color} />
+                      </View>
                       <View style={{ flex: 1 }}>
                         <Text style={styles.eventTitle}>{ev.title}</Text>
                         <Text style={[styles.eventDate, { color: ev.color }]}>{ev.date}</Text>
@@ -269,23 +312,25 @@ export default function ClinicScreen() {
 
           {activeTab === 'deco' && (
             <>
-              <Text style={styles.sectionTitle}>🛏️ Nos Chambres & Suites</Text>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="bed-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
+                <Text style={styles.sectionTitle}>Nos Chambres & Suites</Text>
+              </View>
               <Text style={styles.decoSubtitle}>
                 Un environnement chaleureux et élégant pour vivre ce moment unique dans tout le confort.
               </Text>
               {decoRooms.map((room, idx) => (
                 <View key={idx} style={styles.roomCard}>
-                  <LinearGradient
-                    colors={[room.color, room.color + 'AA']}
-                    style={styles.roomHeader}
-                  >
-                    <Text style={styles.roomIcon}>{room.icon}</Text>
+                  <LinearGradient colors={[room.color, room.color + 'AA']} style={styles.roomHeader}>
+                    <View style={styles.roomIconBox}>
+                      <Ionicons name={room.icon} size={24} color={Colors.white} />
+                    </View>
                     <Text style={styles.roomName}>{room.name}</Text>
                   </LinearGradient>
                   <View style={styles.roomFeatures}>
                     {room.features.map((f, i) => (
                       <View key={i} style={styles.featureRow}>
-                        <Text style={styles.featureBullet}>✓</Text>
+                        <Ionicons name="checkmark-circle-outline" size={16} color={Colors.success} />
                         <Text style={styles.featureText}>{f}</Text>
                       </View>
                     ))}
@@ -293,8 +338,9 @@ export default function ClinicScreen() {
                 </View>
               ))}
               <View style={styles.decoNote}>
+                <Ionicons name="ribbon-outline" size={18} color={Colors.primary} style={{ marginBottom: 6 }} />
                 <Text style={styles.decoNoteText}>
-                  🎀 Toutes nos chambres sont décorées avec des touches de rose et d'élégance pour vous offrir un séjour mémorable.
+                  Toutes nos chambres sont décorées avec des touches de rose et d'élégance pour vous offrir un séjour mémorable.
                   Fleurs à la naissance, panier bébé offert, photos professionnelles disponibles.
                 </Text>
               </View>
@@ -311,33 +357,36 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: { padding: 24, paddingTop: 16, borderBottomLeftRadius: 28, borderBottomRightRadius: 28, alignItems: 'center' },
   backBtn: { position: 'absolute', top: 16, left: 16, padding: 8 },
-  headerEmoji: { fontSize: 48, marginBottom: 8 },
+  headerIconWrap: { marginBottom: 8 },
   headerTitle: { fontSize: 26, fontWeight: '800', color: Colors.white, marginBottom: 4 },
   headerSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.85)', marginBottom: 16, textAlign: 'center' },
   contactRow: { flexDirection: 'row', gap: 12 },
   contactBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.25)', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 20, gap: 6 },
   contactBtnText: { color: Colors.white, fontWeight: '700', fontSize: 14 },
   tabs: { flexDirection: 'row', backgroundColor: Colors.surface, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: Colors.border, gap: 6 },
-  tab: { flex: 1, paddingVertical: 8, borderRadius: 12, alignItems: 'center', backgroundColor: Colors.background },
+  tab: { flex: 1, paddingVertical: 8, borderRadius: 12, alignItems: 'center', backgroundColor: Colors.background, gap: 3 },
   tabActive: { backgroundColor: Colors.primary },
-  tabText: { fontSize: 11, fontWeight: '600', color: Colors.textSecondary },
+  tabText: { fontSize: 10, fontWeight: '600', color: Colors.textSecondary },
   tabTextActive: { color: Colors.white },
   content: { padding: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, marginBottom: 12, marginTop: 4 },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, marginTop: 4 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.text },
   decoSubtitle: { fontSize: 13, color: Colors.textSecondary, marginBottom: 16, lineHeight: 20 },
   infoCard: { backgroundColor: Colors.surface, borderRadius: 18, padding: 18, marginBottom: 20, borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
-  infoCardTitle: { fontSize: 16, fontWeight: '700', color: Colors.text, marginBottom: 12 },
-  infoRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: Colors.border, gap: 10 },
-  infoIcon: { fontSize: 16, width: 24, textAlign: 'center' },
+  infoCardTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  infoCardTitle: { fontSize: 16, fontWeight: '700', color: Colors.text },
+  infoRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: Colors.border, gap: 10 },
+  infoIconBox: { width: 30, height: 30, borderRadius: 8, backgroundColor: Colors.lilac, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
   infoText: { fontSize: 14, color: Colors.text, flex: 1 },
   servicesGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 20 },
   serviceCard: { width: '47%', backgroundColor: Colors.surface, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: Colors.border },
-  serviceIcon: { fontSize: 24, marginBottom: 6 },
+  serviceIconBox: { width: 38, height: 38, borderRadius: 10, backgroundColor: Colors.lilac, justifyContent: 'center', alignItems: 'center', marginBottom: 8 },
   serviceName: { fontSize: 13, fontWeight: '700', color: Colors.text, marginBottom: 3 },
   serviceDesc: { fontSize: 11, color: Colors.textSecondary },
   aboutCard: { borderRadius: 20, overflow: 'hidden' },
   aboutGrad: { padding: 20 },
-  aboutTitle: { fontSize: 18, fontWeight: '700', color: Colors.primaryDark, marginBottom: 10 },
+  aboutTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  aboutTitle: { fontSize: 18, fontWeight: '700', color: Colors.primaryDark },
   aboutText: { fontSize: 14, color: Colors.text, lineHeight: 22, marginBottom: 16 },
   statsRow: { flexDirection: 'row', justifyContent: 'space-around' },
   statItem: { alignItems: 'center' },
@@ -346,24 +395,24 @@ const styles = StyleSheet.create({
   doctorCard: { backgroundColor: Colors.surface, borderRadius: 18, padding: 16, marginBottom: 14, borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   doctorHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   doctorAvatar: { width: 52, height: 52, borderRadius: 26, backgroundColor: Colors.lilac, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
-  doctorAvatarText: { fontSize: 28 },
   doctorInfo: { flex: 1 },
   doctorName: { fontSize: 16, fontWeight: '700', color: Colors.text },
   doctorSpecialty: { fontSize: 13, color: Colors.primary, fontWeight: '500', marginTop: 2 },
-  doctorExp: { fontSize: 12, color: Colors.textLight, marginTop: 2 },
+  doctorExpRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
+  doctorExp: { fontSize: 12, color: Colors.textLight },
   doctorTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
   doctorTag: { backgroundColor: Colors.lilac, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
   doctorTagText: { fontSize: 11, color: Colors.primaryDark, fontWeight: '600' },
   doctorSchedule: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   doctorScheduleText: { fontSize: 12, color: Colors.textSecondary },
   rdvBtn: { borderRadius: 12, overflow: 'hidden' },
-  rdvBtnGrad: { padding: 12, alignItems: 'center' },
+  rdvBtnGrad: { padding: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
   rdvBtnText: { fontSize: 14, fontWeight: '700', color: Colors.white },
   eventCard: { flexDirection: 'row', backgroundColor: Colors.surface, borderRadius: 16, marginBottom: 12, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   eventAccent: { width: 5 },
   eventContent: { flex: 1, padding: 14 },
   eventHeader: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, gap: 10 },
-  eventIcon: { fontSize: 24 },
+  eventIconBox: { width: 38, height: 38, borderRadius: 10, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
   eventTitle: { fontSize: 15, fontWeight: '700', color: Colors.text },
   eventDate: { fontSize: 12, fontWeight: '600', marginTop: 2 },
   eventDesc: { fontSize: 13, color: Colors.textSecondary, lineHeight: 20, marginBottom: 10 },
@@ -371,12 +420,11 @@ const styles = StyleSheet.create({
   inscribeBtnText: { fontSize: 13, fontWeight: '700' },
   roomCard: { borderRadius: 18, overflow: 'hidden', marginBottom: 14, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
   roomHeader: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12 },
-  roomIcon: { fontSize: 28 },
+  roomIconBox: { width: 40, height: 40, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
   roomName: { fontSize: 17, fontWeight: '700', color: Colors.white },
   roomFeatures: { backgroundColor: Colors.surface, padding: 16 },
   featureRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 5, gap: 8 },
-  featureBullet: { fontSize: 14, color: Colors.success, fontWeight: '700' },
   featureText: { fontSize: 14, color: Colors.text },
-  decoNote: { backgroundColor: Colors.lilac, borderRadius: 16, padding: 16 },
-  decoNoteText: { fontSize: 14, color: Colors.primaryDark, lineHeight: 22 },
+  decoNote: { backgroundColor: Colors.lilac, borderRadius: 16, padding: 16, alignItems: 'center' },
+  decoNoteText: { fontSize: 14, color: Colors.primaryDark, lineHeight: 22, textAlign: 'center' },
 });

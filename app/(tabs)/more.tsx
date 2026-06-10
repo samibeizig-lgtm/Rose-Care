@@ -73,7 +73,7 @@ export default function MoreScreen() {
   const contactLinks = [
     { icon: 'alert-circle-outline' as const, label: 'SAMU Tunisie', number: '190', color: Colors.error },
     { icon: 'medical-outline' as const, label: 'Urgences médicales', number: '191', color: Colors.warning },
-    { icon: 'business-outline' as const, label: 'Clinique La Rose', number: '+216 71 000 000', color: Colors.primary },
+    { icon: 'business-outline' as const, label: 'Clinique La Rose', number: '71 100 900', color: Colors.primary },
   ];
 
   return (
@@ -126,7 +126,7 @@ export default function MoreScreen() {
             <TouchableOpacity
               key={idx}
               style={styles.contactRow}
-              onPress={() => Linking.openURL(`tel:${contact.number}`)}
+              onPress={() => Linking.openURL(`tel:${contact.number.replace(/\s/g, '')}`)}
             >
               <View style={[styles.contactIconWrap, { backgroundColor: contact.color + '14' }]}>
                 <Ionicons name={contact.icon} size={22} color={contact.color} />

@@ -9,57 +9,102 @@ import Svg, { Circle, Path, Ellipse, G, Rect, Line } from 'react-native-svg';
 const { width, height } = Dimensions.get('window');
 
 function BackgroundShapes() {
+  const cx = width / 2;
   return (
     <Svg width={width} height={height} style={StyleSheet.absoluteFill} pointerEvents="none">
-      <G opacity={0.09}>
-        {/* Sperm 1 - top left */}
-        <Circle cx={45} cy={110} r={9} fill="#fff" />
-        <Path d="M54 110 C80 95 110 70 140 55" stroke="#fff" strokeWidth={2.5} fill="none" strokeLinecap="round" />
 
-        {/* Sperm 2 - mid right */}
-        <Circle cx={width - 40} cy={220} r={7} fill="#fff" />
-        <Path d={`M${width - 47} 220 C${width - 80} 205 ${width - 110} 185 ${width - 135} 170`} stroke="#fff" strokeWidth={2} fill="none" strokeLinecap="round" />
-
-        {/* Sperm 3 - bottom left */}
-        <Circle cx={60} cy={height - 230} r={6} fill="#fff" />
-        <Path d={`M66 ${height - 230} C95 ${height - 248} 120 ${height - 260} 145 ${height - 272}`} stroke="#fff" strokeWidth={1.8} fill="none" strokeLinecap="round" />
-
-        {/* Sperm 4 - small top right */}
-        <Circle cx={width - 70} cy={90} r={5} fill="#fff" />
-        <Path d={`M${width - 65} 90 C${width - 40} 78 ${width - 20} 65 ${width - 8} 52`} stroke="#fff" strokeWidth={1.5} fill="none" strokeLinecap="round" />
-
-        {/* Ovule - right center */}
-        <Circle cx={width - 50} cy={height / 2 - 40} r={24} fill="none" stroke="#fff" strokeWidth={2} />
-        <Circle cx={width - 50} cy={height / 2 - 40} r={10} fill="#fff" opacity={0.4} />
-        <Circle cx={width - 32} cy={height / 2 - 58} r={3} fill="#fff" />
-        <Circle cx={width - 37} cy={height / 2 - 19} r={2.5} fill="#fff" />
-        <Circle cx={width - 68} cy={height / 2 - 52} r={2} fill="#fff" />
-        <Circle cx={width - 72} cy={height / 2 - 28} r={2.5} fill="#fff" />
-
-        {/* Baby silhouette - bottom right */}
-        {/* head */}
-        <Circle cx={width - 65} cy={height - 180} r={14} fill="none" stroke="#fff" strokeWidth={1.8} />
-        {/* body */}
-        <Ellipse cx={width - 65} cy={height - 148} rx={9} ry={14} fill="none" stroke="#fff" strokeWidth={1.8} />
-        {/* arm left */}
-        <Path d={`M${width - 74} ${height - 155} C${width - 85} ${height - 148} ${width - 88} ${height - 140} ${width - 84} ${height - 135}`} stroke="#fff" strokeWidth={1.5} fill="none" strokeLinecap="round" />
-        {/* arm right */}
-        <Path d={`M${width - 56} ${height - 155} C${width - 45} ${height - 148} ${width - 42} ${height - 140} ${width - 46} ${height - 135}`} stroke="#fff" strokeWidth={1.5} fill="none" strokeLinecap="round" />
-
-        {/* Thermometer - left mid-low */}
-        <Rect x={28} y={height - 280} width={10} height={48} rx={5} fill="none" stroke="#fff" strokeWidth={1.8} />
-        <Circle cx={33} cy={height - 229} r={8} fill="none" stroke="#fff" strokeWidth={1.8} />
-        <Rect x={31} y={height - 258} width={4} height={26} rx={2} fill="#fff" opacity={0.4} />
-        {/* temp lines */}
-        <Line x1={38} y1={height - 272} x2={44} y2={height - 272} stroke="#fff" strokeWidth={1.5} />
-        <Line x1={38} y1={height - 263} x2={44} y2={height - 263} stroke="#fff" strokeWidth={1.5} />
-        <Line x1={38} y1={height - 253} x2={44} y2={height - 253} stroke="#fff" strokeWidth={1.5} />
-
-        {/* Baby sock - top center */}
-        <Path d={`M${width / 2 - 18} 55 L${width / 2 - 18} 80 Q${width / 2 - 18} 90 ${width / 2 - 8} 90 L${width / 2 + 14} 90 Q${width / 2 + 22} 90 ${width / 2 + 22} 82 Q${width / 2 + 22} 75 ${width / 2 + 14} 74 L${width / 2 - 8} 74 L${width / 2 - 8} 55 Z`} fill="none" stroke="#fff" strokeWidth={1.8} strokeLinejoin="round" />
-        {/* sock cuff */}
-        <Line x1={width / 2 - 18} y1={62} x2={width / 2 - 8} y2={62} stroke="#fff" strokeWidth={1.5} />
+      {/* ── ROSE FLOWER  (top-right) ── */}
+      <G opacity={0.22} transform={`translate(${width - 72}, 90)`}>
+        {/* petals */}
+        {[0, 60, 120, 180, 240, 300].map((deg, i) => {
+          const r = deg * (Math.PI / 180);
+          const px = Math.cos(r) * 28;
+          const py = Math.sin(r) * 28;
+          return (
+            <Ellipse key={i} cx={px} cy={py} rx={14} ry={9}
+              fill="none" stroke="#fff" strokeWidth={1.8}
+              transform={`rotate(${deg}, ${px}, ${py})`} />
+          );
+        })}
+        {/* centre */}
+        <Circle cx={0} cy={0} r={9} fill="none" stroke="#fff" strokeWidth={2} />
+        <Circle cx={0} cy={0} r={4} fill="#fff" opacity={0.5} />
+        {/* stem */}
+        <Path d="M0 9 C-3 22 -4 34 -2 46" stroke="#fff" strokeWidth={1.8} fill="none" strokeLinecap="round" />
+        {/* leaf */}
+        <Path d="M-2 34 C-12 28 -16 20 -10 14 C-6 22 -2 30 -2 34 Z" fill="#fff" opacity={0.6} />
       </G>
+
+      {/* ── PREGNANT WOMAN SILHOUETTE (left side) ── */}
+      <G opacity={0.17} transform={`translate(32, ${height * 0.32})`}>
+        {/* head */}
+        <Circle cx={16} cy={0} r={16} fill="none" stroke="#fff" strokeWidth={2} />
+        {/* neck */}
+        <Line x1={14} y1={16} x2={12} y2={26} stroke="#fff" strokeWidth={2} strokeLinecap="round" />
+        <Line x1={18} y1={16} x2={20} y2={26} stroke="#fff" strokeWidth={2} strokeLinecap="round" />
+        {/* body left */}
+        <Path d="M10 28 C5 40 2 58 2 72 C2 88 6 102 10 110" stroke="#fff" strokeWidth={2} fill="none" strokeLinecap="round" />
+        {/* belly bump */}
+        <Path d="M22 30 C34 36 40 52 38 68 C36 82 28 94 20 102" stroke="#fff" strokeWidth={2.5} fill="none" strokeLinecap="round" />
+        {/* arm */}
+        <Path d="M22 34 C30 42 34 54 30 66" stroke="#fff" strokeWidth={1.8} fill="none" strokeLinecap="round" opacity={0.7} />
+        {/* legs */}
+        <Path d="M10 110 C8 122 7 134 8 146" stroke="#fff" strokeWidth={2} fill="none" strokeLinecap="round" />
+        <Path d="M20 106 C22 120 22 132 20 144" stroke="#fff" strokeWidth={2} fill="none" strokeLinecap="round" />
+      </G>
+
+      {/* ── BABY FOOTPRINT (bottom-left) ── */}
+      <G opacity={0.20} transform={`translate(28, ${height - 175})`}>
+        {/* sole */}
+        <Ellipse cx={20} cy={28} rx={18} ry={24} fill="none" stroke="#fff" strokeWidth={2} />
+        {/* toes */}
+        <Circle cx={5}  cy={5}  r={6} fill="none" stroke="#fff" strokeWidth={1.8} />
+        <Circle cx={14} cy={1}  r={5.5} fill="none" stroke="#fff" strokeWidth={1.8} />
+        <Circle cx={23} cy={0}  r={5} fill="none" stroke="#fff" strokeWidth={1.8} />
+        <Circle cx={31} cy={3}  r={4.5} fill="none" stroke="#fff" strokeWidth={1.8} />
+        <Circle cx={37} cy={8}  r={4} fill="none" stroke="#fff" strokeWidth={1.8} />
+      </G>
+
+      {/* ── BABY BOTTLE (top-left) ── */}
+      <G opacity={0.19} transform={`translate(30, 60)`}>
+        {/* nipple */}
+        <Path d="M15 0 C14 -10 18 -14 20 -14 C22 -14 26 -10 25 0" stroke="#fff" strokeWidth={1.8} fill="none" strokeLinecap="round" />
+        {/* collar ring */}
+        <Rect x={12} y={0} width={16} height={7} rx={3} fill="none" stroke="#fff" strokeWidth={1.8} />
+        {/* bottle body */}
+        <Path d="M12 7 L10 18 L10 62 Q10 72 20 72 Q30 72 30 62 L30 18 L28 7 Z" fill="none" stroke="#fff" strokeWidth={1.8} strokeLinejoin="round" />
+        {/* milk fill */}
+        <Rect x={11} y={36} width={18} height={26} rx={0} fill="#fff" opacity={0.12} />
+        <Line x1={11} y1={36} x2={29} y2={36} stroke="#fff" strokeWidth={1.5} />
+        {/* scale marks */}
+        <Line x1={10} y1={26} x2={14} y2={26} stroke="#fff" strokeWidth={1.2} />
+        <Line x1={10} y1={46} x2={14} y2={46} stroke="#fff" strokeWidth={1.2} />
+        <Line x1={10} y1={56} x2={14} y2={56} stroke="#fff" strokeWidth={1.2} />
+      </G>
+
+      {/* ── HEART  (bottom-right) ── */}
+      <G opacity={0.20} transform={`translate(${width - 68}, ${height - 130})`}>
+        <Path d="M0 38 C-3 34 -26 18 -26 4 C-26 -10 -14 -18 0 -6 C14 -18 26 -10 26 4 C26 18 3 34 0 38 Z" fill="none" stroke="#fff" strokeWidth={2.2} />
+        {/* sparkles around heart */}
+        <Line x1={22} y1={-18} x2={22} y2={-10} stroke="#fff" strokeWidth={1.5} />
+        <Line x1={18} y1={-14} x2={26} y2={-14} stroke="#fff" strokeWidth={1.5} />
+        <Line x1={-18} y1={-22} x2={-18} y2={-16} stroke="#fff" strokeWidth={1.5} />
+        <Line x1={-22} y1={-19} x2={-14} y2={-19} stroke="#fff" strokeWidth={1.5} />
+        <Circle cx={28} cy={28} r={2.5} fill="#fff" />
+        <Circle cx={-24} cy={22} r={2} fill="#fff" />
+      </G>
+
+      {/* ── Scattered dots / stars ── */}
+      <G opacity={0.25}>
+        <Circle cx={cx - 80} cy={70}  r={2.5} fill="#fff" />
+        <Circle cx={cx + 60} cy={55}  r={2}   fill="#fff" />
+        <Circle cx={cx + 90} cy={height * 0.4} r={2.5} fill="#fff" />
+        <Circle cx={cx - 60} cy={height * 0.72} r={2} fill="#fff" />
+        <Circle cx={cx + 20} cy={height - 200} r={3} fill="#fff" />
+        {/* 4-pointed star */}
+        <Path d={`M${cx+40} 100 L${cx+43} 108 L${cx+51} 108 L${cx+44} 113 L${cx+47} 121 L${cx+40} 116 L${cx+33} 121 L${cx+36} 113 L${cx+29} 108 L${cx+37} 108 Z`} fill="#fff" opacity={0.4} />
+      </G>
+
     </Svg>
   );
 }

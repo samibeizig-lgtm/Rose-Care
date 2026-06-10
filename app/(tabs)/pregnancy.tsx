@@ -5,7 +5,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   Dimensions,
   Alert,
 } from 'react-native';
@@ -18,6 +17,7 @@ import { pregnancyWeeks } from '../../src/data/weeklyData';
 import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { differenceInWeeks, parseISO, addDays, parse, isValid, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import DatePickerModal from '../../src/components/DatePickerModal';
 
 const { width } = Dimensions.get('window');
 
@@ -34,10 +34,16 @@ export default function PregnancyScreen() {
   const [lastPeriodDate, setLastPeriodDate] = useStorage(STORAGE_KEYS.LAST_PERIOD_DATE, '');
   const [showDDPInput, setShowDDPInput] = useState(false);
   const [ddpInput, setDdpInput] = useState('');
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (lastPeriodDate) {
       setDdpInput(lastPeriodDate);
+      try {
+        const parsed = parse(lastPeriodDate, 'dd/MM/yyyy', new Date());
+        if (isValid(parsed)) setSelectedDate(parsed);
+      } catch {}
     }
   }, [lastPeriodDate]);
 
@@ -49,14 +55,18 @@ export default function PregnancyScreen() {
     ? pregnancyWeeks.filter(w => w.trimester === selectedTrimester)
     : pregnancyWeeks;
 
+  const handleDateSelected = (date: Date) => {
+    setSelectedDate(date);
+    setDdpInput(format(date, 'dd/MM/yyyy'));
+  };
+
   const handleSaveDDP = async () => {
-    const parsed = parse(ddpInput, 'dd/MM/yyyy', new Date());
-    if (!isValid(parsed)) {
-      Alert.alert('Date invalide', 'Veuillez entrer la date au format JJ/MM/AAAA');
+    if (!selectedDate) {
+      Alert.alert('Date manquante', 'Veuillez sélectionner la date de vos dernières règles');
       return;
     }
-    const isoDate = parsed.toISOString();
-    const dueDate = addDays(parsed, 280);
+    const isoDate = selectedDate.toISOString();
+    const dueDate = addDays(selectedDate, 280);
     await setPregnancyStart(isoDate);
     await setLastPeriodDate(ddpInput);
     await storage.set(STORAGE_KEYS.DUE_DATE, dueDate.toISOString());
@@ -121,18 +131,22 @@ export default function PregnancyScreen() {
 
             {showDDPInput && (
               <View style={styles.ddpForm}>
-                <Text style={styles.ddpFormLabel}>Entrez la date de vos dernières règles</Text>
-                <View style={styles.ddpInputRow}>
-                  <Ionicons name="calendar-outline" size={16} color={Colors.textLight} style={{ marginRight: 8 }} />
-                  <TextInput
-                    style={styles.ddpInput}
-                    placeholder="JJ/MM/AAAA"
-                    placeholderTextColor={Colors.textMuted}
-                    value={ddpInput}
-                    onChangeText={setDdpInput}
-                    keyboardType="numeric"
-                  />
-                </View>
+                <Text style={styles.ddpFormLabel}>Sélectionnez la date de vos dernières règles</Text>
+                <TouchableOpacity style={styles.ddpInputRow} onPress={() => setDatePickerVisible(true)}>
+                  <Ionicons name="calendar-outline" size={16} color={Colors.primary} style={{ marginRight: 8 }} />
+                  <Text style={[styles.ddpInput, !selectedDate && { color: Colors.textMuted }]}>
+                    {selectedDate ? format(selectedDate, 'dd MMMM yyyy', { locale: fr }) : 'Sélectionner une date'}
+                  </Text>
+                  <Ionicons name="chevron-down-outline" size={14} color={Colors.textLight} />
+                </TouchableOpacity>
+                <DatePickerModal
+                  visible={datePickerVisible}
+                  onClose={() => setDatePickerVisible(false)}
+                  onSelect={handleDateSelected}
+                  selectedDate={selectedDate}
+                  title="Date des dernières règles"
+                  maxDate={new Date()}
+                />
                 <View style={styles.ddpFormHint}>
                   <Ionicons name="information-circle-outline" size={14} color={Colors.primarySoft} style={{ marginRight: 6 }} />
                   <Text style={styles.ddpHintText}>
@@ -357,8 +371,9 @@ const styles = StyleSheet.create({
   ddpInput: {
     flex: 1,
     paddingVertical: 12,
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.text,
+    fontWeight: '500',
   },
   ddpFormHint: {
     flexDirection: 'row',

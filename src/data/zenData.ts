@@ -20,7 +20,7 @@ export interface RelaxationSound {
   description: string;
   ionicon: string;
   duration: string;
-  audioUrl: string;
+  audioUrl: any;
 }
 
 export interface YogaPose {
@@ -156,7 +156,7 @@ export const relaxationSounds: RelaxationSound[] = [
     description: 'Bruit apaisant de la pluie légère',
     ionicon: 'rainy-outline',
     duration: 'Continue',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Rain_and_thunder.ogg',
+    audioUrl: require('../../assets/sounds/rain.wav'),
   },
   {
     id: 'mer',
@@ -164,7 +164,7 @@ export const relaxationSounds: RelaxationSound[] = [
     description: 'Douceur des vagues sur le sable',
     ionicon: 'water-outline',
     duration: 'Continue',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f5/Gentle_waves_on_a_beachside_-_20130904.ogg',
+    audioUrl: require('../../assets/sounds/mer.wav'),
   },
   {
     id: 'foret',
@@ -172,7 +172,7 @@ export const relaxationSounds: RelaxationSound[] = [
     description: 'Oiseaux et ruisseau en forêt',
     ionicon: 'leaf-outline',
     duration: 'Continue',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a7/Birdsong_in_L%C3%BCbecker_Stadtwald.ogg',
+    audioUrl: require('../../assets/sounds/foret.wav'),
   },
   {
     id: 'berceuse',
@@ -180,7 +180,7 @@ export const relaxationSounds: RelaxationSound[] = [
     description: 'Berceuse douce pour bébé et maman',
     ionicon: 'musical-note-outline',
     duration: '5 min',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/72/Brahms_Wiegenlied_Op._49_No._4.ogg',
+    audioUrl: require('../../assets/sounds/berceuse.wav'),
   },
   {
     id: 'mozart',
@@ -188,7 +188,7 @@ export const relaxationSounds: RelaxationSound[] = [
     description: 'Stimulation cognitive par la musique classique',
     ionicon: 'musical-notes-outline',
     duration: '30 min',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a0/Mozart_-_Eine_kleine_Nachtmusik_-_1._Allegro.ogg',
+    audioUrl: require('../../assets/sounds/mozart.wav'),
   },
   {
     id: 'battements',
@@ -196,7 +196,7 @@ export const relaxationSounds: RelaxationSound[] = [
     description: 'Doux battements de cœur rassurants',
     ionicon: 'heart-circle-outline',
     duration: 'Continue',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/93/Blausen_0452_Heart_Sounds.ogg',
+    audioUrl: require('../../assets/sounds/battements.wav'),
   },
   {
     id: 'blanc',
@@ -204,7 +204,7 @@ export const relaxationSounds: RelaxationSound[] = [
     description: 'Son blanc pour un sommeil profond',
     ionicon: 'radio-outline',
     duration: 'Continue',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/60/Pink_noise.ogg',
+    audioUrl: require('../../assets/sounds/blanc.wav'),
   },
   {
     id: 'vent',
@@ -212,7 +212,7 @@ export const relaxationSounds: RelaxationSound[] = [
     description: 'Vent léger et apaisant',
     ionicon: 'cloud-outline',
     duration: 'Continue',
-    audioUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/Wind_gusty_-_shorter.ogg',
+    audioUrl: require('../../assets/sounds/vent.wav'),
   },
 ];
 

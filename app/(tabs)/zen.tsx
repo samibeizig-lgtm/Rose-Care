@@ -50,10 +50,9 @@ export default function ZenScreen() {
     };
   }, []);
 
-  const playSound = async (soundId: string, audioUrl: string) => {
+  const playSound = async (soundId: string, audioUrl: any) => {
     try {
       setIsLoadingSound(true);
-      // Stop any existing sound
       if (soundRef.current) {
         await soundRef.current.stopAsync();
         await soundRef.current.unloadAsync();
@@ -61,7 +60,7 @@ export default function ZenScreen() {
       }
       setSoundPlaying(soundId);
       const { sound } = await Audio.Sound.createAsync(
-        { uri: audioUrl },
+        audioUrl,
         { isLooping: true, shouldPlay: true }
       );
       soundRef.current = sound;

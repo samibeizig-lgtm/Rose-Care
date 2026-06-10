@@ -20,19 +20,21 @@ export default function CNAMScreen() {
   const cnaminSections = [
     {
       id: 'declaration',
-      title: '📋 Déclaration de Grossesse',
+      icon: 'document-text-outline' as const,
+      title: 'Déclaration de Grossesse',
       color: Colors.primary,
       content: [
         { type: 'step', text: 'Chez votre médecin : demandez le formulaire de déclaration de grossesse' },
         { type: 'step', text: 'Le médecin remplit le certificat médical et la déclaration' },
         { type: 'step', text: 'Déposez les documents à votre caisse CNAM locale' },
         { type: 'step', text: 'Délai : dans les 3 premiers mois de grossesse' },
-        { type: 'info', text: '✅ Après déclaration, vous bénéficiez de la prise en charge à 100% pour les soins de maternité.' },
+        { type: 'info', text: 'Après déclaration, vous bénéficiez de la prise en charge à 100% pour les soins de maternité.' },
       ],
     },
     {
       id: 'prise_en_charge',
-      title: '💊 Prise en Charge des Soins',
+      icon: 'medical-outline' as const,
+      title: 'Prise en Charge des Soins',
       color: Colors.primarySoft,
       content: [
         { type: 'subtitle', text: 'Consultations prises en charge :' },
@@ -45,12 +47,13 @@ export default function CNAMScreen() {
         { type: 'item', text: 'Carte CNAM valide' },
         { type: 'item', text: 'Ordonnance du médecin' },
         { type: 'item', text: 'Carnet de santé maternité' },
-        { type: 'info', text: '⚠️ Certains soins nécessitent une entente préalable. Vérifiez toujours avant.' },
+        { type: 'info', text: 'Certains soins nécessitent une entente préalable. Vérifiez toujours avant.' },
       ],
     },
     {
       id: 'conge_maternite',
-      title: '🏖️ Congé Maternité en Tunisie',
+      icon: 'calendar-outline' as const,
+      title: 'Congé Maternité en Tunisie',
       color: Colors.success,
       content: [
         { type: 'subtitle', text: 'Durée légale :' },
@@ -63,12 +66,13 @@ export default function CNAMScreen() {
         { type: 'step', text: 'Remettez-le à votre employeur au moins 1 mois avant le début du congé' },
         { type: 'step', text: 'Votre employeur déclare à la CNAM pour les indemnités' },
         { type: 'step', text: 'Après accouchement : envoyez l\'extrait de naissance à la CNAM' },
-        { type: 'info', text: '💡 Vous pouvez prendre jusqu\'à 2 ans de congé parental non payé selon la loi tunisienne.' },
+        { type: 'info', text: 'Vous pouvez prendre jusqu\'à 2 ans de congé parental non payé selon la loi tunisienne.' },
       ],
     },
     {
       id: 'allocations',
-      title: '💰 Allocations et Aides',
+      icon: 'cash-outline' as const,
+      title: 'Allocations et Aides',
       color: Colors.primaryLight,
       content: [
         { type: 'subtitle', text: 'Allocations familiales (CNSS) :' },
@@ -78,12 +82,13 @@ export default function CNAMScreen() {
         { type: 'subtitle', text: 'Conditions :' },
         { type: 'item', text: 'Être affiliée à la CNSS (secteur privé) ou CNRPS (public)' },
         { type: 'item', text: 'Enfant à charge jusqu\'à 25 ans si étudiant' },
-        { type: 'info', text: '📍 Contactez votre caisse régionale CNSS pour les détails selon votre situation.' },
+        { type: 'info', text: 'Contactez votre caisse régionale CNSS pour les détails selon votre situation.' },
       ],
     },
     {
       id: 'hospitalisation',
-      title: '🏥 Hospitalisation pour Accouchement',
+      icon: 'business-outline' as const,
+      title: 'Hospitalisation pour Accouchement',
       color: Colors.primaryDeep,
       content: [
         { type: 'subtitle', text: 'Ce que couvre la CNAM :' },
@@ -97,46 +102,46 @@ export default function CNAMScreen() {
         { type: 'step', text: 'Toutes les analyses et échographies' },
         { type: 'step', text: 'Résultat du groupe sanguin' },
         { type: 'step', text: 'Bilan prénatal complet' },
-        { type: 'info', text: '🌹 La Clinique La Rose est conventionnée CNAM. Votre accouchement est pris en charge.' },
+        { type: 'info', text: 'La Clinique La Rose est conventionnée CNAM. Votre accouchement est pris en charge.' },
       ],
     },
     {
       id: 'contacts_cnam',
-      title: '📞 Contacts CNAM',
+      icon: 'call-outline' as const,
+      title: 'Contacts CNAM',
       color: Colors.mauve,
       content: [
-        { type: 'item', text: '📞 Siège CNAM : 71 100 100' },
-        { type: 'item', text: '📱 Numéro vert : 80 100 100 (Gratuit)' },
-        { type: 'item', text: '🌐 Site web : www.cnam.nat.tn' },
-        { type: 'item', text: '📍 Agence Tunis : Route de La Marsa, Tunis' },
-        { type: 'item', text: '⏰ Horaires : Lun-Ven 8h30-16h30' },
-        { type: 'info', text: '💡 Présentez-vous avec tous vos documents et votre CIN.' },
+        { type: 'item', text: 'Siège CNAM : 71 100 100' },
+        { type: 'item', text: 'Numéro vert : 80 100 100 (Gratuit)' },
+        { type: 'item', text: 'Site web : www.cnam.nat.tn' },
+        { type: 'item', text: 'Agence Tunis : Route de La Marsa, Tunis' },
+        { type: 'item', text: 'Horaires : Lun-Ven 8h30-16h30' },
+        { type: 'info', text: 'Présentez-vous avec tous vos documents et votre CIN.' },
       ],
     },
   ];
 
   const checklist = [
-    { done: false, text: 'Déclaration de grossesse chez le médecin' },
-    { done: false, text: 'Dépôt de la déclaration à la CNAM' },
-    { done: false, text: 'Vérification de la validité de la carte CNAM' },
-    { done: false, text: 'Informer l\'employeur de la grossesse' },
-    { done: false, text: 'Préparer lettre de congé maternité' },
-    { done: false, text: 'Vérifier convention maternité avec clinique' },
-    { done: false, text: 'Préparer dossier administratif pour accouchement' },
+    'Déclaration de grossesse chez le médecin',
+    'Dépôt de la déclaration à la CNAM',
+    'Vérification de la validité de la carte CNAM',
+    'Informer l\'employeur de la grossesse',
+    'Préparer lettre de congé maternité',
+    'Vérifier convention maternité avec clinique',
+    'Préparer dossier administratif pour accouchement',
   ];
 
-  const [checks, setChecks] = useState(checklist.map(c => c.done));
+  const [checks, setChecks] = useState(checklist.map(() => false));
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <LinearGradient
-        colors={['#2D1B69', '#6D28D9']}
-        style={styles.header}
-      >
+      <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={Colors.white} />
         </TouchableOpacity>
-        <Text style={styles.headerEmoji}>🏛️</Text>
+        <View style={styles.headerIconWrap}>
+          <Ionicons name="document-text-outline" size={40} color={Colors.lavender} />
+        </View>
         <Text style={styles.headerTitle}>Dossier CNAM</Text>
         <Text style={styles.headerSubtitle}>
           Tout savoir sur votre prise en charge maternité en Tunisie
@@ -148,11 +153,14 @@ export default function CNAMScreen() {
 
           {/* Quick checklist */}
           <View style={styles.checklistCard}>
-            <Text style={styles.checklistTitle}>✅ Ma Checklist Administrative</Text>
+            <View style={styles.checklistTitleRow}>
+              <Ionicons name="checkmark-done-outline" size={20} color={Colors.primary} style={{ marginRight: 8 }} />
+              <Text style={styles.checklistTitle}>Ma Checklist Administrative</Text>
+            </View>
             {checklist.map((item, idx) => (
               <TouchableOpacity
                 key={idx}
-                style={styles.checkRow}
+                style={[styles.checkRow, idx === checklist.length - 1 && { borderBottomWidth: 0 }]}
                 onPress={() => {
                   const newChecks = [...checks];
                   newChecks[idx] = !newChecks[idx];
@@ -163,7 +171,7 @@ export default function CNAMScreen() {
                   {checks[idx] && <Ionicons name="checkmark" size={14} color={Colors.white} />}
                 </View>
                 <Text style={[styles.checkText, checks[idx] && styles.checkTextDone]}>
-                  {item.text}
+                  {item}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -177,12 +185,15 @@ export default function CNAMScreen() {
               onPress={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
             >
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>{section.title}</Text>
-                <View style={[styles.chevronBadge, { backgroundColor: section.color + '20' }]}>
-                  <Text style={[styles.chevron, { color: section.color }]}>
-                    {expandedSection === section.id ? '▲' : '▼'}
-                  </Text>
+                <View style={[styles.sectionIconBox, { backgroundColor: section.color + '20' }]}>
+                  <Ionicons name={section.icon} size={18} color={section.color} />
                 </View>
+                <Text style={styles.sectionTitle}>{section.title}</Text>
+                <Ionicons
+                  name={expandedSection === section.id ? 'chevron-up' : 'chevron-down'}
+                  size={18}
+                  color={section.color}
+                />
               </View>
 
               {expandedSection === section.id && (
@@ -195,7 +206,9 @@ export default function CNAMScreen() {
                       {item.type === 'step' && (
                         <>
                           <View style={[styles.stepBadge, { backgroundColor: section.color }]}>
-                            <Text style={styles.stepBadgeText}>{idx + 1}</Text>
+                            <Text style={styles.stepBadgeText}>
+                              {section.content.slice(0, idx + 1).filter(c => c.type === 'step').length}
+                            </Text>
                           </View>
                           <Text style={styles.contentText}>{item.text}</Text>
                         </>
@@ -210,7 +223,10 @@ export default function CNAMScreen() {
                         <Text style={[styles.subtitleText, { color: section.color }]}>{item.text}</Text>
                       )}
                       {item.type === 'info' && (
-                        <Text style={styles.infoText}>{item.text}</Text>
+                        <View style={styles.infoContent}>
+                          <Ionicons name="information-circle-outline" size={16} color={Colors.primary} style={{ marginRight: 6, marginTop: 1, flexShrink: 0 }} />
+                          <Text style={styles.infoText}>{item.text}</Text>
+                        </View>
                       )}
                     </View>
                   ))}
@@ -221,19 +237,13 @@ export default function CNAMScreen() {
 
           {/* Quick Contact */}
           <View style={styles.contactCard}>
-            <TouchableOpacity
-              style={styles.contactBtn}
-              onPress={() => Linking.openURL('tel:80100100')}
-            >
+            <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('tel:80100100')}>
               <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.contactBtnGrad}>
                 <Ionicons name="call" size={20} color={Colors.white} />
                 <Text style={styles.contactBtnText}>Appeler CNAM (Gratuit)</Text>
               </LinearGradient>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.contactBtn}
-              onPress={() => Linking.openURL('https://www.cnam.nat.tn')}
-            >
+            <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('https://www.cnam.nat.tn')}>
               <View style={styles.contactBtnOutline}>
                 <Ionicons name="globe-outline" size={20} color={Colors.primary} />
                 <Text style={[styles.contactBtnText, { color: Colors.primary }]}>Site CNAM</Text>
@@ -251,32 +261,33 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: { padding: 24, paddingTop: 16, alignItems: 'center', borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   backBtn: { position: 'absolute', top: 16, left: 16, padding: 8 },
-  headerEmoji: { fontSize: 48, marginBottom: 8 },
+  headerIconWrap: { marginBottom: 8 },
   headerTitle: { fontSize: 24, fontWeight: '800', color: Colors.white, marginBottom: 4 },
   headerSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.85)', textAlign: 'center', maxWidth: 280 },
   content: { padding: 16 },
   checklistCard: { backgroundColor: Colors.surface, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
-  checklistTitle: { fontSize: 16, fontWeight: '700', color: Colors.text, marginBottom: 12 },
-  checkRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: Colors.border, gap: 10 },
-  checkBox: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
+  checklistTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+  checklistTitle: { fontSize: 16, fontWeight: '700', color: Colors.text },
+  checkRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: Colors.border, gap: 10 },
+  checkBox: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.primary, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
   checkBoxDone: { backgroundColor: Colors.success, borderColor: Colors.success },
   checkText: { flex: 1, fontSize: 14, color: Colors.text },
   checkTextDone: { textDecorationLine: 'line-through', color: Colors.textLight },
   sectionCard: { backgroundColor: Colors.surface, borderRadius: 16, marginBottom: 12, overflow: 'hidden', borderWidth: 1.5, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 10 },
+  sectionIconBox: { width: 34, height: 34, borderRadius: 10, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
   sectionTitle: { flex: 1, fontSize: 15, fontWeight: '700', color: Colors.text },
-  chevronBadge: { width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
-  chevron: { fontSize: 12, fontWeight: '700' },
   sectionBody: { padding: 16, paddingTop: 0, borderTopWidth: 1, borderTopColor: Colors.border },
   contentRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 7, gap: 10 },
   subtitleRow: { paddingVertical: 10 },
   infoBox: { backgroundColor: Colors.lilac, borderRadius: 10, padding: 12, marginVertical: 8 },
+  infoContent: { flexDirection: 'row', alignItems: 'flex-start' },
   stepBadge: { width: 22, height: 22, borderRadius: 11, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
   stepBadgeText: { fontSize: 11, fontWeight: '700', color: Colors.white },
   bullet: { width: 8, height: 8, borderRadius: 4, marginTop: 6, flexShrink: 0 },
   contentText: { flex: 1, fontSize: 14, color: Colors.text, lineHeight: 21 },
   subtitleText: { fontSize: 14, fontWeight: '700' },
-  infoText: { fontSize: 14, color: Colors.text, lineHeight: 21 },
+  infoText: { flex: 1, fontSize: 14, color: Colors.text, lineHeight: 21 },
   contactCard: { flexDirection: 'row', gap: 10, marginTop: 8 },
   contactBtn: { flex: 1, borderRadius: 14, overflow: 'hidden' },
   contactBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, gap: 8 },

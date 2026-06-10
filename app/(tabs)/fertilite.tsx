@@ -10,6 +10,7 @@ import Colors from '../../src/theme/colors';
 import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { addDays, format, parse, isValid } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import DatePickerModal from '../../src/components/DatePickerModal';
 
 const { width } = Dimensions.get('window');
 
@@ -74,16 +75,22 @@ export default function FertiliteScreen() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState(0);
   const [calcModalVisible, setCalcModalVisible] = useState(false);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [cycleLength, setCycleLength] = useStorage(STORAGE_KEYS.CYCLE_LENGTH, '28');
   const [lastPeriodDate, setLastPeriodDate] = useStorage(STORAGE_KEYS.LAST_PERIOD_DATE, '');
   const [cycleLengthInput, setCycleLengthInput] = useState('28');
   const [lastPeriodInput, setLastPeriodInput] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [result, setResult] = useState<FertileWindow | null>(null);
 
   useEffect(() => {
     setCycleLengthInput(cycleLength || '28');
     setLastPeriodInput(lastPeriodDate || '');
     if (lastPeriodDate) {
+      try {
+        const parsed = parse(lastPeriodDate, 'dd/MM/yyyy', new Date());
+        if (isValid(parsed)) setSelectedDate(parsed);
+      } catch {}
       computeResult(lastPeriodDate, cycleLength || '28');
     }
   }, [cycleLength, lastPeriodDate]);
@@ -104,15 +111,20 @@ export default function FertiliteScreen() {
     }
   };
 
+  const handleDateSelected = (date: Date) => {
+    setSelectedDate(date);
+    const formatted = format(date, 'dd/MM/yyyy');
+    setLastPeriodInput(formatted);
+  };
+
   const handleCalculate = async () => {
     const len = parseInt(cycleLengthInput, 10);
     if (isNaN(len) || len < 21 || len > 45) {
       Alert.alert('Durée invalide', 'Entrez une durée entre 21 et 45 jours.');
       return;
     }
-    const parsed = parse(lastPeriodInput, 'dd/MM/yyyy', new Date());
-    if (!isValid(parsed)) {
-      Alert.alert('Date invalide', 'Entrez la date au format JJ/MM/AAAA.');
+    if (!selectedDate) {
+      Alert.alert('Date manquante', 'Veuillez sélectionner la date de vos dernières règles.');
       return;
     }
     await setCycleLength(cycleLengthInput);
@@ -312,17 +324,22 @@ export default function FertiliteScreen() {
             </View>
 
             <Text style={styles.inputLabel}>Date des dernières règles *</Text>
-            <View style={styles.inputRow}>
-              <Ionicons name="calendar-outline" size={18} color={Colors.textLight} style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder="JJ/MM/AAAA"
-                placeholderTextColor={Colors.textMuted}
-                value={lastPeriodInput}
-                onChangeText={setLastPeriodInput}
-                keyboardType="numeric"
-              />
-            </View>
+            <TouchableOpacity style={styles.datePickerBtn} onPress={() => setDatePickerVisible(true)}>
+              <Ionicons name="calendar-outline" size={18} color={Colors.primary} style={styles.inputIcon} />
+              <Text style={[styles.datePickerText, !selectedDate && styles.datePickerPlaceholder]}>
+                {selectedDate ? format(selectedDate, 'dd MMMM yyyy', { locale: fr }) : 'Sélectionner une date'}
+              </Text>
+              <Ionicons name="chevron-down-outline" size={16} color={Colors.textLight} />
+            </TouchableOpacity>
+
+            <DatePickerModal
+              visible={datePickerVisible}
+              onClose={() => setDatePickerVisible(false)}
+              onSelect={handleDateSelected}
+              selectedDate={selectedDate}
+              title="Date des dernières règles"
+              maxDate={new Date()}
+            />
 
             <Text style={styles.inputLabel}>Durée de votre cycle (jours)</Text>
             <View style={styles.inputRow}>
@@ -411,16 +428,16 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: '300',
+    fontWeight: '800',
     color: Colors.white,
-    letterSpacing: 2,
+    letterSpacing: 1,
   },
   headerSub: {
     fontSize: 13,
-    color: 'rgba(233,213,255,0.75)',
+    color: 'rgba(233,213,255,0.85)',
     marginTop: 4,
     marginBottom: 20,
-    fontWeight: '300',
+    fontWeight: '400',
   },
   pillsScroll: { marginBottom: 0 },
   pills: { gap: 8, paddingBottom: 20 },
@@ -684,6 +701,26 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     color: Colors.text,
+  },
+  datePickerBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  datePickerText: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.text,
+    fontWeight: '500',
+  },
+  datePickerPlaceholder: {
+    color: Colors.textMuted,
+    fontWeight: '400',
   },
   cycleHint: {
     fontSize: 12,
