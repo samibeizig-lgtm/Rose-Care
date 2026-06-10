@@ -222,7 +222,7 @@ export default function ZenScreen() {
             onPress={() => setActiveTab(tab)}
           >
             <Ionicons
-              name={tab === 'respiration' ? 'wind-outline' : tab === 'sons' ? 'musical-notes-outline' : tab === 'affirmations' ? 'chatbubble-outline' : 'body-outline'}
+              name={tab === 'respiration' ? 'wind-outline' : tab === 'sons' ? 'musical-notes-outline' : tab === 'affirmations' ? 'chatbubble-outline' : 'body-outline' as any}
               size={18}
               color={activeTab === tab ? Colors.primary : Colors.textLight}
             />

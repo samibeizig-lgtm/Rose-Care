@@ -487,7 +487,7 @@ export default function HealthScreen() {
             {prenatalAdvice.map((section, idx) => (
               <View key={idx} style={styles.adviceCard}>
                 <View style={[styles.adviceHeader, { backgroundColor: section.color + '15' }]}>
-                  <Ionicons name={section.icon} size={22} color={section.color} style={{ marginRight: 10 }} />
+                  <Ionicons name={section.icon as any} size={22} color={section.color} style={{ marginRight: 10 }} />
                   <Text style={[styles.adviceCategory, { color: section.color }]}>{section.category}</Text>
                 </View>
                 {section.items.map((item, i) => (
