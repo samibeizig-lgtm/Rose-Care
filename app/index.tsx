@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ImageBackground } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { Circle, Path, Ellipse, G, Line } from 'react-native-svg';
 import { storage, STORAGE_KEYS } from '../src/hooks/useStorage';
 
 const { width, height } = Dimensions.get('window');
+
+const WELCOME_IMAGE = 'https://images.unsplash.com/photo-1560707857-b897819e06fb?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
 
 function MotherBabyIllustration() {
   const s = width * 0.78;
@@ -117,12 +120,17 @@ export default function WelcomeScreen() {
 
   return (
     <ImageBackground
-      source={require('../assets/images/welcome-bg.jpg')}
+      source={{ uri: WELCOME_IMAGE }}
       style={styles.container}
       resizeMode="cover"
     >
-      {/* Dark overlay for text readability */}
-      <View style={styles.overlay} />
+      {/* Violet overlay */}
+      <LinearGradient
+        colors={['rgba(75,0,130,0.55)', 'rgba(127,0,255,0.70)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
       <StatusBar style="light" />
       <MotherBabyIllustration />
 
@@ -152,10 +160,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(90, 20, 60, 0.45)',
   },
   content: {
     alignItems: 'center',

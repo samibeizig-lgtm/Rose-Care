@@ -8,7 +8,6 @@ import {
   Animated,
   Easing,
   Dimensions,
-  ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -204,25 +203,15 @@ export default function ZenScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
-      <ImageBackground
-        source={require('../../assets/images/zen-banner.jpg')}
-        style={styles.header}
-        resizeMode="cover"
-      >
-        <LinearGradient
-          colors={['rgba(76,29,149,0.60)', 'rgba(124,58,237,0.80)']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
+      <LinearGradient colors={Colors.gradient.zen} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
         <View style={styles.headerRow}>
-          <Ionicons name="leaf-outline" size={22} color="rgba(233,213,255,0.9)" style={{ marginRight: 10 }} />
+          <Ionicons name="leaf-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
           <View>
             <Text style={styles.headerTitle}>Espace Zen</Text>
             <Text style={styles.headerSubtitle}>Détente, respiration et bien-être</Text>
           </View>
         </View>
-      </ImageBackground>
+      </LinearGradient>
 
       {/* Tabs */}
       <View style={styles.tabs}>

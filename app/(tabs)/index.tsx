@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Dimensions,
   RefreshControl,
-  ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -136,17 +135,12 @@ export default function HomeScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
       >
         {/* Header Hero */}
-        <ImageBackground
-          source={require('../../assets/images/home-hero.jpg')}
+        <LinearGradient
+          colors={Colors.gradient.primary}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.hero}
-          resizeMode="cover"
         >
-          <LinearGradient
-            colors={['rgba(157,23,77,0.55)', 'rgba(219,39,119,0.80)']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
           <View style={styles.heroTop}>
             <View>
               <Text style={styles.greeting}>Bonjour, {profile?.name || 'Belle Maman'} 🌸</Text>
@@ -198,7 +192,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             </View>
           )}
-        </ImageBackground>
+        </LinearGradient>
 
         <View style={styles.content}>
 
