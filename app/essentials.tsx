@@ -58,7 +58,7 @@ export default function EssentialsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={[Colors.secondary, '#CE93D8']}
+        colors={['#2D1B69', '#6D28D9']}
         style={styles.header}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -108,7 +108,7 @@ export default function EssentialsScreen() {
                   <Text style={styles.progressBarPct}>{Math.round(babyStats.progress * 100)}%</Text>
                 </View>
                 <View style={styles.progressTrack}>
-                  <View style={[styles.progressFill, { width: `${babyStats.progress * 100}%`, backgroundColor: Colors.secondary }]} />
+                  <View style={[styles.progressFill, { width: `${babyStats.progress * 100}%`, backgroundColor: Colors.primary }]} />
                 </View>
               </View>
 
@@ -245,7 +245,7 @@ export default function EssentialsScreen() {
               {chamberDecorItems.map((cat, idx) => (
                 <View key={idx} style={styles.chambreCard}>
                   <LinearGradient
-                    colors={[Colors.accent, Colors.primaryLight]}
+                    colors={['#4C1D95', '#6D28D9']}
                     style={styles.chambreHeader}
                   >
                     <Text style={styles.chambreIcon}>{cat.icon}</Text>
@@ -299,15 +299,15 @@ const styles = StyleSheet.create({
   progressValue: { fontSize: 18, fontWeight: '800', color: Colors.white },
   tabs: { flexDirection: 'row', backgroundColor: Colors.surface, paddingHorizontal: 12, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: Colors.border, gap: 6 },
   tab: { flex: 1, alignItems: 'center', paddingVertical: 8, borderRadius: 12 },
-  tabActive: { backgroundColor: Colors.secondary + '20' },
+  tabActive: { backgroundColor: Colors.primary },
   tabIcon: { fontSize: 20 },
   tabText: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary, marginTop: 2 },
-  tabTextActive: { color: Colors.secondary },
+  tabTextActive: { color: Colors.white },
   content: { padding: 16 },
   progressCard: { backgroundColor: Colors.surface, borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: Colors.border },
   progressBarLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
   progressBarLabel: { fontSize: 13, color: Colors.textSecondary, fontWeight: '500' },
-  progressBarPct: { fontSize: 13, fontWeight: '700', color: Colors.secondary },
+  progressBarPct: { fontSize: 13, fontWeight: '700', color: Colors.primary },
   progressTrack: { height: 8, backgroundColor: Colors.border, borderRadius: 4, overflow: 'hidden' },
   progressFill: { height: 8, borderRadius: 4 },
   tipCard: { backgroundColor: Colors.warningLight, borderRadius: 14, padding: 14, marginBottom: 12, borderLeftWidth: 4, borderLeftColor: Colors.warning },
@@ -320,10 +320,10 @@ const styles = StyleSheet.create({
   categoryHeader: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 },
   categoryIcon: { fontSize: 22 },
   categoryTitle: { flex: 1, fontSize: 15, fontWeight: '700', color: Colors.text },
-  categoryStat: { fontSize: 13, fontWeight: '700', color: Colors.secondary, marginRight: 6 },
+  categoryStat: { fontSize: 13, fontWeight: '700', color: Colors.primary, marginRight: 6 },
   itemRow: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: 1, borderTopColor: Colors.border, gap: 10 },
   itemRowDone: { backgroundColor: Colors.successLight },
-  checkbox: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.secondary, justifyContent: 'center', alignItems: 'center', marginTop: 2, flexShrink: 0 },
+  checkbox: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.primary, justifyContent: 'center', alignItems: 'center', marginTop: 2, flexShrink: 0 },
   checkboxDone: { backgroundColor: Colors.success, borderColor: Colors.success },
   itemInfo: { flex: 1 },
   itemNameRow: { flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap', gap: 6 },
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   chambreCard: { borderRadius: 16, overflow: 'hidden', marginBottom: 12, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3 },
   chambreHeader: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 },
   chambreIcon: { fontSize: 22 },
-  chambreCategory: { fontSize: 16, fontWeight: '700', color: Colors.primaryDark },
+  chambreCategory: { fontSize: 16, fontWeight: '700', color: Colors.white },
   chambreItems: { backgroundColor: Colors.surface, padding: 12 },
   chambreItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, gap: 8 },
   chambreItemBullet: { fontSize: 12 },

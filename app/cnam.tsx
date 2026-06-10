@@ -33,7 +33,7 @@ export default function CNAMScreen() {
     {
       id: 'prise_en_charge',
       title: '💊 Prise en Charge des Soins',
-      color: Colors.info,
+      color: Colors.primarySoft,
       content: [
         { type: 'subtitle', text: 'Consultations prises en charge :' },
         { type: 'item', text: '7 consultations prénatales (selon calendrier officiel)' },
@@ -69,7 +69,7 @@ export default function CNAMScreen() {
     {
       id: 'allocations',
       title: '💰 Allocations et Aides',
-      color: Colors.gold,
+      color: Colors.primaryLight,
       content: [
         { type: 'subtitle', text: 'Allocations familiales (CNSS) :' },
         { type: 'item', text: '1er enfant : 40 DT/mois' },
@@ -84,7 +84,7 @@ export default function CNAMScreen() {
     {
       id: 'hospitalisation',
       title: '🏥 Hospitalisation pour Accouchement',
-      color: Colors.secondary,
+      color: Colors.primaryDeep,
       content: [
         { type: 'subtitle', text: 'Ce que couvre la CNAM :' },
         { type: 'item', text: 'Frais d\'hospitalisation à la maternité conventionnée' },
@@ -103,7 +103,7 @@ export default function CNAMScreen() {
     {
       id: 'contacts_cnam',
       title: '📞 Contacts CNAM',
-      color: Colors.zen,
+      color: Colors.mauve,
       content: [
         { type: 'item', text: '📞 Siège CNAM : 71 100 100' },
         { type: 'item', text: '📱 Numéro vert : 80 100 100 (Gratuit)' },
@@ -130,7 +130,7 @@ export default function CNAMScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={['#0288D1', '#29B6F6', '#81D4FA']}
+        colors={['#2D1B69', '#6D28D9']}
         style={styles.header}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -225,7 +225,7 @@ export default function CNAMScreen() {
               style={styles.contactBtn}
               onPress={() => Linking.openURL('tel:80100100')}
             >
-              <LinearGradient colors={['#0288D1', '#29B6F6']} style={styles.contactBtnGrad}>
+              <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.contactBtnGrad}>
                 <Ionicons name="call" size={20} color={Colors.white} />
                 <Text style={styles.contactBtnText}>Appeler CNAM (Gratuit)</Text>
               </LinearGradient>
@@ -235,8 +235,8 @@ export default function CNAMScreen() {
               onPress={() => Linking.openURL('https://www.cnam.nat.tn')}
             >
               <View style={styles.contactBtnOutline}>
-                <Ionicons name="globe-outline" size={20} color={Colors.info} />
-                <Text style={[styles.contactBtnText, { color: Colors.info }]}>Site CNAM</Text>
+                <Ionicons name="globe-outline" size={20} color={Colors.primary} />
+                <Text style={[styles.contactBtnText, { color: Colors.primary }]}>Site CNAM</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   checklistCard: { backgroundColor: Colors.surface, borderRadius: 18, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   checklistTitle: { fontSize: 16, fontWeight: '700', color: Colors.text, marginBottom: 12 },
   checkRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: Colors.border, gap: 10 },
-  checkBox: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.info, justifyContent: 'center', alignItems: 'center' },
+  checkBox: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.primary, justifyContent: 'center', alignItems: 'center' },
   checkBoxDone: { backgroundColor: Colors.success, borderColor: Colors.success },
   checkText: { flex: 1, fontSize: 14, color: Colors.text },
   checkTextDone: { textDecorationLine: 'line-through', color: Colors.textLight },
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   sectionBody: { padding: 16, paddingTop: 0, borderTopWidth: 1, borderTopColor: Colors.border },
   contentRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 7, gap: 10 },
   subtitleRow: { paddingVertical: 10 },
-  infoBox: { backgroundColor: Colors.infoLight, borderRadius: 10, padding: 12, marginVertical: 8 },
+  infoBox: { backgroundColor: Colors.lilac, borderRadius: 10, padding: 12, marginVertical: 8 },
   stepBadge: { width: 22, height: 22, borderRadius: 11, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
   stepBadgeText: { fontSize: 11, fontWeight: '700', color: Colors.white },
   bullet: { width: 8, height: 8, borderRadius: 4, marginTop: 6, flexShrink: 0 },
@@ -280,6 +280,6 @@ const styles = StyleSheet.create({
   contactCard: { flexDirection: 'row', gap: 10, marginTop: 8 },
   contactBtn: { flex: 1, borderRadius: 14, overflow: 'hidden' },
   contactBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, gap: 8 },
-  contactBtnOutline: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, gap: 8, borderWidth: 1.5, borderColor: Colors.info, borderRadius: 14 },
+  contactBtnOutline: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, gap: 8, borderWidth: 1.5, borderColor: Colors.primary, borderRadius: 14 },
   contactBtnText: { fontSize: 14, fontWeight: '700', color: Colors.white },
 });

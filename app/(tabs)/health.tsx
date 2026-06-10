@@ -114,42 +114,38 @@ export default function HealthScreen() {
   const healthCards = [
     {
       type: 'weight' as const,
-      icon: '⚖️',
+      icon: 'scale-outline' as const,
       title: 'Poids',
       value: getLastRecord('weight')?.value,
       unit: 'kg',
-      color: Colors.primary,
-      gradient: [Colors.primary, Colors.primaryLight] as [string, string],
+      gradient: Colors.gradient.health as [string, string],
       normal: '(+1-2kg/mois en T2-T3)',
     },
     {
       type: 'bp' as const,
-      icon: '🩺',
+      icon: 'heart-outline' as const,
       title: 'Tension',
       value: getLastRecord('bp') ? `${getLastRecord('bp')!.value}/${getLastRecord('bp')!.value2}` : undefined,
       unit: 'mmHg',
-      color: Colors.secondary,
-      gradient: [Colors.secondary, Colors.secondaryLight] as [string, string],
+      gradient: [Colors.primaryDeep, Colors.primary] as [string, string],
       normal: 'Normale < 140/90',
     },
     {
       type: 'glucose' as const,
-      icon: '💉',
+      icon: 'water-outline' as const,
       title: 'Glycémie',
       value: getLastRecord('glucose')?.value,
       unit: 'mg/dL',
-      color: Colors.success,
-      gradient: [Colors.success, '#81C784'] as [string, string],
+      gradient: [Colors.primary, Colors.primarySoft] as [string, string],
       normal: 'À jeun < 92 mg/dL',
     },
     {
       type: 'mood' as const,
-      icon: '😊',
+      icon: 'happy-outline' as const,
       title: 'Humeur',
       value: getLastRecord('mood')?.value,
       unit: '',
-      color: Colors.gold,
-      gradient: [Colors.gold, '#FFD54F'] as [string, string],
+      gradient: Colors.gradient.soft as [string, string],
       normal: 'Notez vos émotions',
     },
   ];
@@ -157,8 +153,8 @@ export default function HealthScreen() {
   const prenatalAdvice = [
     {
       category: 'Consultations',
-      icon: '🩺',
-      color: Colors.info,
+      icon: 'stethoscope-outline' as const,
+      color: Colors.primary,
       items: [
         '1ère consultation : semaine 8-10 (bilan complet)',
         'Échographie 1er trimestre : 11-13 SA',
@@ -170,7 +166,7 @@ export default function HealthScreen() {
     },
     {
       category: 'Vaccination',
-      icon: '💉',
+      icon: 'shield-checkmark-outline' as const,
       color: Colors.success,
       items: [
         'Grippe saisonnière : recommandée à tout trimestre',
@@ -181,8 +177,8 @@ export default function HealthScreen() {
     },
     {
       category: 'Analyses obligatoires',
-      icon: '🔬',
-      color: Colors.secondary,
+      icon: 'flask-outline' as const,
+      color: Colors.primaryLight,
       items: [
         'Groupe sanguin + Rhésus (à la 1ère consultation)',
         'NFS complète',
@@ -195,7 +191,7 @@ export default function HealthScreen() {
     },
     {
       category: 'Signes d\'alarme',
-      icon: '🚨',
+      icon: 'warning-outline' as const,
       color: Colors.error,
       items: [
         'Saignements abondants → URGENCE',
@@ -211,10 +207,13 @@ export default function HealthScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Tabs */}
+      {/* Header + Tabs */}
       <View style={styles.tabsHeader}>
-        <LinearGradient colors={[Colors.success, '#81C784']} style={styles.headerGradient}>
-          <Text style={styles.headerTitle}>Suivi Santé 💚</Text>
+        <LinearGradient colors={Colors.gradient.primary} style={styles.headerGradient}>
+          <View style={styles.headerRow}>
+            <Ionicons name="medkit-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
+            <Text style={styles.headerTitle}>Suivi Santé</Text>
+          </View>
         </LinearGradient>
         <View style={styles.tabsRow}>
           {(['suivi', 'rdv', 'conseils'] as const).map(tab => (
@@ -223,8 +222,14 @@ export default function HealthScreen() {
               style={[styles.tab, activeTab === tab && styles.tabActive]}
               onPress={() => setActiveTab(tab)}
             >
+              <Ionicons
+                name={tab === 'suivi' ? 'bar-chart-outline' : tab === 'rdv' ? 'calendar-outline' : 'bulb-outline'}
+                size={14}
+                color={activeTab === tab ? Colors.white : Colors.textSecondary}
+                style={{ marginRight: 4 }}
+              />
               <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                {tab === 'suivi' ? '📊 Suivi' : tab === 'rdv' ? '📅 Rendez-vous' : '💡 Conseils'}
+                {tab === 'suivi' ? 'Suivi' : tab === 'rdv' ? 'Rendez-vous' : 'Conseils'}
               </Text>
             </TouchableOpacity>
           ))}
@@ -243,7 +248,7 @@ export default function HealthScreen() {
                   onPress={() => openModal(card.type)}
                 >
                   <LinearGradient colors={card.gradient} style={styles.healthCardGradient}>
-                    <Text style={styles.cardIcon}>{card.icon}</Text>
+                    <Ionicons name={card.icon} size={26} color="rgba(255,255,255,0.9)" style={{ marginBottom: 6 }} />
                     <Text style={styles.cardTitle}>{card.title}</Text>
                     {card.value ? (
                       <Text style={styles.cardValue}>{card.value} {card.unit}</Text>
@@ -258,15 +263,19 @@ export default function HealthScreen() {
 
             {/* Symptoms */}
             <TouchableOpacity style={styles.symptomsBtn} onPress={() => openModal('symptoms')}>
-              <LinearGradient colors={[Colors.accent, Colors.primaryLight]} style={styles.symptomsBtnGradient}>
-                <Text style={styles.symptomsBtnText}>🤒 Noter mes symptômes du jour</Text>
+              <LinearGradient colors={Colors.gradient.card} style={styles.symptomsBtnGradient}>
+                <Ionicons name="pulse-outline" size={20} color={Colors.primaryDark} style={{ marginRight: 8 }} />
+                <Text style={styles.symptomsBtnText}>Noter mes symptômes du jour</Text>
               </LinearGradient>
             </TouchableOpacity>
 
             {/* Recent Weight Chart */}
             {weightRecords.length > 0 && (
               <View style={styles.chartCard}>
-                <Text style={styles.chartTitle}>📈 Évolution du Poids</Text>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="trending-up-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Évolution du Poids</Text>
+                </View>
                 {weightRecords.slice(0, 5).map((r, idx) => (
                   <View key={r.id} style={styles.recordRow}>
                     <Text style={styles.recordDate}>{format(new Date(r.date), 'dd/MM', { locale: fr })}</Text>
@@ -282,7 +291,10 @@ export default function HealthScreen() {
             {/* Recent BP */}
             {bpRecords.length > 0 && (
               <View style={styles.chartCard}>
-                <Text style={styles.chartTitle}>💓 Tension Artérielle</Text>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="heart-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Tension Artérielle</Text>
+                </View>
                 {bpRecords.map((r) => (
                   <View key={r.id} style={styles.bpRow}>
                     <Text style={styles.recordDate}>{format(new Date(r.date), 'dd/MM HH:mm', { locale: fr })}</Text>
@@ -292,7 +304,7 @@ export default function HealthScreen() {
                     ]}>
                       {r.value}/{r.value2} mmHg
                     </Text>
-                    {parseFloat(r.value) >= 140 && <Text style={styles.alertBadge}>⚠️</Text>}
+                    {parseFloat(r.value) >= 140 && <Ionicons name="warning-outline" size={16} color={Colors.warning} />}
                   </View>
                 ))}
               </View>
@@ -301,7 +313,10 @@ export default function HealthScreen() {
             {/* Glucose Records */}
             {glucoseRecords.length > 0 && (
               <View style={styles.chartCard}>
-                <Text style={styles.chartTitle}>🍬 Glycémie</Text>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="water-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Glycémie</Text>
+                </View>
                 {glucoseRecords.map((r) => (
                   <View key={r.id} style={styles.bpRow}>
                     <Text style={styles.recordDate}>{format(new Date(r.date), 'dd/MM HH:mm', { locale: fr })}</Text>
@@ -311,7 +326,7 @@ export default function HealthScreen() {
                     ]}>
                       {r.value} mg/dL
                     </Text>
-                    {parseFloat(r.value) > 126 && <Text style={styles.alertBadge}>⚠️</Text>}
+                    {parseFloat(r.value) > 126 && <Ionicons name="warning-outline" size={16} color={Colors.warning} />}
                   </View>
                 ))}
               </View>
@@ -320,7 +335,10 @@ export default function HealthScreen() {
             {/* Recent Moods */}
             {records.filter(r => r.type === 'mood').length > 0 && (
               <View style={styles.chartCard}>
-                <Text style={styles.chartTitle}>💭 Mon Humeur</Text>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="happy-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Mon Humeur</Text>
+                </View>
                 {records.filter(r => r.type === 'mood').slice(0, 5).map((r) => (
                   <View key={r.id} style={styles.bpRow}>
                     <Text style={styles.recordDate}>{format(new Date(r.date), 'dd/MM', { locale: fr })}</Text>
@@ -335,15 +353,15 @@ export default function HealthScreen() {
         {activeTab === 'rdv' && (
           <View style={styles.content}>
             <TouchableOpacity style={styles.addRdvBtn} onPress={() => openModal('appointment')}>
-              <LinearGradient colors={[Colors.primary, Colors.primaryLight]} style={styles.addRdvGradient}>
-                <Ionicons name="add-circle" size={22} color={Colors.white} />
+              <LinearGradient colors={Colors.gradient.primary} style={styles.addRdvGradient}>
+                <Ionicons name="add-circle-outline" size={22} color={Colors.white} />
                 <Text style={styles.addRdvText}>Ajouter un rendez-vous</Text>
               </LinearGradient>
             </TouchableOpacity>
 
             {appointments.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyEmoji}>📅</Text>
+                <Ionicons name="calendar-outline" size={56} color={Colors.mauve} />
                 <Text style={styles.emptyText}>Aucun rendez-vous planifié</Text>
                 <Text style={styles.emptySubtext}>Ajoutez vos consultations et échographies</Text>
               </View>
@@ -372,7 +390,7 @@ export default function HealthScreen() {
             {prenatalAdvice.map((section, idx) => (
               <View key={idx} style={styles.adviceCard}>
                 <View style={[styles.adviceHeader, { backgroundColor: section.color + '15' }]}>
-                  <Text style={styles.adviceIcon}>{section.icon}</Text>
+                  <Ionicons name={section.icon} size={22} color={section.color} style={{ marginRight: 10 }} />
                   <Text style={[styles.adviceCategory, { color: section.color }]}>{section.category}</Text>
                 </View>
                 {section.items.map((item, i) => (
@@ -394,15 +412,15 @@ export default function HealthScreen() {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>
-              {modalType === 'weight' ? '⚖️ Ajouter le Poids' :
-               modalType === 'bp' ? '🩺 Ajouter la Tension' :
-               modalType === 'glucose' ? '💉 Ajouter la Glycémie' :
-               modalType === 'mood' ? '😊 Comment vous sentez-vous ?' :
-               modalType === 'appointment' ? '📅 Nouveau Rendez-vous' :
-               '🤒 Symptômes du jour'}
+              {modalType === 'weight' ? 'Ajouter le Poids' :
+               modalType === 'bp' ? 'Ajouter la Tension' :
+               modalType === 'glucose' ? 'Ajouter la Glycémie' :
+               modalType === 'mood' ? 'Comment vous sentez-vous ?' :
+               modalType === 'appointment' ? 'Nouveau Rendez-vous' :
+               'Symptômes du jour'}
             </Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Ionicons name="close" size={26} color={Colors.text} />
+              <Ionicons name="close-circle-outline" size={28} color={Colors.primary} />
             </TouchableOpacity>
           </View>
 
@@ -414,6 +432,7 @@ export default function HealthScreen() {
                   style={styles.input}
                   keyboardType="decimal-pad"
                   placeholder="Ex: 65.5"
+                  placeholderTextColor={Colors.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
@@ -428,6 +447,7 @@ export default function HealthScreen() {
                   style={styles.input}
                   keyboardType="number-pad"
                   placeholder="Ex: 120"
+                  placeholderTextColor={Colors.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
@@ -437,6 +457,7 @@ export default function HealthScreen() {
                   style={styles.input}
                   keyboardType="number-pad"
                   placeholder="Ex: 80"
+                  placeholderTextColor={Colors.textMuted}
                   value={inputValue2}
                   onChangeText={setInputValue2}
                 />
@@ -455,6 +476,7 @@ export default function HealthScreen() {
                   style={styles.input}
                   keyboardType="decimal-pad"
                   placeholder="Ex: 85"
+                  placeholderTextColor={Colors.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
@@ -477,7 +499,9 @@ export default function HealthScreen() {
                       style={[styles.moodOption, selectedMood === mood && styles.moodOptionSelected]}
                       onPress={() => setSelectedMood(mood)}
                     >
-                      <Text style={styles.moodOptionText}>{mood}</Text>
+                      <Text style={[styles.moodOptionText, selectedMood === mood && styles.moodOptionTextSelected]}>
+                        {mood}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -491,6 +515,7 @@ export default function HealthScreen() {
                   style={[styles.input, { height: 120, textAlignVertical: 'top' }]}
                   multiline
                   placeholder="Ex: Nausées le matin, maux de dos, fatigue..."
+                  placeholderTextColor={Colors.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
@@ -504,6 +529,7 @@ export default function HealthScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="Ex: Échographie morphologique"
+                  placeholderTextColor={Colors.textMuted}
                   value={rdvTitle}
                   onChangeText={setRdvTitle}
                   autoFocus
@@ -512,6 +538,7 @@ export default function HealthScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="Ex: 15/07/2024 à 10h30"
+                  placeholderTextColor={Colors.textMuted}
                   value={rdvDate}
                   onChangeText={setRdvDate}
                 />
@@ -519,6 +546,7 @@ export default function HealthScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder="Ex: Dr. Amira Ben Salem - Clinique La Rose"
+                  placeholderTextColor={Colors.textMuted}
                   value={rdvDoctor}
                   onChangeText={setRdvDoctor}
                 />
@@ -532,6 +560,7 @@ export default function HealthScreen() {
                   style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
                   multiline
                   placeholder="Remarques..."
+                  placeholderTextColor={Colors.textMuted}
                   value={inputNote}
                   onChangeText={setInputNote}
                 />
@@ -539,7 +568,8 @@ export default function HealthScreen() {
             )}
 
             <TouchableOpacity style={styles.saveBtn} onPress={saveRecord}>
-              <LinearGradient colors={[Colors.primary, Colors.primaryDark]} style={styles.saveBtnGradient}>
+              <LinearGradient colors={Colors.gradient.primary} style={styles.saveBtnGradient}>
+                <Ionicons name="checkmark-circle-outline" size={20} color={Colors.white} style={{ marginRight: 8 }} />
                 <Text style={styles.saveBtnText}>Enregistrer</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -560,9 +590,11 @@ const styles = StyleSheet.create({
   },
   headerGradient: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+    paddingVertical: 18,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 24,
@@ -583,6 +615,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
     backgroundColor: Colors.background,
   },
   tabActive: {
@@ -620,10 +654,6 @@ const styles = StyleSheet.create({
     minHeight: 120,
     justifyContent: 'space-between',
   },
-  cardIcon: {
-    fontSize: 28,
-    marginBottom: 6,
-  },
   cardTitle: {
     fontSize: 14,
     fontWeight: '700',
@@ -649,10 +679,17 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 16,
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
+    elevation: 2,
   },
   symptomsBtnGradient: {
     padding: 16,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   symptomsBtnText: {
     fontSize: 15,
@@ -669,12 +706,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  chartTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   chartTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: Colors.text,
-    marginBottom: 12,
   },
   recordRow: {
     flexDirection: 'row',
@@ -717,9 +760,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
-  alertBadge: {
-    fontSize: 16,
-  },
   moodValue: {
     fontSize: 15,
     color: Colors.text,
@@ -728,6 +768,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 16,
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 4,
   },
   addRdvGradient: {
     flexDirection: 'row',
@@ -744,16 +789,13 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     padding: 48,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: 12,
+    gap: 12,
   },
   emptyText: {
     fontSize: 16,
     fontWeight: '600',
     color: Colors.textSecondary,
-    marginBottom: 6,
+    marginTop: 4,
   },
   emptySubtext: {
     fontSize: 13,
@@ -791,8 +833,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkCircleDone: {
-    backgroundColor: Colors.success,
-    borderColor: Colors.success,
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   apptInfo: {
     flex: 1,
@@ -832,15 +874,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   adviceHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 14,
-    gap: 10,
-  },
-  adviceIcon: {
-    fontSize: 22,
   },
   adviceCategory: {
     fontSize: 16,
@@ -902,15 +942,17 @@ const styles = StyleSheet.create({
     padding: 14,
     fontSize: 16,
     color: Colors.text,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.border,
   },
   bpInfo: {
-    backgroundColor: Colors.infoLight,
+    backgroundColor: Colors.lilac,
     borderRadius: 12,
     padding: 12,
     marginTop: 12,
     gap: 4,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.primary,
   },
   bpInfoText: {
     fontSize: 13,
@@ -927,26 +969,37 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: Colors.border,
   },
   moodOptionSelected: {
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.primary,
     borderColor: Colors.primary,
   },
   moodOptionText: {
     fontSize: 15,
     color: Colors.text,
   },
+  moodOptionTextSelected: {
+    color: Colors.white,
+    fontWeight: '600',
+  },
   saveBtn: {
     borderRadius: 16,
     overflow: 'hidden',
     marginTop: 24,
     marginBottom: 40,
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
   },
   saveBtnGradient: {
     padding: 16,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   saveBtnText: {
     fontSize: 16,
