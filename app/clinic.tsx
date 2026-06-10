@@ -66,14 +66,14 @@ export default function ClinicScreen() {
       title: 'Journée de la Fertilité',
       icon: '🌱',
       desc: 'Consultations gratuites avec nos spécialistes en fertilité. Sur inscription.',
-      color: Colors.secondary,
+      color: Colors.primarySoft,
     },
     {
       date: 'Trimestriel',
       title: 'Baby Shower Solidaire',
       icon: '🎀',
       desc: 'Collecte de matériel bébé pour les familles dans le besoin. Rejoignez notre communauté.',
-      color: Colors.zen,
+      color: Colors.mauve,
     },
     {
       date: 'Hebdomadaire (Mercredi 10h)',
@@ -87,7 +87,7 @@ export default function ClinicScreen() {
       title: 'Cercle de Mamans',
       icon: '👭',
       desc: 'Groupe de parole pour futures et nouvelles mamans. Partage d\'expériences.',
-      color: Colors.gold,
+      color: Colors.primaryLight,
     },
   ];
 
@@ -102,13 +102,13 @@ export default function ClinicScreen() {
       name: 'Suite Parentale Zen',
       icon: '🌿',
       features: ['Ambiance zen', 'Bain de naissance disponible', 'Dimmer lights', 'Musique douce', 'Baignoire', 'Vue piscine'],
-      color: Colors.zen,
+      color: Colors.primaryDeep,
     },
     {
       name: 'Chambre Confort',
       icon: '🛏️',
       features: ['Chambre double', 'Salle de bain partagée', 'Vue jardin ou intérieur', 'TV', 'Téléphone'],
-      color: Colors.secondary,
+      color: Colors.primarySoft,
     },
   ];
 
@@ -126,7 +126,7 @@ export default function ClinicScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={[Colors.primaryDark, Colors.primary, Colors.primaryLight]}
+        colors={['#2D1B69', '#6D28D9']}
         style={styles.header}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -192,7 +192,7 @@ export default function ClinicScreen() {
 
               {/* About */}
               <View style={styles.aboutCard}>
-                <LinearGradient colors={[Colors.accent, Colors.primaryLight]} style={styles.aboutGrad}>
+                <LinearGradient colors={['#F3E8FF', '#EDE9FE']} style={styles.aboutGrad}>
                   <Text style={styles.aboutTitle}>🌹 Notre Mission</Text>
                   <Text style={styles.aboutText}>
                     La Clinique La Rose est spécialisée en maternité, gynécologie et néonatologie depuis 2005. Nous accompagnons les femmes dans tous les moments de leur vie reproductive, de la conception jusqu'après l'accouchement. Notre équipe multidisciplinaire est dédiée à votre bien-être et celui de votre bébé.
@@ -234,7 +234,7 @@ export default function ClinicScreen() {
                     <Text style={styles.doctorScheduleText}>{doc.schedule}</Text>
                   </View>
                   <TouchableOpacity style={styles.rdvBtn} onPress={() => Linking.openURL('tel:+21671000000')}>
-                    <LinearGradient colors={[Colors.primary, Colors.primaryDark]} style={styles.rdvBtnGrad}>
+                    <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.rdvBtnGrad}>
                       <Text style={styles.rdvBtnText}>📅 Prendre rendez-vous</Text>
                     </LinearGradient>
                   </TouchableOpacity>
@@ -345,14 +345,14 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, color: Colors.textSecondary, marginTop: 2, textAlign: 'center' },
   doctorCard: { backgroundColor: Colors.surface, borderRadius: 18, padding: 16, marginBottom: 14, borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   doctorHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-  doctorAvatar: { width: 52, height: 52, borderRadius: 26, backgroundColor: Colors.accent, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  doctorAvatar: { width: 52, height: 52, borderRadius: 26, backgroundColor: Colors.lilac, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   doctorAvatarText: { fontSize: 28 },
   doctorInfo: { flex: 1 },
   doctorName: { fontSize: 16, fontWeight: '700', color: Colors.text },
   doctorSpecialty: { fontSize: 13, color: Colors.primary, fontWeight: '500', marginTop: 2 },
   doctorExp: { fontSize: 12, color: Colors.textLight, marginTop: 2 },
   doctorTags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
-  doctorTag: { backgroundColor: Colors.accent, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
+  doctorTag: { backgroundColor: Colors.lilac, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4 },
   doctorTagText: { fontSize: 11, color: Colors.primaryDark, fontWeight: '600' },
   doctorSchedule: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   doctorScheduleText: { fontSize: 12, color: Colors.textSecondary },
@@ -377,6 +377,6 @@ const styles = StyleSheet.create({
   featureRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 5, gap: 8 },
   featureBullet: { fontSize: 14, color: Colors.success, fontWeight: '700' },
   featureText: { fontSize: 14, color: Colors.text },
-  decoNote: { backgroundColor: Colors.accent, borderRadius: 16, padding: 16 },
+  decoNote: { backgroundColor: Colors.lilac, borderRadius: 16, padding: 16 },
   decoNoteText: { fontSize: 14, color: Colors.primaryDark, lineHeight: 22 },
 });

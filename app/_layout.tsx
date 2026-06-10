@@ -8,16 +8,17 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatusBar style="dark" backgroundColor={Colors.background} />
+        <StatusBar style="light" backgroundColor={Colors.primaryDark} />
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
             name="pregnancy/week/[week]"
             options={{
               headerShown: true,
               headerTitle: 'Développement bébé',
-              headerStyle: { backgroundColor: Colors.background },
-              headerTintColor: Colors.primary,
+              headerStyle: { backgroundColor: Colors.primaryDeep },
+              headerTintColor: Colors.white,
               headerBackTitle: 'Retour',
             }}
           />
@@ -27,8 +28,8 @@ export default function RootLayout() {
               presentation: 'modal',
               headerShown: true,
               headerTitle: 'Ajouter une mesure',
-              headerStyle: { backgroundColor: Colors.background },
-              headerTintColor: Colors.primary,
+              headerStyle: { backgroundColor: Colors.primaryDeep },
+              headerTintColor: Colors.white,
             }}
           />
           <Stack.Screen
@@ -37,8 +38,8 @@ export default function RootLayout() {
               presentation: 'modal',
               headerShown: true,
               headerTitle: 'Mon échographie',
-              headerStyle: { backgroundColor: Colors.background },
-              headerTintColor: Colors.primary,
+              headerStyle: { backgroundColor: Colors.primaryDeep },
+              headerTintColor: Colors.white,
             }}
           />
         </Stack>

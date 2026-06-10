@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   ScrollView,
   View,
@@ -16,7 +16,7 @@ import Colors from '../../src/theme/colors';
 import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { getWeekData } from '../../src/data/weeklyData';
 import ProgressBar from '../../src/components/ProgressBar';
-import { differenceInWeeks, parseISO, addWeeks, format } from 'date-fns';
+import { differenceInWeeks, parseISO, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const { width } = Dimensions.get('window');
@@ -49,12 +49,12 @@ export default function HomeScreen() {
   };
 
   const quickActions = [
-    { icon: '🤰', label: 'Ma grossesse', route: '/(tabs)/pregnancy', color: Colors.primaryLight },
-    { icon: '💊', label: 'Ma santé', route: '/(tabs)/health', color: '#C8E6C9' },
-    { icon: '🧘', label: 'Zen', route: '/(tabs)/zen', color: Colors.zenLight },
-    { icon: '🏥', label: 'La Rose', route: '/(tabs)/more', color: Colors.goldLight },
-    { icon: '📋', label: 'CNAM', route: '/cnam', color: '#E3F2FD' },
-    { icon: '🖼️', label: 'Échographies', route: '/ultrasound', color: '#FFF8E1' },
+    { icon: 'female-outline' as const, label: 'Ma grossesse', route: '/(tabs)/pregnancy', bg: Colors.primary },
+    { icon: 'medkit-outline' as const, label: 'Ma santé', route: '/(tabs)/health', bg: Colors.primaryDeep },
+    { icon: 'leaf-outline' as const, label: 'Zen', route: '/(tabs)/zen', bg: Colors.primaryLight },
+    { icon: 'business-outline' as const, label: 'La Rose', route: '/(tabs)/more', bg: Colors.primarySoft },
+    { icon: 'document-text-outline' as const, label: 'CNAM', route: '/cnam', bg: Colors.accentDark },
+    { icon: 'images-outline' as const, label: 'Échographies', route: '/ultrasound', bg: Colors.zen },
   ];
 
   return (
@@ -65,7 +65,7 @@ export default function HomeScreen() {
       >
         {/* Header Hero */}
         <LinearGradient
-          colors={[Colors.primaryDark, Colors.primary, '#F4A7B5']}
+          colors={Colors.gradient.primary}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.hero}
@@ -76,7 +76,7 @@ export default function HomeScreen() {
               <Text style={styles.heroDate}>{format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}</Text>
             </View>
             <TouchableOpacity style={styles.notifBtn} onPress={() => router.push('/health/add' as any)}>
-              <Ionicons name="add-circle" size={32} color={Colors.white} />
+              <Ionicons name="add-circle-outline" size={32} color={Colors.white} />
             </TouchableOpacity>
           </View>
 
@@ -131,10 +131,10 @@ export default function HomeScreen() {
             {quickActions.map((action, idx) => (
               <TouchableOpacity
                 key={idx}
-                style={[styles.quickItem, { backgroundColor: action.color }]}
+                style={[styles.quickItem, { backgroundColor: action.bg }]}
                 onPress={() => router.push(action.route as any)}
               >
-                <Text style={styles.quickIcon}>{action.icon}</Text>
+                <Ionicons name={action.icon} size={26} color={Colors.white} style={styles.quickIconEl} />
                 <Text style={styles.quickLabel}>{action.label}</Text>
               </TouchableOpacity>
             ))}
@@ -143,8 +143,11 @@ export default function HomeScreen() {
           {/* Week Tip */}
           {weekData && (
             <View style={styles.tipCard}>
-              <LinearGradient colors={['#FFF0F5', '#F8D7E3']} style={styles.tipGradient}>
-                <Text style={styles.tipTitle}>💡 Conseil de la semaine {currentWeek}</Text>
+              <LinearGradient colors={Colors.gradient.card} style={styles.tipGradient}>
+                <View style={styles.tipTitleRow}>
+                  <Ionicons name="bulb-outline" size={18} color={Colors.primaryDark} />
+                  <Text style={styles.tipTitle}>Conseil de la semaine {currentWeek}</Text>
+                </View>
                 <Text style={styles.tipText}>{weekData.nutritionTip}</Text>
               </LinearGradient>
             </View>
@@ -156,10 +159,10 @@ export default function HomeScreen() {
               style={styles.devCard}
               onPress={() => router.push(`/pregnancy/week/${currentWeek}` as any)}
             >
-              <LinearGradient colors={[Colors.secondary, Colors.secondaryLight]} style={styles.devGradient}>
+              <LinearGradient colors={Colors.gradient.soft} style={styles.devGradient}>
                 <View style={styles.devHeader}>
                   <Text style={styles.devTitle}>Développement de bébé</Text>
-                  <Text style={styles.devArrow}>→</Text>
+                  <Ionicons name="arrow-forward" size={18} color={Colors.white} />
                 </View>
                 <Text style={styles.devEmoji}>{weekData.fruitEmoji}</Text>
                 <Text style={styles.devText}>{weekData.babyDevelopment[0]}</Text>
@@ -171,7 +174,10 @@ export default function HomeScreen() {
           {/* Emotional Note */}
           {weekData && (
             <View style={styles.emotionCard}>
-              <Text style={styles.emotionTitle}>Message pour toi 💕</Text>
+              <View style={styles.emotionTitleRow}>
+                <Ionicons name="heart-outline" size={18} color={Colors.primary} />
+                <Text style={styles.emotionTitle}>Message pour toi</Text>
+              </View>
               <Text style={styles.emotionText}>{weekData.emotionalNote}</Text>
             </View>
           )}
@@ -179,7 +185,7 @@ export default function HomeScreen() {
           {/* Next Appointment Reminder */}
           <View style={styles.reminderCard}>
             <View style={styles.reminderIcon}>
-              <Text style={styles.reminderEmoji}>📅</Text>
+              <Ionicons name="calendar-outline" size={22} color={Colors.primary} />
             </View>
             <View style={styles.reminderText}>
               <Text style={styles.reminderTitle}>Prochain rendez-vous</Text>
@@ -209,14 +215,14 @@ export default function HomeScreen() {
               <View style={{ height: 12 }} />
               <ProgressBar
                 progress={currentWeek <= 12 ? 0 : Math.min(1, (currentWeek - 12) / 15)}
-                color={Colors.secondary}
+                color={Colors.primaryLight}
                 label="2ème Trimestre (S13-S27)"
                 showPercent
               />
               <View style={{ height: 12 }} />
               <ProgressBar
                 progress={currentWeek <= 27 ? 0 : Math.min(1, (currentWeek - 27) / 13)}
-                color={Colors.zen}
+                color={Colors.mauve}
                 label="3ème Trimestre (S28-S40)"
                 showPercent
               />
@@ -262,12 +268,14 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   weekBadge: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    backgroundColor: 'rgba(255,255,255,0.18)',
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 8,
     alignSelf: 'flex-start',
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.28)',
   },
   weekNumber: {
     fontSize: 18,
@@ -322,13 +330,13 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 8,
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(255,255,255,0.22)',
     borderRadius: 4,
     overflow: 'hidden',
   },
   progressFill: {
     height: 8,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.lavender,
     borderRadius: 4,
   },
   daysLeft: {
@@ -349,10 +357,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   setupBtn: {
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(255,255,255,0.22)',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.38)',
   },
   setupBtnText: {
     color: Colors.white,
@@ -363,11 +373,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '600',
     color: Colors.text,
     marginBottom: 14,
     marginTop: 4,
+    letterSpacing: 0.2,
   },
   quickGrid: {
     flexDirection: 'row',
@@ -380,40 +391,44 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 14,
     alignItems: 'center',
-    shadowColor: Colors.primaryDark,
+    shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 3,
   },
-  quickIcon: {
-    fontSize: 28,
+  quickIconEl: {
     marginBottom: 6,
   },
   quickLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: Colors.text,
+    color: Colors.white,
     textAlign: 'center',
   },
   tipCard: {
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 16,
-    shadowColor: Colors.primaryDark,
+    shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.07,
     shadowRadius: 8,
     elevation: 3,
   },
   tipGradient: {
     padding: 20,
   },
+  tipTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
   tipTitle: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '600',
     color: Colors.primaryDark,
-    marginBottom: 8,
   },
   tipText: {
     fontSize: 14,
@@ -424,9 +439,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 16,
-    shadowColor: Colors.secondary,
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.18,
     shadowRadius: 12,
     elevation: 6,
   },
@@ -444,11 +459,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.white,
   },
-  devArrow: {
-    fontSize: 18,
-    color: Colors.white,
-    fontWeight: '700',
-  },
   devEmoji: {
     fontSize: 40,
     marginBottom: 8,
@@ -461,27 +471,32 @@ const styles = StyleSheet.create({
   },
   devMore: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.75)',
+    color: 'rgba(255,255,255,0.7)',
     fontStyle: 'italic',
   },
   emotionCard: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     borderRadius: 20,
     padding: 20,
     marginBottom: 16,
     borderLeftWidth: 4,
     borderLeftColor: Colors.primary,
-    shadowColor: Colors.primaryDark,
+    shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
     elevation: 2,
   },
+  emotionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
   emotionTitle: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '600',
     color: Colors.primary,
-    marginBottom: 8,
   },
   emotionText: {
     fontSize: 14,
@@ -492,11 +507,11 @@ const styles = StyleSheet.create({
   reminderCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: Colors.primaryDark,
+    shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -505,14 +520,11 @@ const styles = StyleSheet.create({
   reminderIcon: {
     width: 44,
     height: 44,
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.lilac,
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
-  },
-  reminderEmoji: {
-    fontSize: 22,
   },
   reminderText: {
     flex: 1,
@@ -528,10 +540,10 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   trimesterCard: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     borderRadius: 20,
     padding: 20,
-    shadowColor: Colors.primaryDark,
+    shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,

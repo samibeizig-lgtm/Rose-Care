@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import Colors from '../../src/theme/colors';
 import { pregnancyWeeks } from '../../src/data/weeklyData';
 import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
@@ -18,10 +19,10 @@ import { differenceInWeeks, parseISO } from 'date-fns';
 
 const { width } = Dimensions.get('window');
 
-const TRIMESTER_COLORS = {
-  1: [Colors.primary, Colors.primaryLight],
-  2: [Colors.secondary, Colors.secondaryLight],
-  3: [Colors.zen, Colors.zenLight],
+const TRIMESTER_COLORS: Record<1 | 2 | 3, [string, string]> = {
+  1: [Colors.primaryDark, Colors.primary],
+  2: [Colors.primary, Colors.primaryLight],
+  3: [Colors.primaryLight, Colors.primarySoft],
 };
 
 export default function PregnancyScreen() {
@@ -47,10 +48,10 @@ export default function PregnancyScreen() {
   ];
 
   const fertilityInfo = [
-    { icon: '📅', title: 'Jours fertiles', desc: 'Généralement 5 jours avant et 1 jour après l\'ovulation' },
-    { icon: '🔬', title: 'Bilan de fertilité', desc: 'Spermogramme + bilan hormonal si difficultés après 12 mois' },
-    { icon: '💉', title: 'FIV & AMP', desc: 'Techniques d\'Assistance Médicale à la Procréation disponibles' },
-    { icon: '🏥', title: 'Clinique La Rose', desc: 'Consultez nos spécialistes en fertilité' },
+    { icon: 'calendar-outline' as const, title: 'Jours fertiles', desc: 'Généralement 5 jours avant et 1 jour après l\'ovulation' },
+    { icon: 'flask-outline' as const, title: 'Bilan de fertilité', desc: 'Spermogramme + bilan hormonal si difficultés après 12 mois' },
+    { icon: 'medical-outline' as const, title: 'FIV & AMP', desc: 'Techniques d\'Assistance Médicale à la Procréation disponibles' },
+    { icon: 'business-outline' as const, title: 'Clinique La Rose', desc: 'Consultez nos spécialistes en fertilité' },
   ];
 
   return (
@@ -58,19 +59,20 @@ export default function PregnancyScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <LinearGradient
-          colors={[Colors.secondary, Colors.primary]}
+          colors={Colors.gradient.primary}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.header}
         >
-          <Text style={styles.headerTitle}>Ma Grossesse 🤱</Text>
+          <Text style={styles.headerTitle}>Ma Grossesse</Text>
           <Text style={styles.headerSubtitle}>De la conception à l'accouchement</Text>
           {currentWeek > 0 && (
             <TouchableOpacity
               style={styles.currentWeekBtn}
               onPress={() => router.push(`/pregnancy/week/${currentWeek}` as any)}
             >
-              <Text style={styles.currentWeekBtnText}>Ma semaine actuelle (S{currentWeek}) →</Text>
+              <Ionicons name="arrow-forward-circle-outline" size={16} color={Colors.white} />
+              <Text style={styles.currentWeekBtnText}>Ma semaine actuelle (S{currentWeek})</Text>
             </TouchableOpacity>
           )}
         </LinearGradient>
@@ -79,7 +81,7 @@ export default function PregnancyScreen() {
 
           {/* Conception Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🌱 Conception & Fertilité</Text>
+            <Text style={styles.sectionTitle}>Conception & Fertilité</Text>
             <Text style={styles.sectionSubtitle}>Conseils pour concevoir naturellement</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
               {conceptionTips.map((tip, idx) => (
@@ -94,10 +96,12 @@ export default function PregnancyScreen() {
 
           {/* Fertility Help Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🔬 Traitement de l'Infertilité</Text>
+            <Text style={styles.sectionTitle}>Traitement de l'Infertilité</Text>
             {fertilityInfo.map((item, idx) => (
               <View key={idx} style={styles.fertilityRow}>
-                <Text style={styles.fertilityIcon}>{item.icon}</Text>
+                <View style={styles.fertilityIconWrap}>
+                  <Ionicons name={item.icon} size={22} color={Colors.primary} />
+                </View>
                 <View style={styles.fertilityText}>
                   <Text style={styles.fertilityTitle}>{item.title}</Text>
                   <Text style={styles.fertilityDesc}>{item.desc}</Text>
@@ -107,7 +111,7 @@ export default function PregnancyScreen() {
           </View>
 
           {/* Trimester Filter */}
-          <Text style={styles.sectionTitle}>📅 Semaine par Semaine</Text>
+          <Text style={styles.sectionTitle}>Semaine par Semaine</Text>
           <View style={styles.filterRow}>
             <TouchableOpacity
               style={[styles.filterBtn, !selectedTrimester && styles.filterBtnActive]}
@@ -118,7 +122,7 @@ export default function PregnancyScreen() {
             {([1, 2, 3] as const).map(t => (
               <TouchableOpacity
                 key={t}
-                style={[styles.filterBtn, selectedTrimester === t && styles.filterBtnActive, { borderColor: TRIMESTER_COLORS[t][0] }]}
+                style={[styles.filterBtn, selectedTrimester === t && styles.filterBtnActive]}
                 onPress={() => setSelectedTrimester(selectedTrimester === t ? null : t)}
               >
                 <Text style={[styles.filterBtnText, selectedTrimester === t && styles.filterBtnTextActive]}>
@@ -133,7 +137,7 @@ export default function PregnancyScreen() {
             {filteredWeeks.map((week) => {
               const isCurrentWeek = week.week === currentWeek;
               const isPassed = week.week < currentWeek;
-              const colors = TRIMESTER_COLORS[week.trimester] as [string, string];
+              const colors = TRIMESTER_COLORS[week.trimester as 1 | 2 | 3];
 
               return (
                 <TouchableOpacity
@@ -149,10 +153,12 @@ export default function PregnancyScreen() {
                     <LinearGradient colors={colors} style={styles.weekGradient}>
                       <Text style={styles.weekEmoji}>{week.fruitEmoji}</Text>
                       <Text style={[styles.weekNum, { color: Colors.white }]}>S{week.week}</Text>
-                      <View style={styles.currentBadge}><Text style={styles.currentBadgeText}>✓</Text></View>
+                      <View style={styles.currentBadge}>
+                        <Ionicons name="checkmark" size={10} color={Colors.white} />
+                      </View>
                     </LinearGradient>
                   ) : (
-                    <View style={[styles.weekPlain, isPassed && { backgroundColor: Colors.accent }]}>
+                    <View style={[styles.weekPlain, isPassed && { backgroundColor: Colors.lilac }]}>
                       <Text style={styles.weekEmoji}>{week.fruitEmoji}</Text>
                       <Text style={[styles.weekNum, isPassed && { color: Colors.primary }]}>S{week.week}</Text>
                     </View>
@@ -190,11 +196,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   currentWeekBtn: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.32)',
   },
   currentWeekBtnText: {
     color: Colors.white,
@@ -208,10 +219,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '600',
     color: Colors.text,
     marginBottom: 6,
+    letterSpacing: 0.2,
   },
   sectionSubtitle: {
     fontSize: 13,
@@ -222,12 +234,12 @@ const styles = StyleSheet.create({
     marginHorizontal: -4,
   },
   tipCard: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 6,
     width: 140,
-    shadowColor: Colors.primaryDark,
+    shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -253,22 +265,27 @@ const styles = StyleSheet.create({
   fertilityRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     borderRadius: 14,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: Colors.border,
-    shadowColor: Colors.primaryDark,
+    shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 1,
   },
-  fertilityIcon: {
-    fontSize: 24,
+  fertilityIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.lilac,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
-    marginTop: 2,
+    flexShrink: 0,
   },
   fertilityText: {
     flex: 1,
@@ -295,7 +312,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1.5,
     borderColor: Colors.border,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
   },
   filterBtnActive: {
     backgroundColor: Colors.primary,
@@ -338,7 +355,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 70,
     justifyContent: 'center',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     borderWidth: 1,
     borderColor: Colors.border,
   },
@@ -355,16 +372,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
-    backgroundColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: 'rgba(255,255,255,0.32)',
     borderRadius: 8,
     width: 16,
     height: 16,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  currentBadgeText: {
-    fontSize: 10,
-    color: Colors.white,
-    fontWeight: '700',
   },
 });
