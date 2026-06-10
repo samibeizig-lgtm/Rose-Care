@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   Dimensions,
   RefreshControl,
+  Modal,
+  TextInput,
+  FlatList,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,14 +18,20 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
-import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
+import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { getWeekData } from '../../src/data/weeklyData';
 import ProgressBar from '../../src/components/ProgressBar';
+import DrawerMenu from '../../src/components/DrawerMenu';
 import { differenceInWeeks, parseISO, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const { width } = Dimensions.get('window');
-const WAVE_H = 56;
+const WAVE_H = 50;
+
+const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
+const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const YEARS = Array.from({ length: 60 }, (_, i) => String(2006 - i));
+const ITEM_H = 44;
 
 const dailyTips = [
   'Boire 8 à 10 verres d\'eau par jour aide votre corps à former le liquide amniotique.',
@@ -85,7 +95,7 @@ const dailyInfo = [
   'Bébé fait ses premiers mouvements respiratoires (exercice) vers 10 SA.',
   'La couleur des yeux de bébé peut changer dans les 6 mois suivant la naissance.',
   'Une grossesse multiple double le risque de prématurité — suivi renforcé recommandé.',
-  'Le méconium, premier selles de bébé, se forme dès 16 SA mais ne sort qu\'à la naissance.',
+  'Le méconium, premières selles de bébé, se forme dès 16 SA mais ne sort qu\'à la naissance.',
   'À terme, le placenta pèse environ 500g et mesure 20 cm.',
   'Bébé ouvre et ferme les poings, suce son pouce dès 15 SA.',
   'Le fer stocké in utero suffit pour les 6 premiers mois de vie.',
@@ -99,23 +109,69 @@ const dailyInfo = [
   'Après la naissance, bébé reconnaît votre voix et votre odeur dès les premières heures.',
 ];
 
-const MODULES = [
-  { icon: 'heart-outline', label: 'Grossesse', colors: ['#4B0082', '#7F00FF'] as [string, string], route: '/(tabs)/pregnancy' },
-  { icon: 'sparkles-outline', label: 'Fertilité', colors: ['#7F00FF', '#9933FF'] as [string, string], route: '/(tabs)/fertilite' },
-  { icon: 'pulse-outline', label: 'Santé', colors: ['#5B00B5', '#7F00FF'] as [string, string], route: '/(tabs)/health' },
-  { icon: 'leaf-outline', label: 'Zen', colors: ['#4B0082', '#5B21B6'] as [string, string], route: '/(tabs)/zen' },
-  { icon: 'bag-outline', label: 'Essentiels', colors: ['#7C3AED', '#A78BFA'] as [string, string], route: '/essentials' },
-  { icon: 'calendar-outline', label: 'Calendrier', colors: ['#5B21B6', '#7F00FF'] as [string, string], route: '/menstrual' },
-];
-
-const MODULE_W = (width - 48 - 12) / 2;
+function WheelCol({ items, selectedIndex, onSelect, colWidth }: { items: string[]; selectedIndex: number; onSelect: (i: number) => void; colWidth: number }) {
+  const ref = useRef<FlatList>(null);
+  useEffect(() => {
+    ref.current?.scrollToIndex({ index: selectedIndex, animated: false });
+  }, []);
+  return (
+    <View style={{ width: colWidth, height: ITEM_H * 5, overflow: 'hidden' }}>
+      <View style={[{ position: 'absolute', left: 4, right: 4, height: ITEM_H, top: ITEM_H * 2, backgroundColor: 'rgba(127,0,255,0.1)', borderRadius: 8, zIndex: 1 }]} pointerEvents="none" />
+      <FlatList
+        ref={ref}
+        data={items}
+        keyExtractor={(_, i) => String(i)}
+        showsVerticalScrollIndicator={false}
+        snapToInterval={ITEM_H}
+        decelerationRate="fast"
+        getItemLayout={(_, index) => ({ length: ITEM_H, offset: ITEM_H * index, index })}
+        contentContainerStyle={{ paddingVertical: ITEM_H * 2 }}
+        onMomentumScrollEnd={(e) => {
+          const idx = Math.round(e.nativeEvent.contentOffset.y / ITEM_H);
+          onSelect(Math.max(0, Math.min(idx, items.length - 1)));
+        }}
+        renderItem={({ item, index }) => (
+          <TouchableOpacity
+            onPress={() => { ref.current?.scrollToIndex({ index, animated: true }); onSelect(index); }}
+            style={{ height: ITEM_H, justifyContent: 'center', alignItems: 'center' }}
+          >
+            <Text style={{ fontSize: index === selectedIndex ? 17 : 14, color: index === selectedIndex ? Colors.primary : 'rgba(30,27,75,0.4)', fontWeight: index === selectedIndex ? '700' : '400' }}>{item}</Text>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
-  const [profile] = useStorage(STORAGE_KEYS.USER_PROFILE, { name: 'Belle Maman', mode: 'pregnant' });
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
+
+  const [profile, setProfile] = useStorage(STORAGE_KEYS.USER_PROFILE, { name: 'Belle Maman', mode: 'pregnant' });
   const [dueDate] = useStorage(STORAGE_KEYS.DUE_DATE, '');
   const [pregnancyStart] = useStorage(STORAGE_KEYS.PREGNANCY_START, '');
+
+  // Profile edit state
+  const [editPrenom, setEditPrenom] = useState('');
+  const [editNom, setEditNom] = useState('');
+  const [editDayIdx, setEditDayIdx] = useState(14);
+  const [editMonthIdx, setEditMonthIdx] = useState(0);
+  const [editYearIdx, setEditYearIdx] = useState(25);
+
+  // Random indices per launch
+  const [indices] = useState(() => ({
+    tip: Math.floor(Math.random() * dailyTips.length),
+    breath: Math.floor(Math.random() * breathingDaily.length),
+    info: Math.floor(Math.random() * dailyInfo.length),
+  }));
+
+  // Card entrance animation
+  const cardAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(cardAnim, { toValue: 1, duration: 600, useNativeDriver: true, delay: 200 }).start();
+  }, []);
 
   const currentWeek = pregnancyStart
     ? Math.min(40, Math.max(1, differenceInWeeks(new Date(), parseISO(pregnancyStart)) + 1))
@@ -135,9 +191,36 @@ export default function HomeScreen() {
     setTimeout(() => setRefreshing(false), 800);
   };
 
-  const dayIndex = (new Date().getDate() - 1) % dailyTips.length;
-  const breathIndex = new Date().getDay() % breathingDaily.length;
-  const infoIndex = (new Date().getDate() - 1) % dailyInfo.length;
+  const openProfileEdit = () => {
+    const p = profile as any;
+    setEditPrenom(p?.name && p.name !== 'Belle Maman' ? p.name : '');
+    setEditNom(p?.lastName || '');
+    const bd = p?.birthDate || '';
+    if (bd) {
+      const parts = bd.split('/');
+      if (parts.length === 3) {
+        setEditDayIdx(DAYS.indexOf(parts[0].padStart(2, '0')));
+        setEditMonthIdx(parseInt(parts[1], 10) - 1);
+        setEditYearIdx(YEARS.indexOf(parts[2]));
+      }
+    }
+    setProfileModalVisible(true);
+  };
+
+  const saveProfile = async () => {
+    const birthDate = `${DAYS[editDayIdx]}/${String(editMonthIdx + 1).padStart(2, '0')}/${YEARS[editYearIdx]}`;
+    const updated = { ...(profile as any), name: editPrenom || 'Belle Maman', lastName: editNom, birthDate, mode: 'pregnant' };
+    await setProfile(updated);
+    await storage.set(STORAGE_KEYS.ONBOARDING_DONE, true);
+    setProfileModalVisible(false);
+  };
+
+  const colW = (width - 80) / 3;
+
+  const cardStyle = {
+    opacity: cardAnim,
+    transform: [{ translateY: cardAnim.interpolate({ inputRange: [0, 1], outputRange: [24, 0] }) }],
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -145,27 +228,20 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
       >
-        {/* ─── Hero header ─── */}
-        <View style={styles.heroWrap}>
-          <LinearGradient
-            colors={Colors.gradient.primary}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.hero}
-          >
-            {/* Top row */}
-            <View style={styles.heroTop}>
-              <View>
-                <Text style={styles.greeting}>Bonjour, {profile?.name || 'Belle Maman'} 🌸</Text>
-                <Text style={styles.heroDate}>{format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}</Text>
-              </View>
-              <TouchableOpacity style={styles.avatarBtn} onPress={() => router.push('/health/add' as any)}>
-                <Ionicons name="person-outline" size={22} color={Colors.white} />
-              </TouchableOpacity>
+        {/* ─── Hero ─── */}
+        <LinearGradient colors={Colors.gradient.primary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+          <View style={styles.heroTop}>
+            <TouchableOpacity style={styles.menuBtn} onPress={() => setDrawerOpen(true)}>
+              <Ionicons name="menu" size={26} color={Colors.white} />
+            </TouchableOpacity>
+            <View style={styles.heroGreeting}>
+              <Text style={styles.greeting}>Bonjour, {(profile as any)?.name || 'Belle Maman'} 🌸</Text>
+              <Text style={styles.heroDate}>{format(new Date(), 'EEEE d MMMM yyyy', { locale: fr })}</Text>
             </View>
+          </View>
 
-            {/* Stats row */}
-            {currentWeek > 0 ? (
+          {currentWeek > 0 ? (
+            <>
               <View style={styles.statsRow}>
                 <View style={styles.statChip}>
                   <Text style={styles.statValue}>S{currentWeek}</Text>
@@ -186,15 +262,6 @@ export default function HomeScreen() {
                   </>
                 )}
               </View>
-            ) : (
-              <TouchableOpacity style={styles.setupChip} onPress={() => router.push('/health/add' as any)}>
-                <Ionicons name="add-circle-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
-                <Text style={styles.setupChipText}>Configurer mon profil</Text>
-              </TouchableOpacity>
-            )}
-
-            {/* Progress bar */}
-            {currentWeek > 0 && (
               <View style={styles.progressWrap}>
                 <View style={styles.progressLabels}>
                   <Text style={styles.progressLabel}>Progression grossesse</Text>
@@ -204,54 +271,35 @@ export default function HomeScreen() {
                   <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
                 </View>
               </View>
-            )}
-          </LinearGradient>
+            </>
+          ) : (
+            <TouchableOpacity style={styles.setupChip} onPress={openProfileEdit}>
+              <Ionicons name="person-add-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={styles.setupChipText}>Configurer mon profil</Text>
+            </TouchableOpacity>
+          )}
 
-          {/* Wave at bottom of hero */}
-          <Svg
-            width={width}
-            height={WAVE_H}
-            style={{ marginTop: -1 }}
-            viewBox={`0 0 ${width} ${WAVE_H}`}
-          >
-            <Path
-              d={`M0,0 Q${width * 0.5},${WAVE_H} ${width},0 L${width},${WAVE_H} L0,${WAVE_H} Z`}
-              fill="#FFFFFF"
-            />
+          {/* Wave */}
+          <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
+            <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
           </Svg>
-        </View>
+        </LinearGradient>
 
         {/* ─── White content ─── */}
-        <View style={styles.content}>
+        <Animated.View style={[styles.content, cardStyle]}>
 
-          {/* Modules grid */}
-          <Text style={styles.sectionLabel}>MODULES</Text>
-          <View style={styles.modulesGrid}>
-            {MODULES.map((mod) => (
-              <TouchableOpacity
-                key={mod.label}
-                style={styles.moduleCard}
-                onPress={() => router.push(mod.route as any)}
-                activeOpacity={0.82}
-              >
-                <LinearGradient
-                  colors={mod.colors}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.moduleGrad}
-                >
-                  <View style={styles.moduleIconWrap}>
-                    <Ionicons name={mod.icon as any} size={28} color="#FFFFFF" />
-                  </View>
-                  <Text style={styles.moduleLabel}>{mod.label}</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {/* Modifier profil (accessible quand profil déjà configuré) */}
+          {currentWeek > 0 && (
+            <TouchableOpacity style={styles.editProfileRow} onPress={openProfileEdit}>
+              <Ionicons name="person-circle-outline" size={20} color={Colors.primary} />
+              <Text style={styles.editProfileText}>Modifier mon profil</Text>
+              <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} style={{ marginLeft: 'auto' }} />
+            </TouchableOpacity>
+          )}
 
-          {/* Conseil du jour */}
           <Text style={styles.sectionLabel}>AUJOURD'HUI</Text>
 
+          {/* Conseil du jour */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconCircle, { backgroundColor: Colors.lilac }]}>
@@ -259,29 +307,25 @@ export default function HomeScreen() {
               </View>
               <Text style={styles.cardTitle}>Conseil du jour</Text>
             </View>
-            <Text style={styles.cardText}>{dailyTips[dayIndex]}</Text>
+            <Text style={styles.cardText}>{dailyTips[indices.tip]}</Text>
           </View>
 
-          {/* Exercice respiration */}
-          <TouchableOpacity
-            style={styles.breathCard}
-            onPress={() => router.push('/(tabs)/zen' as any)}
-            activeOpacity={0.9}
-          >
+          {/* Exercice du jour */}
+          <TouchableOpacity style={styles.breathCard} onPress={() => router.push('/(tabs)/zen' as any)} activeOpacity={0.9}>
             <LinearGradient colors={Colors.gradient.soft} style={styles.breathGrad}>
               <View style={styles.cardHeader}>
                 <View style={[styles.iconCircle, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                  <Ionicons name={breathingDaily[breathIndex].icon} size={18} color={Colors.white} />
+                  <Ionicons name={breathingDaily[indices.breath].icon} size={18} color={Colors.white} />
                 </View>
                 <Text style={[styles.cardTitle, { color: Colors.white }]}>Exercice du jour</Text>
                 <Ionicons name="chevron-forward" size={18} color="rgba(255,255,255,0.7)" style={{ marginLeft: 'auto' }} />
               </View>
-              <Text style={styles.breathTitle}>{breathingDaily[breathIndex].title}</Text>
-              <Text style={styles.breathDesc}>{breathingDaily[breathIndex].desc}</Text>
+              <Text style={styles.breathTitle}>{breathingDaily[indices.breath].title}</Text>
+              <Text style={styles.breathDesc}>{breathingDaily[indices.breath].desc}</Text>
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Info du jour */}
+          {/* Le saviez-vous */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconCircle, { backgroundColor: Colors.infoLight }]}>
@@ -289,22 +333,13 @@ export default function HomeScreen() {
               </View>
               <Text style={styles.cardTitle}>Le saviez-vous ?</Text>
             </View>
-            <Text style={styles.cardText}>{dailyInfo[infoIndex]}</Text>
+            <Text style={styles.cardText}>{dailyInfo[indices.info]}</Text>
           </View>
 
-          {/* Week tip & baby dev */}
+          {/* Baby dev */}
           {weekData && (
             <>
-              <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <View style={[styles.iconCircle, { backgroundColor: Colors.lilac }]}>
-                    <Ionicons name="sparkles-outline" size={18} color={Colors.primaryDeep} />
-                  </View>
-                  <Text style={styles.cardTitle}>Semaine {currentWeek}</Text>
-                </View>
-                <Text style={styles.cardText}>{weekData.nutritionTip}</Text>
-              </View>
-
+              <Text style={styles.sectionLabel}>BÉBÉ CETTE SEMAINE</Text>
               <TouchableOpacity
                 style={styles.devCard}
                 onPress={() => router.push(`/pregnancy/week/${currentWeek}` as any)}
@@ -313,7 +348,7 @@ export default function HomeScreen() {
                 <LinearGradient colors={Colors.gradient.primary} style={styles.devGrad}>
                   <View style={styles.devRow}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.devTitle}>Développement de bébé</Text>
+                      <Text style={styles.devTitle}>Développement — Semaine {currentWeek}</Text>
                       <Text style={styles.devSub}>{weekData.babyWeight} · {weekData.babyLength}</Text>
                       <Text style={styles.devText}>{weekData.babyDevelopment[0]}</Text>
                     </View>
@@ -328,6 +363,16 @@ export default function HomeScreen() {
 
               <View style={styles.card}>
                 <View style={styles.cardHeader}>
+                  <View style={[styles.iconCircle, { backgroundColor: Colors.lilac }]}>
+                    <Ionicons name="sparkles-outline" size={18} color={Colors.primaryDeep} />
+                  </View>
+                  <Text style={styles.cardTitle}>Conseil semaine {currentWeek}</Text>
+                </View>
+                <Text style={styles.cardText}>{weekData.nutritionTip}</Text>
+              </View>
+
+              <View style={styles.card}>
+                <View style={styles.cardHeader}>
                   <View style={[styles.iconCircle, { backgroundColor: Colors.roseLight }]}>
                     <Ionicons name="heart-outline" size={18} color={Colors.roseDark} />
                   </View>
@@ -338,32 +383,22 @@ export default function HomeScreen() {
             </>
           )}
 
-          {/* Prochain RDV */}
+          {/* Rendez-vous */}
           <Text style={styles.sectionLabel}>RENDEZ-VOUS</Text>
-          <TouchableOpacity
-            style={styles.reminderCard}
-            onPress={() => router.push('/(tabs)/health' as any)}
-            activeOpacity={0.85}
-          >
-            <View style={styles.reminderLeft}>
-              <View style={[styles.iconCircle, { backgroundColor: Colors.lilac, width: 48, height: 48, borderRadius: 24 }]}>
-                <Ionicons name="calendar-outline" size={22} color={Colors.primary} />
-              </View>
-              <View style={styles.reminderInfo}>
-                <Text style={styles.reminderTitle}>Prochain rendez-vous</Text>
-                <Text style={styles.reminderSub}>
-                  {currentWeek < 14 ? 'Bilan du 1er trimestre' :
-                    currentWeek < 22 ? 'Échographie morphologique' :
-                      currentWeek < 28 ? 'Test glycémie (HGPO)' :
-                        currentWeek < 32 ? 'Écho 3ème trimestre' :
-                          'Consultation mensuelle'}
-                </Text>
-              </View>
+          <TouchableOpacity style={styles.reminderCard} onPress={() => router.push('/(tabs)/health' as any)} activeOpacity={0.85}>
+            <View style={[styles.iconCircle, { backgroundColor: Colors.lilac, width: 48, height: 48, borderRadius: 24 }]}>
+              <Ionicons name="calendar-outline" size={22} color={Colors.primary} />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.reminderTitle}>Prochain rendez-vous</Text>
+              <Text style={styles.reminderSub}>
+                {currentWeek < 14 ? 'Bilan du 1er trimestre' : currentWeek < 22 ? 'Échographie morphologique' : currentWeek < 28 ? 'Test glycémie (HGPO)' : currentWeek < 32 ? 'Écho 3ème trimestre' : 'Consultation mensuelle'}
+              </Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={Colors.textMuted} />
           </TouchableOpacity>
 
-          {/* Trimester progress */}
+          {/* Progression trimestres */}
           {currentWeek > 0 && (
             <>
               <Text style={styles.sectionLabel}>PROGRESSION</Text>
@@ -378,54 +413,87 @@ export default function HomeScreen() {
           )}
 
           <View style={{ height: 24 }} />
-        </View>
+        </Animated.View>
       </ScrollView>
+
+      {/* ─── Drawer ─── */}
+      <DrawerMenu visible={drawerOpen} onClose={() => setDrawerOpen(false)} />
+
+      {/* ─── Profile edit modal ─── */}
+      <Modal visible={profileModalVisible} transparent animationType="slide" onRequestClose={() => setProfileModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Mon Profil</Text>
+              <TouchableOpacity onPress={() => setProfileModalVisible(false)}>
+                <Ionicons name="close" size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.inputLabel}>Prénom</Text>
+            <TextInput
+              style={styles.input}
+              value={editPrenom}
+              onChangeText={setEditPrenom}
+              placeholder="Votre prénom"
+              placeholderTextColor={Colors.textMuted}
+            />
+
+            <Text style={styles.inputLabel}>Nom</Text>
+            <TextInput
+              style={styles.input}
+              value={editNom}
+              onChangeText={setEditNom}
+              placeholder="Votre nom"
+              placeholderTextColor={Colors.textMuted}
+            />
+
+            <Text style={styles.inputLabel}>Date de naissance</Text>
+            <View style={styles.wheelRow}>
+              <WheelCol items={DAYS} selectedIndex={editDayIdx} onSelect={setEditDayIdx} colWidth={colW} />
+              <WheelCol items={MONTHS} selectedIndex={editMonthIdx} onSelect={setEditMonthIdx} colWidth={colW} />
+              <WheelCol items={YEARS} selectedIndex={editYearIdx} onSelect={setEditYearIdx} colWidth={colW} />
+            </View>
+
+            <TouchableOpacity style={styles.saveBtn} onPress={saveProfile}>
+              <LinearGradient colors={Colors.gradient.primary} style={styles.saveBtnGrad}>
+                <Text style={styles.saveBtnText}>Enregistrer</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
+  container: { flex: 1, backgroundColor: '#FFFFFF' },
 
-  /* Hero */
-  heroWrap: {
-    overflow: 'visible',
-  },
   hero: {
     paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 24,
+    paddingTop: 16,
+    paddingBottom: WAVE_H + 16,
+    overflow: 'hidden',
   },
   heroTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 18,
+    gap: 12,
   },
-  greeting: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.white,
-  },
-  heroDate: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    marginTop: 2,
-    textTransform: 'capitalize',
-  },
-  avatarBtn: {
+  menuBtn: {
     width: 42,
     height: 42,
     borderRadius: 21,
     backgroundColor: 'rgba(255,255,255,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.28)',
   },
+  heroGreeting: { flex: 1 },
+  greeting: { fontSize: 19, fontWeight: '700', color: Colors.white },
+  heroDate: { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2, textTransform: 'capitalize' },
+
   statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -433,29 +501,15 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    marginBottom: 16,
+    marginBottom: 14,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.18)',
   },
-  statChip: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  statLabel: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.75)',
-    marginTop: 2,
-  },
-  statDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: 'rgba(255,255,255,0.22)',
-  },
+  statChip: { flex: 1, alignItems: 'center' },
+  statValue: { fontSize: 18, fontWeight: '800', color: '#FFFFFF' },
+  statLabel: { fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
+  statDivider: { width: 1, height: 28, backgroundColor: 'rgba(255,255,255,0.22)' },
+
   setupChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -464,49 +518,33 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     alignSelf: 'flex-start',
-    marginBottom: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.28)',
   },
-  setupChipText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  progressWrap: {
-    marginTop: 4,
-  },
-  progressLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 7,
-  },
-  progressLabel: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.85)',
-  },
-  progressPct: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  progressTrack: {
-    height: 7,
-    backgroundColor: 'rgba(255,255,255,0.22)',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: 7,
-    backgroundColor: Colors.lavender,
-    borderRadius: 4,
-  },
+  setupChipText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
 
-  /* Content */
-  content: {
-    paddingHorizontal: 20,
-    backgroundColor: '#FFFFFF',
+  progressWrap: { marginTop: 4 },
+  progressLabels: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 7 },
+  progressLabel: { fontSize: 12, color: 'rgba(255,255,255,0.85)' },
+  progressPct: { fontSize: 12, fontWeight: '700', color: '#FFFFFF' },
+  progressTrack: { height: 7, backgroundColor: 'rgba(255,255,255,0.22)', borderRadius: 4, overflow: 'hidden' },
+  progressFill: { height: 7, backgroundColor: Colors.lavender, borderRadius: 4 },
+
+  content: { paddingHorizontal: 20, backgroundColor: '#FFFFFF' },
+
+  editProfileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.lilac,
+    borderRadius: 14,
+    marginTop: 16,
+    marginBottom: 4,
   },
+  editProfileText: { fontSize: 14, fontWeight: '600', color: Colors.primary, flex: 1 },
+
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
@@ -516,43 +554,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  /* Modules grid */
-  modulesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  moduleCard: {
-    width: MODULE_W,
-    borderRadius: 18,
-    overflow: 'hidden',
-    shadowColor: Colors.primaryDeep,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  moduleGrad: {
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    alignItems: 'flex-start',
-  },
-  moduleIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  moduleLabel: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-
-  /* White cards */
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
@@ -560,142 +561,43 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     shadowColor: Colors.primaryDeep,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
   },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 10,
-  },
-  iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text,
-  },
-  cardText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 22,
-  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
+  iconCircle: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  cardTitle: { fontSize: 14, fontWeight: '700', color: Colors.text },
+  cardText: { fontSize: 14, color: Colors.textSecondary, lineHeight: 22 },
 
-  /* Breathing card */
-  breathCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 14,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.22,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  breathGrad: {
-    padding: 18,
-  },
-  breathTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.white,
-    marginBottom: 5,
-  },
-  breathDesc: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.82)',
-    lineHeight: 20,
-  },
+  breathCard: { borderRadius: 20, overflow: 'hidden', marginBottom: 14, shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.22, shadowRadius: 12, elevation: 6 },
+  breathGrad: { padding: 18 },
+  breathTitle: { fontSize: 16, fontWeight: '700', color: Colors.white, marginBottom: 5 },
+  breathDesc: { fontSize: 13, color: 'rgba(255,255,255,0.82)', lineHeight: 20 },
 
-  /* Dev card */
-  devCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 14,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.22,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  devGrad: {
-    padding: 18,
-  },
-  devRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  devTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: Colors.white,
-    marginBottom: 3,
-  },
-  devSub: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.75)',
-    marginBottom: 6,
-  },
-  devText: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
-    lineHeight: 20,
-  },
-  devEmoji: {
-    fontSize: 44,
-    marginLeft: 12,
-  },
-  devFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  devMore: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
-    fontStyle: 'italic',
-  },
+  devCard: { borderRadius: 20, overflow: 'hidden', marginBottom: 14, shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.22, shadowRadius: 12, elevation: 6 },
+  devGrad: { padding: 18 },
+  devRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  devTitle: { fontSize: 15, fontWeight: '700', color: Colors.white, marginBottom: 3 },
+  devSub: { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginBottom: 6 },
+  devText: { fontSize: 13, color: 'rgba(255,255,255,0.9)', lineHeight: 20 },
+  devEmoji: { fontSize: 44, marginLeft: 12 },
+  devFooter: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  devMore: { fontSize: 12, color: 'rgba(255,255,255,0.7)', fontStyle: 'italic' },
 
-  /* Reminder card */
-  reminderCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 14,
-    shadowColor: Colors.primaryDeep,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  reminderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    flex: 1,
-  },
-  reminderInfo: {
-    flex: 1,
-  },
-  reminderTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text,
-  },
-  reminderSub: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    marginTop: 2,
-  },
+  reminderCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', borderRadius: 18, padding: 16, marginBottom: 14, shadowColor: Colors.primaryDeep, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 8, elevation: 3 },
+  reminderTitle: { fontSize: 14, fontWeight: '700', color: Colors.text },
+  reminderSub: { fontSize: 12, color: Colors.textMuted, marginTop: 2 },
+
+  // Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalSheet: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 24, paddingBottom: 40 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
+  modalTitle: { fontSize: 20, fontWeight: '800', color: Colors.text },
+  inputLabel: { fontSize: 12, fontWeight: '600', color: Colors.textMuted, letterSpacing: 0.8, marginBottom: 6, textTransform: 'uppercase' },
+  input: { backgroundColor: Colors.lilac, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 12, fontSize: 15, color: Colors.text, marginBottom: 16 },
+  wheelRow: { flexDirection: 'row', gap: 8, marginBottom: 24 },
+  saveBtn: { borderRadius: 14, overflow: 'hidden' },
+  saveBtnGrad: { paddingVertical: 15, alignItems: 'center' },
+  saveBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
 });

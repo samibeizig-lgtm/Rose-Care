@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -14,20 +14,33 @@ const CIRCLE_D = 120;
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ name: string; lastName?: string } | null>(null);
 
   useEffect(() => {
-    storage.get(STORAGE_KEYS.ONBOARDING_DONE, false).then((done) => {
-      if (done) router.replace('/(tabs)');
+    storage.get(STORAGE_KEYS.USER_PROFILE, null).then((p: any) => {
+      if (p?.name && p.name !== 'Belle Maman') {
+        setProfile(p);
+      }
+      setLoading(false);
     });
   }, []);
 
   const circleTop = TOP_H - WAVE_H / 2 - CIRCLE_D / 2;
 
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#FFFFFF" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* ─── Purple top section ─── */}
+      {/* ─── Purple top ─── */}
       <View style={[styles.topSection, { height: TOP_H }]}>
         <LinearGradient
           colors={['#4B0082', '#7F00FF']}
@@ -35,7 +48,6 @@ export default function WelcomeScreen() {
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
-
         <View style={styles.topContent}>
           <View style={styles.smallBadge}>
             <Ionicons name="heart" size={12} color="rgba(255,255,255,0.8)" />
@@ -45,43 +57,55 @@ export default function WelcomeScreen() {
             <Text style={styles.bold}>Rose</Text>
             <Text style={styles.light}> Care</Text>
           </Text>
-          <Text style={styles.tagline}>Votre compagne de maternité</Text>
+          <Text style={styles.tagline}>
+            {profile ? `Ravi de vous revoir !` : 'Votre compagne de maternité'}
+          </Text>
         </View>
-
-        {/* White wave cutting into the purple */}
         <Svg
           width={width}
           height={WAVE_H}
           style={{ position: 'absolute', bottom: 0 }}
           viewBox={`0 0 ${width} ${WAVE_H}`}
         >
-          <Path
-            d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`}
-            fill="#FFFFFF"
-          />
+          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
         </Svg>
       </View>
 
-      {/* ─── White bottom section ─── */}
+      {/* ─── White bottom ─── */}
       <View style={styles.bottomSection}>
-        {/* Spacer for circle bottom half */}
         <View style={{ height: CIRCLE_D / 2 + 24 }} />
 
-        <Text style={styles.welcomeTitle}>Commençons !</Text>
-        <Text style={styles.welcomeSub}>
-          Suivez votre parcours de fertilité{'\n'}et de maternité pas à pas
-        </Text>
-
-        <TouchableOpacity
-          style={styles.cta}
-          activeOpacity={0.85}
-          onPress={() => router.replace('/onboarding' as any)}
-        >
-          <Text style={styles.ctaText}>COMMENCER</Text>
-        </TouchableOpacity>
+        {profile ? (
+          <>
+            <Text style={styles.welcomeBack}>Bon retour,</Text>
+            <Text style={styles.welcomeName}>{profile.name} !</Text>
+            <Text style={styles.welcomeSub}>Votre parcours maternité continue ici.</Text>
+            <TouchableOpacity
+              style={styles.cta}
+              activeOpacity={0.85}
+              onPress={() => router.replace('/(tabs)')}
+            >
+              <Text style={styles.ctaText}>CONTINUER</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <Text style={styles.welcomeTitle}>Commençons !</Text>
+            <Text style={styles.welcomeSub}>
+              Suivez votre parcours de fertilité{'\n'}et de maternité pas à pas
+            </Text>
+            <TouchableOpacity
+              style={styles.cta}
+              activeOpacity={0.85}
+              onPress={() => router.replace('/onboarding' as any)}
+            >
+              <Text style={styles.ctaText}>COMMENCER</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
-      {/* ─── Floating circle at boundary ─── */}
+      {/* ─── Floating circle ─── */}
       <View style={[styles.floatCircle, { top: circleTop, left: (width - CIRCLE_D) / 2 }]}>
         <LinearGradient
           colors={['#7F00FF', '#B366FF']}
@@ -97,6 +121,12 @@ export default function WelcomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  loader: {
+    flex: 1,
+    backgroundColor: '#7F00FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -154,6 +184,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     paddingBottom: 48,
     justifyContent: 'center',
+  },
+  welcomeBack: {
+    fontSize: 20,
+    color: '#9CA3AF',
+    fontWeight: '400',
+    marginBottom: 4,
+  },
+  welcomeName: {
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#1E1B4B',
+    marginBottom: 10,
   },
   welcomeTitle: {
     fontSize: 26,

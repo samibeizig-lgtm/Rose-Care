@@ -60,10 +60,26 @@ const fertilityTreatments = [
 ];
 
 const faqs = [
-  { q: 'À quel moment du cycle suis-je la plus fertile ?', a: 'Les 5 jours avant l\'ovulation et le jour de l\'ovulation constituent la fenêtre fertile. Pour un cycle de 28 jours, c\'est généralement autour du J14.' },
+  { q: 'À quel moment du cycle suis-je la plus fertile ?', a: 'Les 5 jours avant l\'ovulation et le jour J constituent la fenêtre fertile. Pour un cycle de 28 jours, c\'est généralement autour du J14.' },
   { q: 'Combien de temps faut-il en moyenne pour concevoir ?', a: 'Chez les couples fertiles, 85% conçoivent dans l\'année. Si aucune grossesse après 12 mois (ou 6 mois après 35 ans), consultez un spécialiste.' },
-  { q: 'Le stress peut-il réduire la fertilité ?', a: 'Oui. Le stress chronique élève le cortisol, qui perturbe les hormones LH et FSH essentielles à l\'ovulation.' },
-  { q: 'Quels examens pour un bilan de fertilité ?', a: 'Pour la femme : bilan hormonal, échographie pelvienne, bilan thyroïdien. Pour l\'homme : spermogramme. À faire en couple dès 6–12 mois sans grossesse.' },
+  { q: 'Le stress peut-il réduire la fertilité ?', a: 'Oui. Le stress chronique élève le cortisol, qui perturbe les hormones LH et FSH essentielles à l\'ovulation. La relaxation et le yoga prénatal aident.' },
+  { q: 'Quels examens pour un bilan de fertilité ?', a: 'Pour la femme : bilan hormonal (FSH, LH, AMH), échographie pelvienne, bilan thyroïdien. Pour l\'homme : spermogramme. À faire en couple dès 6–12 mois sans grossesse.' },
+  { q: 'Comment détecter l\'ovulation naturellement ?', a: 'Plusieurs méthodes : température basale (hausse de 0,2–0,5°C après l\'ovulation), glaire cervicale (transparente et filante au moment fertile), tests d\'ovulation urinaires.' },
+  { q: 'L\'alimentation influence-t-elle la fertilité ?', a: 'Oui. Les folates (épinards, légumineuses), le zinc, les oméga-3 et la vitamine D sont essentiels. Évitez les aliments ultra-transformés, l\'alcool et le tabac.' },
+  { q: 'Le poids corporel a-t-il un impact sur la fertilité ?', a: 'Un IMC en dehors de la fourchette normale (18.5–25) peut perturber l\'ovulation. Aussi bien la sous-nutrition que l\'obésité réduisent les chances de conception.' },
+  { q: 'Qu\'est-ce que l\'insuffisance ovarienne prématurée ?', a: 'C\'est un arrêt du fonctionnement normal des ovaires avant 40 ans. Elle touche 1% des femmes. Un bilan hormonal (FSH élevée, AMH basse) permet le diagnostic.' },
+  { q: 'L\'âge de l\'homme affecte-t-il la fertilité du couple ?', a: 'Oui. Après 40 ans, la qualité du sperme décline : moins de mobilité, plus de fragmentation de l\'ADN. Cela augmente légèrement le risque de fausse couche.' },
+  { q: 'Qu\'est-ce que le syndrome des ovaires polykystiques (SOPK) ?', a: 'C\'est la cause la plus fréquente d\'infertilité anovulatoire. Signes : cycles irréguliers, acné, excès de pilosité. Traitable par mode de vie et médicaments.' },
+  { q: 'La thyroïde peut-elle influencer la fertilité ?', a: 'Oui. L\'hypothyroïdie et l\'hyperthyroïdie perturbent toutes deux l\'ovulation et augmentent le risque de fausse couche. Un bilan TSH est recommandé avant toute PMA.' },
+  { q: 'Qu\'est-ce que la réserve ovarienne ?', a: 'C\'est la quantité et la qualité d\'ovocytes restants. Elle est évaluée par le taux d\'AMH (hormone anti-müllerienne) et le compte des follicules antraux à l\'échographie.' },
+  { q: 'Combien de tentatives de FIV sont généralement nécessaires ?', a: 'En moyenne, 2 à 3 cycles sont nécessaires pour obtenir une grossesse. Le taux de succès cumulatif après 3 tentatives atteint 60–70% selon l\'âge.' },
+  { q: 'Les rapports sexuels trop fréquents réduisent-ils les chances ?', a: 'Non, des rapports tous les 1 à 2 jours pendant la période fertile sont optimaux. Contrairement aux idées reçues, l\'abstinence prolongée diminue la qualité du sperme.' },
+  { q: 'Le café peut-il affecter la fertilité ?', a: 'À forte dose (plus de 5 tasses/jour), la caféine réduit légèrement la fertilité féminine et augmente le risque de fausse couche. 2 tasses/jour restent sans impact significatif.' },
+  { q: 'Qu\'est-ce que l\'endométriose et comment affecte-t-elle la fertilité ?', a: 'C\'est une présence de tissu utérin hors de l\'utérus. Elle touche 10% des femmes et 30–50% des femmes infertiles. Elle peut être traitée chirurgicalement.' },
+  { q: 'Les compléments alimentaires améliorent-ils la fertilité ?', a: 'L\'acide folique (400 µg/jour) est indispensable. La CoQ10, la vitamine E, et le zinc peuvent améliorer la qualité ovocytaire et spermatique.' },
+  { q: 'Faut-il consulter un médecin avant de concevoir ?', a: 'Oui, une consultation préconceptionnelle permet d\'évaluer les risques, mettre à jour les vaccins, supplémenter en folates et corriger d\'éventuels problèmes thyroïdiens.' },
+  { q: 'L\'arrêt de la contraception hormonale retarde-t-il la conception ?', a: 'Chez la plupart des femmes, les cycles reprennent dans le premier mois. Chez certaines, cela peut prendre 3 à 6 mois. C\'est normal et sans incidence à long terme.' },
+  { q: 'Qu\'est-ce que la procréation médicalement assistée (PMA) ?', a: 'La PMA regroupe l\'insémination artificielle, la FIV et l\'ICSI. Elle est proposée après 12 mois d\'infertilité chez les moins de 35 ans, 6 mois après 35 ans, ou d\'emblée en cas de pathologie connue.' },
 ];
 
 interface FertileWindow {

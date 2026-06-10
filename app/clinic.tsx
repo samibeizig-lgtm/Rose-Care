@@ -6,7 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Linking,
+  Dimensions,
 } from 'react-native';
+
+const { width } = Dimensions.get('window');
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -123,11 +126,18 @@ export default function ClinicScreen() {
   ];
 
   const infoRows = [
-    { icon: 'location-outline' as const, text: 'Avenue de la Bourse, Les Jardins du Lac, 1053 Tunis' },
-    { icon: 'call-outline' as const, text: '71 100 900' },
-    { icon: 'mail-outline' as const, text: 'contact@clinique-larose.com' },
-    { icon: 'globe-outline' as const, text: 'www.clinique-larose.com' },
-    { icon: 'time-outline' as const, text: 'Urgences 24h/24 - 7j/7' },
+    { icon: 'location-outline' as const, text: 'Avenue de la Bourse, Les Jardins du Lac, 1053 Tunis', url: 'https://maps.app.goo.gl/G2K1uNmA5vHqGx8r8' },
+    { icon: 'call-outline' as const, text: '71 100 900', url: 'tel:+21671100900' },
+    { icon: 'mail-outline' as const, text: 'contact@clinique-larose.com', url: 'mailto:contact@clinique-larose.com' },
+    { icon: 'globe-outline' as const, text: 'www.clinique-larose.com', url: 'https://www.clinique-larose.com' },
+    { icon: 'time-outline' as const, text: 'Urgences 24h/24 - 7j/7', url: null },
+  ];
+
+  const stats = [
+    { value: '+1200', label: 'Naissances / an', icon: 'happy-outline' as const },
+    { value: '40 ans', label: 'D\'expérience', icon: 'time-outline' as const },
+    { value: '24h/7j', label: 'Disponibilité', icon: 'medical-outline' as const },
+    { value: '100%', label: 'Dédié à la maternité', icon: 'heart-outline' as const },
   ];
 
   const TABS = [
@@ -153,7 +163,7 @@ export default function ClinicScreen() {
             <Ionicons name="call" size={18} color={Colors.white} />
             <Text style={styles.contactBtnText}>Appeler</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('https://maps.google.com/?q=Avenue+de+la+Bourse+Les+Jardins+du+Lac+Tunis')}>
+          <TouchableOpacity style={styles.contactBtn} onPress={() => Linking.openURL('https://maps.app.goo.gl/G2K1uNmA5vHqGx8r8')}>
             <Ionicons name="location" size={18} color={Colors.white} />
             <Text style={styles.contactBtnText}>Localiser</Text>
           </TouchableOpacity>
@@ -185,6 +195,17 @@ export default function ClinicScreen() {
 
           {activeTab === 'info' && (
             <>
+              {/* Stats */}
+              <View style={styles.statsRow}>
+                {stats.map((s, i) => (
+                  <View key={i} style={styles.statBox}>
+                    <Ionicons name={s.icon} size={20} color={Colors.rose} style={{ marginBottom: 6 }} />
+                    <Text style={styles.statValue}>{s.value}</Text>
+                    <Text style={styles.statLabel}>{s.label}</Text>
+                  </View>
+                ))}
+              </View>
+
               {/* Contact Info */}
               <View style={styles.infoCard}>
                 <View style={styles.infoCardTitleRow}>
@@ -192,12 +213,18 @@ export default function ClinicScreen() {
                   <Text style={styles.infoCardTitle}>Coordonnées</Text>
                 </View>
                 {infoRows.map((row, idx) => (
-                  <View key={idx} style={[styles.infoRow, idx === infoRows.length - 1 && { borderBottomWidth: 0 }]}>
+                  <TouchableOpacity
+                    key={idx}
+                    style={[styles.infoRow, idx === infoRows.length - 1 && { borderBottomWidth: 0 }]}
+                    onPress={() => row.url && Linking.openURL(row.url)}
+                    disabled={!row.url}
+                  >
                     <View style={styles.infoIconBox}>
                       <Ionicons name={row.icon} size={16} color={Colors.primary} />
                     </View>
-                    <Text style={styles.infoText}>{row.text}</Text>
-                  </View>
+                    <Text style={[styles.infoText, row.url ? { color: Colors.primary, textDecorationLine: 'underline' } : {}]}>{row.text}</Text>
+                    {row.url && <Ionicons name="open-outline" size={14} color={Colors.textMuted} />}
+                  </TouchableOpacity>
                 ))}
               </View>
 
@@ -372,6 +399,10 @@ const styles = StyleSheet.create({
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, marginTop: 4 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: Colors.text },
   decoSubtitle: { fontSize: 13, color: Colors.textSecondary, marginBottom: 16, lineHeight: 20 },
+  statsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 20 },
+  statBox: { flex: 1, minWidth: (width - 60) / 2, backgroundColor: Colors.surface, borderRadius: 16, padding: 16, alignItems: 'center', shadowColor: Colors.primaryDeep, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3, borderWidth: 1, borderColor: Colors.border },
+  statValue: { fontSize: 20, fontWeight: '900', color: Colors.primary, marginBottom: 2 },
+  statLabel: { fontSize: 11, color: Colors.textMuted, textAlign: 'center', fontWeight: '500' },
   infoCard: { backgroundColor: Colors.surface, borderRadius: 18, padding: 18, marginBottom: 20, borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   infoCardTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   infoCardTitle: { fontSize: 16, fontWeight: '700', color: Colors.text },
@@ -388,10 +419,8 @@ const styles = StyleSheet.create({
   aboutTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   aboutTitle: { fontSize: 18, fontWeight: '700', color: Colors.primaryDark },
   aboutText: { fontSize: 14, color: Colors.text, lineHeight: 22, marginBottom: 16 },
-  statsRow: { flexDirection: 'row', justifyContent: 'space-around' },
   statItem: { alignItems: 'center' },
   statNum: { fontSize: 22, fontWeight: '800', color: Colors.primary },
-  statLabel: { fontSize: 11, color: Colors.textSecondary, marginTop: 2, textAlign: 'center' },
   doctorCard: { backgroundColor: Colors.surface, borderRadius: 18, padding: 16, marginBottom: 14, borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   doctorHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   doctorAvatar: { width: 52, height: 52, borderRadius: 26, backgroundColor: Colors.lilac, justifyContent: 'center', alignItems: 'center', marginRight: 12 },

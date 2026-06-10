@@ -26,7 +26,7 @@ const { width } = Dimensions.get('window');
 const WAVE_H = 50;
 
 export default function ZenScreen() {
-  const [activeTab, setActiveTab] = useState<'respiration' | 'sons' | 'affirmations' | 'yoga'>('respiration');
+  const [activeTab, setActiveTab] = useState<'respiration' | 'hypnose' | 'affirmations' | 'yoga'>('respiration');
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [isBreathing, setIsBreathing] = useState(false);
   const [breathPhase, setBreathPhase] = useState<'inspire' | 'hold' | 'expire' | 'idle'>('idle');
@@ -220,19 +220,19 @@ export default function ZenScreen() {
 
       {/* Tabs */}
       <View style={styles.tabs}>
-        {(['respiration', 'sons', 'affirmations', 'yoga'] as const).map(tab => (
+        {(['respiration', 'hypnose', 'affirmations', 'yoga'] as const).map(tab => (
           <TouchableOpacity
             key={tab}
             style={[styles.tab, activeTab === tab && styles.tabActive]}
             onPress={() => setActiveTab(tab)}
           >
             <Ionicons
-              name={tab === 'respiration' ? 'wind-outline' : tab === 'sons' ? 'musical-notes-outline' : tab === 'affirmations' ? 'chatbubble-outline' : 'body-outline' as any}
+              name={tab === 'respiration' ? 'pulse-outline' : tab === 'hypnose' ? 'mic-outline' : tab === 'affirmations' ? 'chatbubble-outline' : 'body-outline' as any}
               size={18}
               color={activeTab === tab ? Colors.primary : Colors.textLight}
             />
             <Text style={[styles.tabLabel, activeTab === tab && styles.tabLabelActive]}>
-              {tab === 'respiration' ? 'Respiration' : tab === 'sons' ? 'Sons' : tab === 'affirmations' ? 'Affirmations' : 'Yoga'}
+              {tab === 'respiration' ? 'Respiration' : tab === 'hypnose' ? 'Hypnose' : tab === 'affirmations' ? 'Affirmations' : 'Yoga'}
             </Text>
           </TouchableOpacity>
         ))}
@@ -339,61 +339,79 @@ export default function ZenScreen() {
           </View>
         )}
 
-        {/* SOUNDS TAB */}
-        {activeTab === 'sons' && (
+        {/* HYPNOSE TAB */}
+        {activeTab === 'hypnose' && (
           <View style={styles.content}>
-            <Text style={styles.sectionTitle}>Sons de Relaxation</Text>
+            <Text style={styles.sectionTitle}>Hypnose & Relaxation Guidée</Text>
             <Text style={styles.sectionSubtitle}>
-              Choisissez un son apaisant pour vous détendre et créer un environnement serein pour votre bébé.
+              Des séances de relaxation et d'hypnose douce en français, spécialement conçues pour la grossesse.
             </Text>
 
-            {soundPlaying && (
-              <View style={styles.nowPlayingBar}>
-                <Ionicons name="volume-high-outline" size={16} color={Colors.primary} style={{ marginRight: 8 }} />
-                <Text style={styles.nowPlayingText}>
-                  {relaxationSounds.find(s => s.id === soundPlaying)?.title ?? ''} — en cours de lecture
-                </Text>
-                <TouchableOpacity onPress={stopSound} style={styles.stopSoundBtn}>
-                  <Ionicons name="stop-circle-outline" size={22} color={Colors.error} />
-                </TouchableOpacity>
-              </View>
-            )}
-
-            <View style={styles.soundsGrid}>
-              {relaxationSounds.map((sound) => (
-                <TouchableOpacity
-                  key={sound.id}
-                  style={[styles.soundCard, soundPlaying === sound.id && styles.soundCardActive]}
-                  onPress={() => handleSoundPress(sound.id, sound.audioUrl)}
-                  disabled={isLoadingSound}
-                >
-                  {soundPlaying === sound.id ? (
-                    <LinearGradient colors={Colors.gradient.soft} style={styles.soundCardGrad}>
-                      <Ionicons name={sound.ionicon as any} size={30} color="rgba(255,255,255,0.95)" style={{ marginBottom: 8 }} />
-                      <Text style={[styles.soundTitle, { color: Colors.white }]}>{sound.title}</Text>
-                      <View style={styles.soundPlayingRow}>
-                        <Ionicons name="volume-high-outline" size={12} color="rgba(255,255,255,0.85)" />
-                        <Text style={styles.soundPlaying}> En cours</Text>
-                      </View>
-                    </LinearGradient>
-                  ) : (
-                    <View style={styles.soundCardInner}>
-                      <Ionicons name={sound.ionicon as any} size={30} color={Colors.primary} style={{ marginBottom: 8 }} />
-                      <Text style={styles.soundTitle}>{sound.title}</Text>
-                      <Text style={styles.soundDesc}>{sound.description}</Text>
+            {[
+              { id: 'voyage', title: 'Voyage Intérieur', duration: '15 min', icon: 'compass-outline', colors: ['#4B0082', '#7F00FF'] as [string,string],
+                desc: 'Un voyage guidé au cœur de vous-même pour retrouver calme et sérénité.',
+                script: 'Installez-vous confortablement... Fermez doucement les yeux... Prenez une grande inspiration et laissez votre corps se détendre complètement...\n\nRessentez le poids de votre corps qui s\'enfonce dans la surface sous vous... Chaque expiration emporte un peu plus de tension...\n\nImaginez-vous dans un jardin fleuri... l\'air est doux et parfumé... Vous entendez le chant des oiseaux au loin... Vous êtes en sécurité ici...\n\nRespiration après respiration, vous vous enfoncez plus profondément dans la détente...' },
+              { id: 'nuit', title: 'Nuit Sereine', duration: '20 min', icon: 'moon-outline', colors: ['#5B21B6', '#4B0082'] as [string,string],
+                desc: 'Préparez votre corps et votre esprit pour un sommeil profond et réparateur.',
+                script: 'Ce soir, vous méritez un repos complet... Allongez-vous confortablement... Sentez votre corps qui s\'alourdit progressivement...\n\nVos paupières sont lourdes... très lourdes... Vos muscles se relâchent l\'un après l\'autre...\n\nVotre bébé dort paisiblement en vous, bercé par votre calme... Vous pouvez lâcher prise... Il est temps de vous reposer...' },
+              { id: 'bebe', title: 'Lien Maman-Bébé', duration: '12 min', icon: 'heart-outline', colors: ['#7F00FF', '#B366FF'] as [string,string],
+                desc: 'Renforcez la connexion profonde avec votre bébé à travers cette méditation.',
+                script: 'Placez doucement vos mains sur votre ventre... Sentez la chaleur qui irradie de vos paumes...\n\nVisualisez votre bébé, niché en sécurité en vous... entouré d\'une lumière dorée et chaude...\n\nDites-lui intérieurement : "Je t\'aime, je te protège, je suis là pour toi..." Votre bébé entend votre voix, il ressent votre amour...' },
+              { id: 'confiance', title: 'Confiance en l\'Accouchement', duration: '18 min', icon: 'shield-checkmark-outline', colors: ['#4B0082', '#7C3AED'] as [string,string],
+                desc: 'Préparez-vous mentalement à l\'accouchement avec sérénité et confiance.',
+                script: 'Votre corps a été conçu pour cela... Il sait exactement ce qu\'il doit faire... Faites confiance à cette sagesse innée...\n\nChaque contraction est une vague qui vous rapproche de votre bébé... Accueillez-la, respirez avec elle, laissez-la passer...\n\nVous êtes forte... Vous avez toutes les ressources nécessaires en vous... Votre corps et votre bébé travaillent ensemble...' },
+              { id: 'anxiete', title: 'Libérer l\'Anxiété', duration: '10 min', icon: 'leaf-outline', colors: ['#6B21A8', '#9333EA'] as [string,string],
+                desc: 'Relâchez les inquiétudes et retrouvez un état de calme profond.',
+                script: 'L\'anxiété n\'est qu\'une pensée... et les pensées passent comme des nuages dans le ciel...\n\nImaginez que chaque souffle expiré emporte une préoccupation... Le ciel se dégage peu à peu...\n\nVous n\'avez rien à résoudre maintenant... Vous pouvez simplement être... ici... présente... en paix...' },
+              { id: 'energie', title: 'Énergie Positive', duration: '8 min', icon: 'sunny-outline', colors: ['#7F00FF', '#A855F7'] as [string,string],
+                desc: 'Rechargez vos batteries et amplifiez votre énergie vitale.',
+                script: 'Imaginez une lumière dorée au-dessus de vous... Elle descend doucement vers votre sommet de la tête...\n\nCette lumière tiède traverse votre nuque, vos épaules, votre cœur... jusqu\'à vos pieds...\n\nVous êtes remplie d\'énergie positive... Cette lumière nourrit aussi votre bébé... Vous rayonnez d\'amour et de vitalité...' },
+            ].map((session) => (
+              <TouchableOpacity
+                key={session.id}
+                style={styles.hypnoseCard}
+                onPress={() => setSelectedExercise(selectedExercise === session.id ? null : session.id)}
+                activeOpacity={0.85}
+              >
+                <LinearGradient colors={session.colors} style={styles.hypnoseHeader}>
+                  <View style={styles.hypnoseHeaderLeft}>
+                    <Ionicons name={session.icon as any} size={28} color="#FFFFFF" />
+                    <View style={{ marginLeft: 14 }}>
+                      <Text style={styles.hypnoseTitle}>{session.title}</Text>
+                      <Text style={styles.hypnoseDuration}>{session.duration}</Text>
                     </View>
-                  )}
-                </TouchableOpacity>
-              ))}
-            </View>
+                  </View>
+                  <Ionicons
+                    name={selectedExercise === session.id ? 'chevron-up' : 'chevron-down'}
+                    size={20}
+                    color="rgba(255,255,255,0.8)"
+                  />
+                </LinearGradient>
+                {selectedExercise !== session.id && (
+                  <View style={styles.hypnoseDesc}>
+                    <Text style={styles.hypnoseDescText}>{session.desc}</Text>
+                  </View>
+                )}
+                {selectedExercise === session.id && (
+                  <View style={styles.hypnoseScript}>
+                    <Text style={styles.hypnoseScriptLabel}>Séance guidée :</Text>
+                    <Text style={styles.hypnoseScriptText}>{session.script}</Text>
+                    <View style={styles.hypnoseTip}>
+                      <Ionicons name="headset-outline" size={16} color={Colors.primary} style={{ marginRight: 6 }} />
+                      <Text style={styles.hypnoseTipText}>Fermez les yeux et lisez lentement, ou faites-vous lire ce texte à voix haute.</Text>
+                    </View>
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
 
             <View style={styles.musicNote}>
               <View style={styles.musicNoteTitleRow}>
-                <Ionicons name="musical-note-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                <Text style={styles.musicNoteTitle}>Musique et bébé</Text>
+                <Ionicons name="mic-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                <Text style={styles.musicNoteTitle}>Les bienfaits de l'hypnose prénatale</Text>
               </View>
               <Text style={styles.musicNoteText}>
-                Votre bébé entend la musique à partir de la semaine 16. La musique douce stimule son développement cérébral et crée des souvenirs émotionnels. Chantez-lui des berceuses !
+                L'hypnose douce réduit l'anxiété de 60%, améliore la qualité du sommeil et renforce le lien maman-bébé. Pratiquez 10 à 20 min par jour pour des résultats optimaux.
               </Text>
             </View>
           </View>
@@ -863,6 +881,79 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'rgba(255,255,255,0.85)',
     fontWeight: '600',
+  },
+  hypnoseCard: {
+    borderRadius: 18,
+    overflow: 'hidden',
+    marginBottom: 14,
+    shadowColor: Colors.primaryDeep,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
+    backgroundColor: '#FFFFFF',
+  },
+  hypnoseHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 18,
+  },
+  hypnoseHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  hypnoseTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  hypnoseDuration: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.75)',
+    marginTop: 2,
+  },
+  hypnoseDesc: {
+    padding: 16,
+    paddingTop: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  hypnoseDescText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+  hypnoseScript: {
+    padding: 18,
+    backgroundColor: '#FAFAFA',
+  },
+  hypnoseScriptLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.textMuted,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  hypnoseScriptText: {
+    fontSize: 14,
+    color: Colors.text,
+    lineHeight: 24,
+    fontStyle: 'italic',
+    marginBottom: 14,
+  },
+  hypnoseTip: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: Colors.lilac,
+    borderRadius: 10,
+    padding: 10,
+  },
+  hypnoseTipText: {
+    fontSize: 12,
+    color: Colors.primaryDeep,
+    flex: 1,
+    lineHeight: 18,
   },
   musicNote: {
     backgroundColor: Colors.lilac,
