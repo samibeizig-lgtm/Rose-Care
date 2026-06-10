@@ -57,20 +57,7 @@ jobs:
 
           echo "Build output: $BUILD_JSON"
 
-          APK_URL=$(echo "$BUILD_JSON" | python3 -c "
-import sys, json
-raw = sys.stdin.read().strip()
-try:
-    data = json.loads(raw)
-    builds = data if isinstance(data, list) else [data]
-    for b in builds:
-        url = b.get('artifacts', {}).get('buildUrl', '')
-        if url:
-            print(url)
-            break
-except Exception as e:
-    print('parse error:', e, file=sys.stderr)
-" 2>/dev/null || echo "")
+          APK_URL=$(echo "$BUILD_JSON" | jq -r 'if type == "array" then .[0] else . end | .artifacts.buildUrl // ""' 2>/dev/null || echo "")
 
           echo "APK URL: $APK_URL"
           echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
