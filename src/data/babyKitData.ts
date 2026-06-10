@@ -18,7 +18,7 @@ export const momBagCategories: KitCategory[] = [
   {
     id: 'admin',
     title: 'Documents administratifs',
-    icon: '📋',
+    icon: 'document-text-outline',
     items: [
       { id: 'cin', name: 'Carte d\'identité nationale (CIN)', priority: 'essential', checked: false },
       { id: 'carnet_sante', name: 'Carnet de santé de grossesse', priority: 'essential', checked: false },
@@ -32,7 +32,7 @@ export const momBagCategories: KitCategory[] = [
   {
     id: 'vetements_maman',
     title: 'Vêtements et confort',
-    icon: '👕',
+    icon: 'shirt-outline',
     items: [
       { id: 'chemises_nuit', name: 'Chemises de nuit (ouvertes pour allaitement)', quantity: '2-3', priority: 'essential', checked: false },
       { id: 'robe_de_chambre', name: 'Robe de chambre', priority: 'important', checked: false },
@@ -46,7 +46,7 @@ export const momBagCategories: KitCategory[] = [
   {
     id: 'hygiene_maman',
     title: 'Hygiène et soins',
-    icon: '🧴',
+    icon: 'sparkles-outline',
     items: [
       { id: 'serviettes', name: 'Serviettes hygiéniques spéciales post-partum', quantity: 'Grand paquet', priority: 'essential', checked: false },
       { id: 'brosse_dents', name: 'Brosse à dents et dentifrice', priority: 'essential', checked: false },
@@ -61,7 +61,7 @@ export const momBagCategories: KitCategory[] = [
   {
     id: 'confort',
     title: 'Confort et divertissement',
-    icon: '📱',
+    icon: 'phone-portrait-outline',
     items: [
       { id: 'telephone', name: 'Téléphone et chargeur', priority: 'essential', checked: false },
       { id: 'oreiller', name: 'Oreiller personnel', priority: 'optional', checked: false },
@@ -75,7 +75,7 @@ export const momBagCategories: KitCategory[] = [
   {
     id: 'medicaments',
     title: 'Médicaments prescrits',
-    icon: '💊',
+    icon: 'medkit-outline',
     items: [
       { id: 'medicaments_prescrits', name: 'Médicaments prescrits par le médecin', priority: 'essential', checked: false },
       { id: 'vitamines', name: 'Vitamines prénatales', priority: 'important', checked: false },
@@ -88,7 +88,7 @@ export const babyKitCategories: KitCategory[] = [
   {
     id: 'vetements_bebe',
     title: 'Vêtements bébé',
-    icon: '👶',
+    icon: 'happy-outline',
     items: [
       { id: 'pyjamas_naissance', name: 'Pyjamas dors-bien (grenouillères)', quantity: '4-5', priority: 'essential', note: 'Taille naissance ET 1 mois', checked: false },
       { id: 'bodies', name: 'Bodies manches longues', quantity: '5-6', priority: 'essential', checked: false },
@@ -102,7 +102,7 @@ export const babyKitCategories: KitCategory[] = [
   {
     id: 'hygiene_bebe',
     title: 'Hygiène bébé',
-    icon: '🧼',
+    icon: 'water-outline',
     items: [
       { id: 'couches_naissance', name: 'Couches taille naissance', quantity: '1 paquet', priority: 'essential', checked: false },
       { id: 'couches_1', name: 'Couches taille 1', quantity: '1 paquet', priority: 'essential', checked: false },
@@ -117,7 +117,7 @@ export const babyKitCategories: KitCategory[] = [
   {
     id: 'alimentation',
     title: 'Alimentation',
-    icon: '🍼',
+    icon: 'nutrition-outline',
     items: [
       { id: 'biberons', name: 'Biberons (si biberon)', quantity: '3-4', priority: 'essential', checked: false },
       { id: 'lait', name: 'Lait infantile 1er âge (si non allaitement)', priority: 'important', checked: false },
@@ -128,7 +128,7 @@ export const babyKitCategories: KitCategory[] = [
   {
     id: 'couchage',
     title: 'Couchage et mobilité',
-    icon: '🛏️',
+    icon: 'bed-outline',
     items: [
       { id: 'couffin', name: 'Couffin / berceau / lit bébé', priority: 'essential', checked: false },
       { id: 'matelas', name: 'Matelas ferme', priority: 'essential', checked: false },
@@ -141,7 +141,7 @@ export const babyKitCategories: KitCategory[] = [
   {
     id: 'sante',
     title: 'Santé et pharmacie',
-    icon: '🌡️',
+    icon: 'thermometer-outline',
     items: [
       { id: 'thermometre', name: 'Thermomètre', priority: 'essential', checked: false },
       { id: 'mouche_bebe', name: 'Mouche-bébé nasal', priority: 'essential', checked: false },
@@ -156,17 +156,17 @@ export const babyKitCategories: KitCategory[] = [
 export const chamberDecorItems = [
   {
     category: 'Mobilier',
-    icon: '🪑',
+    icon: 'home-outline',
     items: ['Lit barreaux', 'Table à langer', 'Commode', 'Fauteuil allaitement', 'Armoire bébé'],
   },
   {
     category: 'Décoration',
-    icon: '🎨',
+    icon: 'color-palette-outline',
     items: ['Veilleuse', 'Mobile musical', 'Tapis d\'éveil', 'Cadres décoratifs', 'Stickers muraux', 'Rideau occultant'],
   },
   {
     category: 'Sécurité',
-    icon: '🔒',
+    icon: 'shield-checkmark-outline',
     items: ['Babyphone', 'Protège-coins', 'Caches prises', 'Barrière de sécurité'],
   },
 ];

@@ -144,7 +144,9 @@ export default function EssentialsScreen() {
                       style={styles.categoryHeader}
                       onPress={() => setExpandedCat(isExpanded ? null : cat.id)}
                     >
-                      <Text style={styles.categoryIcon}>{cat.icon}</Text>
+                      <View style={styles.categoryIconWrap}>
+                        <Ionicons name={cat.icon as any} size={18} color={Colors.primary} />
+                      </View>
                       <Text style={styles.categoryTitle}>{cat.title}</Text>
                       <Text style={styles.categoryStat}>{catChecked}/{cat.items.length}</Text>
                       <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={Colors.textLight} />
@@ -169,7 +171,12 @@ export default function EssentialsScreen() {
                             </View>
                           </View>
                           {item.quantity && <Text style={styles.itemQty}>Quantité : {item.quantity}</Text>}
-                          {item.note && <Text style={styles.itemNote}>💡 {item.note}</Text>}
+                          {item.note && (
+                            <View style={styles.itemNoteRow}>
+                              <Ionicons name="bulb-outline" size={12} color={Colors.warning} style={{ marginRight: 4 }} />
+                              <Text style={styles.itemNote}>{item.note}</Text>
+                            </View>
+                          )}
                         </View>
                       </TouchableOpacity>
                     ))}
@@ -217,7 +224,9 @@ export default function EssentialsScreen() {
                       style={styles.categoryHeader}
                       onPress={() => setExpandedCat(isExpanded ? null : cat.id)}
                     >
-                      <Text style={styles.categoryIcon}>{cat.icon}</Text>
+                      <View style={styles.categoryIconWrap}>
+                        <Ionicons name={cat.icon as any} size={18} color={Colors.primary} />
+                      </View>
                       <Text style={styles.categoryTitle}>{cat.title}</Text>
                       <Text style={styles.categoryStat}>{catChecked}/{cat.items.length}</Text>
                       <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={Colors.textLight} />
@@ -242,7 +251,12 @@ export default function EssentialsScreen() {
                             </View>
                           </View>
                           {item.quantity && <Text style={styles.itemQty}>Quantité : {item.quantity}</Text>}
-                          {item.note && <Text style={styles.itemNote}>💡 {item.note}</Text>}
+                          {item.note && (
+                            <View style={styles.itemNoteRow}>
+                              <Ionicons name="bulb-outline" size={12} color={Colors.warning} style={{ marginRight: 4 }} />
+                              <Text style={styles.itemNote}>{item.note}</Text>
+                            </View>
+                          )}
                         </View>
                       </TouchableOpacity>
                     ))}
@@ -265,7 +279,7 @@ export default function EssentialsScreen() {
                     colors={['#4C1D95', '#6D28D9']}
                     style={styles.chambreHeader}
                   >
-                    <Text style={styles.chambreIcon}>{cat.icon}</Text>
+                    <Ionicons name={cat.icon as any} size={20} color="rgba(255,255,255,0.9)" />
                     <Text style={styles.chambreCategory}>{cat.category}</Text>
                   </LinearGradient>
                   <View style={styles.chambreItems}>
@@ -340,7 +354,7 @@ const styles = StyleSheet.create({
   legendText: { fontSize: 12, color: Colors.textSecondary, fontWeight: '500' },
   categoryCard: { backgroundColor: Colors.surface, borderRadius: 16, marginBottom: 10, overflow: 'hidden', borderWidth: 1, borderColor: Colors.border, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   categoryHeader: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 },
-  categoryIcon: { fontSize: 22 },
+  categoryIconWrap: { width: 32, height: 32, borderRadius: 8, backgroundColor: Colors.lilac, justifyContent: 'center', alignItems: 'center' },
   categoryTitle: { flex: 1, fontSize: 15, fontWeight: '700', color: Colors.text },
   categoryStat: { fontSize: 13, fontWeight: '700', color: Colors.primary, marginRight: 6 },
   itemRow: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: 1, borderTopColor: Colors.border, gap: 10 },
@@ -354,12 +368,12 @@ const styles = StyleSheet.create({
   priorityBadge: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 },
   priorityText: { fontSize: 10, fontWeight: '700' },
   itemQty: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-  itemNote: { fontSize: 12, color: Colors.textLight, marginTop: 2, fontStyle: 'italic' },
+  itemNoteRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 3 },
+  itemNote: { flex: 1, fontSize: 12, color: Colors.textLight, fontStyle: 'italic' },
   chambreTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   chambreTitle: { fontSize: 20, fontWeight: '700', color: Colors.text },
   chambreCard: { borderRadius: 16, overflow: 'hidden', marginBottom: 12, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3 },
   chambreHeader: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 10 },
-  chambreIcon: { fontSize: 22 },
   chambreCategory: { fontSize: 16, fontWeight: '700', color: Colors.white },
   chambreItems: { backgroundColor: Colors.surface, padding: 12 },
   chambreItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6, gap: 8 },

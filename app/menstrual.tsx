@@ -37,6 +37,7 @@ export default function MenstrualScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [startDatePicker, setStartDatePicker] = useState(false);
   const [endDatePicker, setEndDatePicker] = useState(false);
+  const [lastPeriodPicker, setLastPeriodPicker] = useState(false);
   const [newStartDate, setNewStartDate] = useState<Date | null>(null);
   const [newEndDate, setNewEndDate] = useState<Date | null>(null);
   const [newNote, setNewNote] = useState('');
@@ -112,6 +113,12 @@ export default function MenstrualScreen() {
         const endDate = cycle.endDate ? parseISO(cycle.endDate) : addDays(startDate, 5);
         if (date >= startDate && date <= endDate) return 'period';
       } catch {}
+    }
+
+    // Show current period from lastPeriodDate even if not added to cycles array
+    if (lastPeriodDate && cycles.length === 0) {
+      const periodEnd = addDays(lastPeriodDate, 5);
+      if (date >= lastPeriodDate && date <= periodEnd) return 'period';
     }
 
     if (fertileStart && fertileEnd && date >= fertileStart && date <= fertileEnd) return 'fertile';
@@ -223,11 +230,22 @@ export default function MenstrualScreen() {
                 </TouchableOpacity>
               </View>
 
+              {/* Last period date quick setter */}
+              <TouchableOpacity style={styles.lastPeriodBtn} onPress={() => setLastPeriodPicker(true)}>
+                <Ionicons name="calendar-outline" size={16} color={Colors.primary} style={{ marginRight: 8 }} />
+                <Text style={styles.lastPeriodBtnLabel}>Dernières règles :</Text>
+                <Text style={styles.lastPeriodBtnValue}>
+                  {lastPeriodStorage ? lastPeriodStorage : 'Non renseigné'}
+                </Text>
+                <Ionicons name="pencil-outline" size={14} color={Colors.textLight} style={{ marginLeft: 6 }} />
+              </TouchableOpacity>
+
+              {/* Legend */}
               <View style={styles.legend}>
-                <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: Colors.primary }]} /><Text style={styles.legendText}>Règles</Text></View>
-                <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: Colors.success }]} /><Text style={styles.legendText}>Fertile</Text></View>
-                <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: Colors.rose }]} /><Text style={styles.legendText}>Ovulation</Text></View>
-                <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: Colors.primaryLight + '80', borderWidth: 1, borderColor: Colors.primary }]} /><Text style={styles.legendText}>Prévision</Text></View>
+                <View style={styles.legendChip}><View style={[styles.legendDot, { backgroundColor: Colors.primary + 'CC' }]} /><Text style={styles.legendText}>Règles</Text></View>
+                <View style={styles.legendChip}><View style={[styles.legendDot, { backgroundColor: Colors.success }]} /><Text style={styles.legendText}>Fertile</Text></View>
+                <View style={styles.legendChip}><View style={[styles.legendDot, { backgroundColor: Colors.rose, borderRadius: 8 }]} /><Text style={styles.legendText}>Ovulation</Text></View>
+                <View style={styles.legendChip}><View style={[styles.legendDot, { backgroundColor: Colors.primaryLight + '80', borderWidth: 1, borderColor: Colors.primary }]} /><Text style={styles.legendText}>Prévision</Text></View>
               </View>
 
               <View style={styles.calendarCard}>
@@ -414,6 +432,17 @@ export default function MenstrualScreen() {
       </Modal>
 
       <DatePickerModal
+        visible={lastPeriodPicker}
+        onClose={() => setLastPeriodPicker(false)}
+        onSelect={(d) => {
+          setLastPeriodStorage(format(d, 'dd/MM/yyyy'));
+          setLastPeriodPicker(false);
+        }}
+        selectedDate={lastPeriodStorage ? (() => { try { return parse(lastPeriodStorage, 'dd/MM/yyyy', new Date()); } catch { return null; } })() || undefined : undefined}
+        title="Date des dernières règles"
+        maxDate={new Date()}
+      />
+      <DatePickerModal
         visible={startDatePicker}
         onClose={() => setStartDatePicker(false)}
         onSelect={(d) => setNewStartDate(d)}
@@ -458,10 +487,13 @@ const styles = StyleSheet.create({
   content: { padding: 16 },
   monthNav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   monthTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, textTransform: 'capitalize' },
-  legend: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 12 },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  lastPeriodBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: 12, padding: 10, marginBottom: 10, borderWidth: 1, borderColor: Colors.border },
+  lastPeriodBtnLabel: { fontSize: 12, color: Colors.textSecondary, fontWeight: '500' },
+  lastPeriodBtnValue: { flex: 1, fontSize: 13, color: Colors.primary, fontWeight: '700', marginLeft: 6 },
+  legend: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
+  legendChip: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: Colors.surface, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 5, borderWidth: 1, borderColor: Colors.border },
   legendDot: { width: 10, height: 10, borderRadius: 5 },
-  legendText: { fontSize: 12, color: Colors.textSecondary },
+  legendText: { fontSize: 11, color: Colors.textSecondary, fontWeight: '500' },
   calendarCard: { backgroundColor: Colors.surface, borderRadius: 20, padding: 12, marginBottom: 16, shadowColor: Colors.primaryDark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 },
   weekDays: { flexDirection: 'row', marginBottom: 8 },
   weekDay: { flex: 1, textAlign: 'center', fontSize: 12, fontWeight: '700', color: Colors.textLight },
