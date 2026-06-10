@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
@@ -41,9 +41,12 @@ export default function PregnancyScreen() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fadeAnim.setValue(0);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+    }, [])
+  );
 
   useEffect(() => {
     if (lastPeriodDate) {

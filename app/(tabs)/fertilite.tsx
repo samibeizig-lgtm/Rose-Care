@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
   TouchableOpacity, Dimensions, Modal, TextInput, Alert, Animated,
@@ -12,6 +12,7 @@ import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { addDays, format, parse, isValid } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import DatePickerModal from '../../src/components/DatePickerModal';
+import { useFocusEffect } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const WAVE_H = 50;
@@ -94,9 +95,12 @@ export default function FertiliteScreen() {
   const [activeSection, setActiveSection] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fadeAnim.setValue(0);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+    }, [])
+  );
   const [calcModalVisible, setCalcModalVisible] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [cycleLength, setCycleLength] = useStorage(STORAGE_KEYS.CYCLE_LENGTH, '28');

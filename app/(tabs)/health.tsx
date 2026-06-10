@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   ScrollView,
   View,
@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import * as Notifications from 'expo-notifications';
 import Colors from '../../src/theme/colors';
+import { useFocusEffect } from 'expo-router';
 import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -71,6 +72,7 @@ export default function HealthScreen() {
   const [echographies, setEchographies] = useStorage<Echographie[]>('echographies', []);
   const [medications, setMedications] = useStorage<Medication[]>('medications', []);
   const [activeTab, setActiveTab] = useState<'suivi' | 'echographies' | 'traitement' | 'conseils'>('suivi');
+  const [expandedAdvice, setExpandedAdvice] = useState<number | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'weight' | 'bp' | 'glucose' | 'mood' | 'symptoms' | 'temperature' | 'echographie' | 'medication'>('weight');
   const [inputValue, setInputValue] = useState('');
@@ -86,8 +88,15 @@ export default function HealthScreen() {
   const [medTime, setMedTime] = useState('08:00');
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+  useFocusEffect(
+    useCallback(() => {
+      fadeAnim.setValue(0);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+    }, [])
+  );
+
+  // Request notification permissions once on mount
+  React.useEffect(() => {
     Notifications.requestPermissionsAsync().catch(() => {});
   }, []);
 
@@ -185,6 +194,7 @@ export default function HealthScreen() {
   const weightRecords = records.filter(r => r.type === 'weight').slice(0, 10);
   const bpRecords = records.filter(r => r.type === 'bp').slice(0, 5);
   const glucoseRecords = records.filter(r => r.type === 'glucose').slice(0, 5);
+  const temperatureRecords = records.filter(r => r.type === 'temperature').slice(0, 10);
 
   const healthCards = [
     {
@@ -520,6 +530,61 @@ export default function HealthScreen() {
               </View>
             )}
 
+            {/* Temperature LineChart */}
+            {temperatureRecords.length >= 2 && (
+              <View style={styles.chartCard}>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="thermometer-outline" size={18} color="#EF4444" style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Température</Text>
+                </View>
+                <LineChart
+                  data={{
+                    labels: temperatureRecords.slice(0, 7).reverse().map(r => format(new Date(r.date), 'dd/MM', { locale: fr })),
+                    datasets: [{ data: temperatureRecords.slice(0, 7).reverse().map(r => parseFloat(r.value) || 0) }],
+                  }}
+                  width={width - 64}
+                  height={160}
+                  chartConfig={{
+                    backgroundColor: Colors.surface,
+                    backgroundGradientFrom: Colors.surface,
+                    backgroundGradientTo: Colors.surface,
+                    decimalPlaces: 1,
+                    color: (opacity = 1) => `rgba(239, 68, 68, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(91, 33, 182, ${opacity})`,
+                    propsForDots: { r: '5', strokeWidth: '2', stroke: '#EF4444' },
+                    propsForBackgroundLines: { stroke: Colors.border },
+                  }}
+                  bezier
+                  style={{ borderRadius: 12, marginVertical: 4 }}
+                  yAxisSuffix="°C"
+                />
+                {temperatureRecords.slice(0, 5).map((r) => (
+                  <View key={r.id} style={styles.bpRow}>
+                    <Text style={styles.recordDate}>{format(new Date(r.date), 'dd/MM HH:mm', { locale: fr })}</Text>
+                    <Text style={[styles.bpValue, parseFloat(r.value) >= 38 ? { color: Colors.error } : parseFloat(r.value) >= 37.5 ? { color: Colors.warning } : { color: Colors.success }]}>
+                      {r.value}°C
+                    </Text>
+                    {parseFloat(r.value) >= 38 && <Ionicons name="warning-outline" size={16} color={Colors.warning} />}
+                  </View>
+                ))}
+              </View>
+            )}
+            {temperatureRecords.length === 1 && (
+              <View style={styles.chartCard}>
+                <View style={styles.chartTitleRow}>
+                  <Ionicons name="thermometer-outline" size={18} color="#EF4444" style={{ marginRight: 6 }} />
+                  <Text style={styles.chartTitle}>Température</Text>
+                </View>
+                <View style={styles.bpRow}>
+                  <Text style={styles.recordDate}>{format(new Date(temperatureRecords[0].date), 'dd/MM HH:mm', { locale: fr })}</Text>
+                  <Text style={[styles.bpValue, parseFloat(temperatureRecords[0].value) >= 38 ? { color: Colors.error } : { color: Colors.success }]}>
+                    {temperatureRecords[0].value}°C
+                  </Text>
+                </View>
+                <Text style={styles.chartHint}>Ajoutez plus de mesures pour voir l'évolution</Text>
+              </View>
+            )}
+
             {/* Recent Moods */}
             {records.filter(r => r.type === 'mood').length > 0 && (
               <View style={styles.chartCard}>
@@ -622,11 +687,20 @@ export default function HealthScreen() {
           <View style={styles.content}>
             {prenatalAdvice.map((section, idx) => (
               <View key={idx} style={styles.adviceCard}>
-                <View style={[styles.adviceHeader, { backgroundColor: section.color + '15' }]}>
-                  <Ionicons name={section.icon as any} size={22} color={section.color} style={{ marginRight: 10 }} />
-                  <Text style={[styles.adviceCategory, { color: section.color }]}>{section.category}</Text>
-                </View>
-                {section.items.map((item, i) => (
+                <TouchableOpacity
+                  style={[styles.adviceHeader, { backgroundColor: section.color + '15' }]}
+                  onPress={() => setExpandedAdvice(expandedAdvice === idx ? null : idx)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name={section.icon as any} size={20} color={section.color} style={{ marginRight: 10 }} />
+                  <Text style={[styles.adviceCategory, { color: section.color, flex: 1 }]}>{section.category}</Text>
+                  <Ionicons
+                    name={expandedAdvice === idx ? 'chevron-up' : 'chevron-down'}
+                    size={18}
+                    color={section.color}
+                  />
+                </TouchableOpacity>
+                {expandedAdvice === idx && section.items.map((item, i) => (
                   <View key={i} style={styles.adviceItem}>
                     <View style={[styles.adviseBullet, { backgroundColor: section.color }]} />
                     <Text style={styles.adviceText}>{item}</Text>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
@@ -169,9 +169,12 @@ export default function HomeScreen() {
 
   // Card entrance animation
   const cardAnim = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.timing(cardAnim, { toValue: 1, duration: 600, useNativeDriver: true, delay: 200 }).start();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      cardAnim.setValue(0);
+      Animated.timing(cardAnim, { toValue: 1, duration: 600, useNativeDriver: true, delay: 200 }).start();
+    }, [])
+  );
 
   const currentWeek = pregnancyStart
     ? Math.min(40, Math.max(1, differenceInWeeks(new Date(), parseISO(pregnancyStart)) + 1))

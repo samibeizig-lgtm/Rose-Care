@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   ScrollView,
   View,
@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
@@ -23,9 +23,12 @@ export default function MoreScreen() {
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fadeAnim.setValue(0);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+    }, [])
+  );
 
   const menuSections = [
     {
@@ -35,22 +38,6 @@ export default function MoreScreen() {
       route: '/cnam',
       icon: 'document-text-outline' as const,
       description: 'Prise en charge, congé maternité',
-    },
-    {
-      title: 'Urgences & SOS',
-      color: Colors.error,
-      gradient: ['#C0392B', '#E74C3C'] as [string, string],
-      route: null,
-      icon: 'medkit-outline' as const,
-      description: 'Contacts d\'urgence rapides',
-    },
-    {
-      title: 'Rose Care',
-      color: Colors.primarySoft,
-      gradient: Colors.gradient.soft as [string, string],
-      route: null,
-      icon: 'heart-outline' as const,
-      description: 'À propos de l\'application',
     },
   ];
 
@@ -128,22 +115,6 @@ export default function MoreScreen() {
             </TouchableOpacity>
           ))}
 
-          {/* App Info */}
-          <View style={styles.appInfo}>
-            <LinearGradient colors={Colors.gradient.card} style={styles.appInfoGrad}>
-              <View style={styles.appInfoIconRow}>
-                <Ionicons name="heart-outline" size={24} color={Colors.primary} />
-              </View>
-              <Text style={styles.appInfoTitle}>Rose Care</Text>
-              <Text style={styles.appInfoText}>
-                Votre compagnon de grossesse de la conception à l'accouchement.
-                Développé avec amour pour les mamans tunisiennes.
-              </Text>
-              <View style={styles.versionBadge}>
-                <Text style={styles.appInfoVersion}>Version 1.0.0</Text>
-              </View>
-            </LinearGradient>
-          </View>
         </Animated.View>
         <View style={{ height: 40 }} />
       </ScrollView>

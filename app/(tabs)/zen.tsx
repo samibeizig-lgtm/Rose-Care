@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
+import { useFocusEffect } from 'expo-router';
 import { Audio } from 'expo-av';
 import {
   breathingExercises,
@@ -44,9 +45,12 @@ export default function ZenScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isSpeaking, setIsSpeaking] = useState<string | null>(null);
 
-  useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fadeAnim.setValue(0);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true, delay: 100 }).start();
+    }, [])
+  );
 
   const speakScript = async (sessionId: string, text: string) => {
     try {
@@ -58,8 +62,8 @@ export default function ZenScreen() {
       setIsSpeaking(sessionId);
       Speech.speak(text, {
         language: 'fr-FR',
-        pitch: 0.9,
-        rate: 0.85,
+        pitch: 0.72,
+        rate: 0.50,
         onDone: () => setIsSpeaking(null),
         onStopped: () => setIsSpeaking(null),
         onError: () => setIsSpeaking(null),
