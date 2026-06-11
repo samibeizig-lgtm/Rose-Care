@@ -311,7 +311,7 @@ export default function HealthScreen() {
             <Text style={styles.headerTitle}>Suivi Santé</Text>
           </View>
           <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
-            <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+            <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill={th.bg} />
           </Svg>
         </LinearGradient>
         <View style={[styles.tabsRow, { backgroundColor: th.card, borderBottomColor: th.border }]}>

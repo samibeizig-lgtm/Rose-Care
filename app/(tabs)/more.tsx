@@ -44,8 +44,7 @@ export default function MoreScreen() {
   ];
 
   const contactLinks = [
-    { icon: 'alert-circle-outline' as const, label: 'SAMU Tunisie', number: '190', color: Colors.error },
-    { icon: 'medical-outline' as const, label: 'Urgences médicales', number: '191', color: Colors.warning },
+    { icon: 'medical-outline' as const, label: 'Urgences médicales', number: '190', color: Colors.warning },
     { icon: 'business-outline' as const, label: 'Clinique La Rose', number: '71 100 900', color: Colors.primary },
   ];
 
@@ -65,7 +64,7 @@ export default function MoreScreen() {
           </View>
         </View>
         <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
-          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill={th.bg} />
         </Svg>
       </LinearGradient>
 

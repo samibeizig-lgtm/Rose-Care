@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import Svg, { Path } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { storage, STORAGE_KEYS } from '../src/hooks/useStorage';
+import { useTheme } from '../src/theme/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 const WAVE_H = 64;
@@ -14,6 +15,7 @@ const CIRCLE_D = 120;
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { th } = useTheme();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ name: string; lastName?: string } | null>(null);
 
@@ -67,12 +69,12 @@ export default function WelcomeScreen() {
           style={{ position: 'absolute', bottom: 0 }}
           viewBox={`0 0 ${width} ${WAVE_H}`}
         >
-          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill={th.bg} />
         </Svg>
       </View>
 
       {/* ─── White bottom ─── */}
-      <View style={styles.bottomSection}>
+      <View style={[styles.bottomSection, { backgroundColor: th.bg }]}>
         <View style={{ height: CIRCLE_D / 2 + 24 }} />
 
         {profile ? (

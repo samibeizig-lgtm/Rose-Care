@@ -42,6 +42,7 @@ export default function ZenScreen() {
 
   const breathScale = useRef(new Animated.Value(1)).current;
   const breathOpacity = useRef(new Animated.Value(0.6)).current;
+  const isBreathingRef = useRef(false);
   const affirmFade = useRef(new Animated.Value(1)).current;
   const soundRef = useRef<Audio.Sound | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -131,17 +132,22 @@ export default function ZenScreen() {
     const toScale = phase === 'inspire' ? 1.5 : phase === 'hold' ? 1.5 : 1;
     const toOpacity = phase === 'inspire' ? 1 : phase === 'hold' ? 1 : 0.6;
     Animated.parallel([
-      Animated.timing(breathScale, { toValue: toScale, duration, useNativeDriver: true, easing: Easing.inOut(Easing.ease) }),
+      Animated.timing(breathScale, { toValue: toScale, duration, useNativeDriver: true, easing: Easing.inOut(Easing.sin) }),
       Animated.timing(breathOpacity, { toValue: toOpacity, duration, useNativeDriver: true }),
-    ]).start(nextPhase);
+    ]).start(({ finished }) => { if (finished) nextPhase(); });
   };
 
   const startBreathing478 = () => {
+    breathScale.setValue(1);
+    breathOpacity.setValue(0.6);
+    isBreathingRef.current = true;
     setIsBreathing(true);
     setBreathCount(0);
     let count = 0;
     const runCycle = () => {
+      if (!isBreathingRef.current) return;
       if (count >= 4) {
+        isBreathingRef.current = false;
         setIsBreathing(false);
         setBreathPhase('idle');
         breathScale.setValue(1);
@@ -150,10 +156,13 @@ export default function ZenScreen() {
       }
       setBreathPhase('inspire');
       breathAnimation('inspire', 4000, () => {
+        if (!isBreathingRef.current) return;
         setBreathPhase('hold');
         breathAnimation('hold', 7000, () => {
+          if (!isBreathingRef.current) return;
           setBreathPhase('expire');
           breathAnimation('expire', 8000, () => {
+            if (!isBreathingRef.current) return;
             count++;
             setBreathCount(count);
             runCycle();
@@ -165,11 +174,16 @@ export default function ZenScreen() {
   };
 
   const startCoherence = () => {
+    breathScale.setValue(1);
+    breathOpacity.setValue(0.6);
+    isBreathingRef.current = true;
     setIsBreathing(true);
     setBreathCount(0);
     let count = 0;
     const runCycle = () => {
+      if (!isBreathingRef.current) return;
       if (count >= 6) {
+        isBreathingRef.current = false;
         setIsBreathing(false);
         setBreathPhase('idle');
         breathScale.setValue(1);
@@ -178,8 +192,10 @@ export default function ZenScreen() {
       }
       setBreathPhase('inspire');
       breathAnimation('inspire', 5000, () => {
+        if (!isBreathingRef.current) return;
         setBreathPhase('expire');
         breathAnimation('expire', 5000, () => {
+          if (!isBreathingRef.current) return;
           count++;
           setBreathCount(count);
           runCycle();
@@ -190,10 +206,13 @@ export default function ZenScreen() {
   };
 
   const stopBreathing = () => {
+    isBreathingRef.current = false;
     setIsBreathing(false);
     setBreathPhase('idle');
-    breathScale.stopAnimation(() => breathScale.setValue(1));
-    breathOpacity.stopAnimation(() => breathOpacity.setValue(0.6));
+    breathScale.stopAnimation();
+    breathOpacity.stopAnimation();
+    breathScale.setValue(1);
+    breathOpacity.setValue(0.6);
   };
 
   const changeAffirmation = () => {
@@ -247,7 +266,7 @@ export default function ZenScreen() {
           </View>
         </View>
         <Svg width={width} height={WAVE_H} style={{ position: 'absolute', bottom: 0 }} viewBox={`0 0 ${width} ${WAVE_H}`}>
-          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
+          <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill={th.bg} />
         </Svg>
       </LinearGradient>
 
