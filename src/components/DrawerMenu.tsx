@@ -1,12 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Animated,
-  Dimensions, Modal, Pressable,
+  Dimensions, Modal, Pressable, Switch,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
 import Colors from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
 const DRAWER_W = width * 0.72;
@@ -50,8 +52,18 @@ const MENU_ITEMS = [
 
 export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMenuProps) {
   const router = useRouter();
+  const { isDark, toggleTheme } = useTheme();
   const slideX = useRef(new Animated.Value(-DRAWER_W)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const appVersion = Constants.expoConfig?.version ?? '1.0.0';
+
+  const dark = {
+    bg: '#1C1C2E',
+    text: '#FFFFFF',
+    sub: 'rgba(255,255,255,0.45)',
+    section: 'rgba(255,255,255,0.35)',
+    border: 'rgba(255,255,255,0.08)',
+  };
 
   useEffect(() => {
     Animated.parallel([
@@ -83,7 +95,7 @@ export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMe
         </Animated.View>
 
         {/* Drawer panel */}
-        <Animated.View style={[styles.drawer, { transform: [{ translateX: slideX }] }]}>
+        <Animated.View style={[styles.drawer, { transform: [{ translateX: slideX }], backgroundColor: isDark ? dark.bg : '#FFFFFF' }]}>
           <LinearGradient colors={['#4B0082', '#7F00FF']} style={styles.drawerHeader}>
             <View style={styles.drawerLogo}>
               <Text style={styles.drawerLogoText}>
@@ -98,11 +110,11 @@ export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMe
           </LinearGradient>
 
           <View style={styles.drawerBody}>
-            <Text style={styles.drawerSectionLabel}>NAVIGATION</Text>
+            <Text style={[styles.drawerSectionLabel, isDark && { color: dark.section }]}>NAVIGATION</Text>
             {MENU_ITEMS.map((item) => (
               <TouchableOpacity
                 key={item.label}
-                style={styles.menuItem}
+                style={[styles.menuItem, isDark && { borderBottomColor: dark.border }]}
                 onPress={() => navigate(item.route)}
                 activeOpacity={0.7}
               >
@@ -110,16 +122,16 @@ export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMe
                   <Ionicons name={item.icon} size={20} color="#FFFFFF" />
                 </LinearGradient>
                 <View style={styles.menuItemText}>
-                  <Text style={styles.menuItemLabel}>{item.label}</Text>
-                  <Text style={styles.menuItemSub}>{item.subtitle}</Text>
+                  <Text style={[styles.menuItemLabel, isDark && { color: dark.text }]}>{item.label}</Text>
+                  <Text style={[styles.menuItemSub, isDark && { color: dark.sub }]}>{item.subtitle}</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+                <Ionicons name="chevron-forward" size={16} color={isDark ? dark.sub : Colors.textMuted} />
               </TouchableOpacity>
             ))}
 
-            <Text style={[styles.drawerSectionLabel, { marginTop: 20 }]}>MON COMPTE</Text>
+            <Text style={[styles.drawerSectionLabel, { marginTop: 20 }, isDark && { color: dark.section }]}>MON COMPTE</Text>
             <TouchableOpacity
-              style={styles.menuItem}
+              style={[styles.menuItem, isDark && { borderBottomColor: dark.border }]}
               onPress={() => { onClose(); setTimeout(() => onOpenProfile?.(), 300); }}
               activeOpacity={0.7}
             >
@@ -127,16 +139,33 @@ export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMe
                 <Ionicons name="person-outline" size={20} color="#FFFFFF" />
               </LinearGradient>
               <View style={styles.menuItemText}>
-                <Text style={styles.menuItemLabel}>Configurer mon profil</Text>
-                <Text style={styles.menuItemSub}>Nom, prénom, date de naissance</Text>
+                <Text style={[styles.menuItemLabel, isDark && { color: dark.text }]}>Configurer mon profil</Text>
+                <Text style={[styles.menuItemSub, isDark && { color: dark.sub }]}>Nom, prénom, date de naissance</Text>
               </View>
-              <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+              <Ionicons name="chevron-forward" size={16} color={isDark ? dark.sub : Colors.textMuted} />
             </TouchableOpacity>
+
+            <View style={[styles.menuItem, { borderBottomWidth: 0 }, isDark && { borderBottomColor: dark.border }]}>
+              <LinearGradient colors={isDark ? ['#374151', '#6B7280'] : ['#4B5563', '#9CA3AF']} style={styles.menuIconGrad}>
+                <Ionicons name="moon-outline" size={20} color="#FFFFFF" />
+              </LinearGradient>
+              <View style={styles.menuItemText}>
+                <Text style={[styles.menuItemLabel, isDark && { color: dark.text }]}>Mode Sombre</Text>
+                <Text style={[styles.menuItemSub, isDark && { color: dark.sub }]}>Apparence de l'app</Text>
+              </View>
+              <Switch
+                value={isDark}
+                onValueChange={toggleTheme}
+                trackColor={{ false: Colors.border, true: Colors.primary + '80' }}
+                thumbColor={isDark ? Colors.primary : '#F3F4F6'}
+                ios_backgroundColor={Colors.border}
+              />
+            </View>
           </View>
 
-          <View style={styles.drawerFooter}>
+          <View style={[styles.drawerFooter, isDark && { borderTopColor: dark.border }]}>
             <Ionicons name="heart" size={14} color={Colors.rose} />
-            <Text style={styles.footerText}> Rose Care © 2024</Text>
+            <Text style={[styles.footerText, isDark && { color: dark.sub }]}> Rose Care v{appVersion}</Text>
           </View>
         </Animated.View>
       </View>

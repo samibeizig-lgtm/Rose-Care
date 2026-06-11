@@ -56,17 +56,22 @@ export default function CNAMScreen() {
       title: 'Congé Maternité en Tunisie',
       color: Colors.success,
       content: [
-        { type: 'subtitle', text: 'Durée légale :' },
-        { type: 'item', text: 'Secteur public : 2 mois (30 jours avant + 30 jours après)' },
-        { type: 'item', text: 'Secteur privé : 30 jours (prorogeable selon convention)' },
-        { type: 'item', text: 'Naissance prématurée : prolongation possible' },
-        { type: 'item', text: 'Naissances multiples : prolongation de 15 jours par enfant supplémentaire' },
+        { type: 'tableHeader', text: '', col1: 'Type de Congé', col2: 'Durée' },
+        { type: 'tableRow', text: '', col1: 'Congé Prénatal', col2: '15 jours max', alt: false },
+        { type: 'tableRow', text: '', col1: 'Congé Postnatal', col2: '3 mois (4 mois cas spéciaux*)', alt: true },
+        { type: 'tableRow', text: '', col1: 'Congé Paternité', col2: '7 jours (10 j cas spéciaux*)', alt: false },
+        { type: 'tableRow', text: '', col1: 'Congé Accouchement', col2: '1 à 4 mois optionnel', alt: true },
+        { type: 'tableRow', text: '', col1: 'Repos Allaitement', col2: '9 mois – 1h/jour payée', alt: false },
+        { type: 'info', text: 'Loi n°44 du 12 août 2024. *Cas spéciaux : naissances multiples, prématuré, handicap, malformations congénitales.' },
+        { type: 'subtitle', text: 'Rémunération :' },
+        { type: 'item', text: 'Secteur public : plein traitement pour les congés prénatal et postnatal' },
+        { type: 'item', text: 'Secteur privé (CNSS) : 2/3 du salaire journalier pour le postnatal' },
+        { type: 'item', text: 'Congé accouchement (optionnel) : demi-traitement' },
+        { type: 'item', text: 'Repos allaitement : intégralement rémunéré' },
         { type: 'subtitle', text: 'Procédure :' },
-        { type: 'step', text: 'Obtenez un certificat médical attestant la grossesse et la date prévue d\'accouchement' },
+        { type: 'step', text: 'Obtenez un certificat médical attestant la date prévue d\'accouchement' },
         { type: 'step', text: 'Remettez-le à votre employeur au moins 1 mois avant le début du congé' },
-        { type: 'step', text: 'Votre employeur déclare à la CNAM pour les indemnités' },
         { type: 'step', text: 'Après accouchement : envoyez l\'extrait de naissance à la CNAM' },
-        { type: 'info', text: 'Vous pouvez prendre jusqu\'à 2 ans de congé parental non payé selon la loi tunisienne.' },
       ],
     },
     {
@@ -200,7 +205,9 @@ export default function CNAMScreen() {
                 <View style={styles.sectionBody}>
                   {section.content.map((item, idx) => (
                     <View key={idx} style={[
-                      item.type === 'info' ? styles.infoBox : styles.contentRow,
+                      item.type === 'info' ? styles.infoBox :
+                      item.type === 'tableHeader' || item.type === 'tableRow' ? {} :
+                      styles.contentRow,
                       item.type === 'subtitle' ? styles.subtitleRow : {},
                     ]}>
                       {item.type === 'step' && (
@@ -226,6 +233,18 @@ export default function CNAMScreen() {
                         <View style={styles.infoContent}>
                           <Ionicons name="information-circle-outline" size={16} color={Colors.primary} style={{ marginRight: 6, marginTop: 1, flexShrink: 0 }} />
                           <Text style={styles.infoText}>{item.text}</Text>
+                        </View>
+                      )}
+                      {item.type === 'tableHeader' && (
+                        <View style={[styles.tableHeaderRow, { backgroundColor: section.color + '20' }]}>
+                          <Text style={[styles.tableCol1, styles.tableHeaderText, { color: section.color }]}>{(item as any).col1}</Text>
+                          <Text style={[styles.tableCol2, styles.tableHeaderText, { color: section.color }]}>{(item as any).col2}</Text>
+                        </View>
+                      )}
+                      {item.type === 'tableRow' && (
+                        <View style={[styles.tableDataRow, (item as any).alt && styles.tableDataRowAlt]}>
+                          <Text style={styles.tableCol1}>{(item as any).col1}</Text>
+                          <Text style={styles.tableCol2}>{(item as any).col2}</Text>
                         </View>
                       )}
                     </View>
@@ -288,6 +307,12 @@ const styles = StyleSheet.create({
   contentText: { flex: 1, fontSize: 14, color: Colors.text, lineHeight: 21 },
   subtitleText: { fontSize: 14, fontWeight: '700' },
   infoText: { flex: 1, fontSize: 14, color: Colors.text, lineHeight: 21 },
+  tableHeaderRow: { flexDirection: 'row', borderRadius: 8, paddingVertical: 9, paddingHorizontal: 10, marginBottom: 2 },
+  tableDataRow: { flexDirection: 'row', paddingVertical: 9, paddingHorizontal: 10, borderBottomWidth: 1, borderBottomColor: Colors.border },
+  tableDataRowAlt: { backgroundColor: '#F5F0FF' },
+  tableCol1: { flex: 1.2, fontSize: 13, fontWeight: '600', color: Colors.text },
+  tableCol2: { flex: 1, fontSize: 13, color: Colors.textSecondary, textAlign: 'right' as const },
+  tableHeaderText: { fontWeight: '700', fontSize: 12, textTransform: 'uppercase' as const, letterSpacing: 0.5 },
   contactCard: { flexDirection: 'row', gap: 10, marginTop: 8 },
   contactBtn: { flex: 1, borderRadius: 14, overflow: 'hidden' },
   contactBtnGrad: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 14, gap: 8 },

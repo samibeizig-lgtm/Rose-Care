@@ -62,8 +62,8 @@ export default function ZenScreen() {
       setIsSpeaking(sessionId);
       Speech.speak(text, {
         language: 'fr-FR',
-        pitch: 0.72,
-        rate: 0.50,
+        pitch: 0.65,
+        rate: 0.40,
         onDone: () => setIsSpeaking(null),
         onStopped: () => setIsSpeaking(null),
         onError: () => setIsSpeaking(null),
