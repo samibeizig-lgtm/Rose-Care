@@ -11,7 +11,9 @@ import {
   Alert,
   Animated,
   Image,
+  FlatList,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -53,6 +55,7 @@ interface Echographie {
   week: string;
   title: string;
   note?: string;
+  photos?: string[];
 }
 
 interface Medication {
@@ -88,6 +91,8 @@ export default function HealthScreen() {
   const [medDosage, setMedDosage] = useState('');
   const [medFrequency, setMedFrequency] = useState(FREQUENCY_OPTIONS[0]);
   const [medTime, setMedTime] = useState('08:00');
+  const [echoPhotos, setEchoPhotos] = useState<string[]>([]);
+  const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useFocusEffect(
@@ -115,6 +120,7 @@ export default function HealthScreen() {
     setMedDosage('');
     setMedFrequency(FREQUENCY_OPTIONS[0]);
     setMedTime('08:00');
+    setEchoPhotos([]);
     setModalVisible(true);
   };
 
@@ -143,6 +149,7 @@ export default function HealthScreen() {
         week: echoWeek,
         title: echoTitle,
         note: inputNote || undefined,
+        photos: echoPhotos.length > 0 ? echoPhotos : undefined,
       };
       setEchographies([newEcho, ...echographies]);
     } else if (modalType === 'medication') {
@@ -187,6 +194,29 @@ export default function HealthScreen() {
       { text: 'Annuler' },
       { text: 'Supprimer', style: 'destructive', onPress: () => setMedications(medications.filter(m => m.id !== id)) },
     ]);
+  };
+
+  const deleteEchographie = (id: string) => {
+    Alert.alert('Supprimer', 'Supprimer cette échographie ?', [
+      { text: 'Annuler' },
+      { text: 'Supprimer', style: 'destructive', onPress: () => setEchographies(echographies.filter(e => e.id !== id)) },
+    ]);
+  };
+
+  const pickEchoPhoto = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission requise', 'Autorisez l\'accès à la galerie pour ajouter des photos.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 0.85,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setEchoPhotos(prev => [...prev, result.assets[0].uri].slice(0, 6));
+    }
   };
 
   const getLastRecord = (type: HealthRecord['type']) => {
@@ -623,14 +653,28 @@ export default function HealthScreen() {
             ) : (
               echographies.map((echo) => (
                 <View key={echo.id} style={[styles.echoCard, { backgroundColor: th.card, borderColor: th.border }]}>
-                  <View style={styles.echoIconBox}>
-                    <Ionicons name="scan-outline" size={28} color={Colors.primary} />
+                  <View style={styles.echoCardTop}>
+                    <View style={styles.echoIconBox}>
+                      <Ionicons name="scan-outline" size={28} color={Colors.primary} />
+                    </View>
+                    <View style={styles.echoInfo}>
+                      <Text style={[styles.echoTitle, { color: th.text }]}>{echo.title}</Text>
+                      <Text style={[styles.echoMeta, { color: th.textSub }]}>📅 {echo.date}{echo.week ? ` · SA ${echo.week}` : ''}</Text>
+                      {echo.note && <Text style={styles.echoNote}>{echo.note}</Text>}
+                    </View>
+                    <TouchableOpacity onPress={() => deleteEchographie(echo.id)} style={styles.echoDeleteBtn}>
+                      <Ionicons name="trash-outline" size={16} color={Colors.error} />
+                    </TouchableOpacity>
                   </View>
-                  <View style={styles.echoInfo}>
-                    <Text style={[styles.echoTitle, { color: th.text }]}>{echo.title}</Text>
-                    <Text style={[styles.echoMeta, { color: th.textSub }]}>📅 {echo.date}{echo.week ? ` · SA ${echo.week}` : ''}</Text>
-                    {echo.note && <Text style={styles.echoNote}>{echo.note}</Text>}
-                  </View>
+                  {echo.photos && echo.photos.length > 0 && (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.echoPhotosRow} contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}>
+                      {echo.photos.map((uri, idx) => (
+                        <TouchableOpacity key={idx} onPress={() => setLightboxPhoto(uri)} activeOpacity={0.85}>
+                          <Image source={{ uri }} style={styles.echoThumb} />
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  )}
                 </View>
               ))
             )}
@@ -715,6 +759,18 @@ export default function HealthScreen() {
 
         <View style={{ height: 40 }} />
       </Animated.ScrollView>
+
+      {/* Lightbox */}
+      <Modal visible={!!lightboxPhoto} transparent animationType="fade" onRequestClose={() => setLightboxPhoto(null)}>
+        <TouchableOpacity style={styles.lightboxOverlay} activeOpacity={1} onPress={() => setLightboxPhoto(null)}>
+          {lightboxPhoto && (
+            <Image source={{ uri: lightboxPhoto }} style={styles.lightboxImage} resizeMode="contain" />
+          )}
+          <TouchableOpacity style={styles.lightboxClose} onPress={() => setLightboxPhoto(null)}>
+            <Ionicons name="close-circle" size={36} color="#FFFFFF" />
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
 
       {/* Modal */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet">
@@ -891,6 +947,28 @@ export default function HealthScreen() {
                   value={inputNote}
                   onChangeText={setInputNote}
                 />
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Photos ({echoPhotos.length}/6)</Text>
+                {echoPhotos.length > 0 && (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }} contentContainerStyle={{ gap: 8 }}>
+                    {echoPhotos.map((uri, idx) => (
+                      <View key={idx} style={styles.photoThumbWrap}>
+                        <Image source={{ uri }} style={styles.photoThumb} />
+                        <TouchableOpacity
+                          style={styles.photoThumbRemove}
+                          onPress={() => setEchoPhotos(prev => prev.filter((_, i) => i !== idx))}
+                        >
+                          <Ionicons name="close-circle" size={20} color={Colors.error} />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </ScrollView>
+                )}
+                {echoPhotos.length < 6 && (
+                  <TouchableOpacity style={[styles.photoPickBtn, { backgroundColor: th.infoBox, borderColor: th.border }]} onPress={pickEchoPhoto}>
+                    <Ionicons name="camera-outline" size={20} color={Colors.primary} style={{ marginRight: 8 }} />
+                    <Text style={[styles.photoPickBtnText, { color: Colors.primary }]}>Ajouter une photo</Text>
+                  </TouchableOpacity>
+                )}
               </>
             )}
 
@@ -1411,12 +1489,9 @@ const styles = StyleSheet.create({
     color: Colors.white,
   },
   echoCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
     backgroundColor: Colors.surface,
     borderRadius: 16,
-    padding: 14,
-    marginBottom: 10,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: Colors.border,
     shadowColor: Colors.primaryDark,
@@ -1424,6 +1499,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 6,
     elevation: 2,
+    overflow: 'hidden',
+  },
+  echoCardTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    padding: 14,
   },
   echoIconBox: {
     width: 52,
@@ -1439,6 +1520,58 @@ const styles = StyleSheet.create({
   echoTitle: { fontSize: 15, fontWeight: '700', color: Colors.text, marginBottom: 4 },
   echoMeta: { fontSize: 13, color: Colors.textSecondary, marginBottom: 4 },
   echoNote: { fontSize: 12, color: Colors.textLight, fontStyle: 'italic' },
+  echoDeleteBtn: { padding: 4 },
+  echoPhotosRow: { paddingBottom: 12 },
+  echoThumb: {
+    width: 90,
+    height: 90,
+    borderRadius: 10,
+    backgroundColor: Colors.border,
+  },
+  photoThumbWrap: { position: 'relative' },
+  photoThumb: {
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    backgroundColor: Colors.border,
+  },
+  photoThumbRemove: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+  },
+  photoPickBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 4,
+  },
+  photoPickBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  lightboxOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lightboxImage: {
+    width: '100%',
+    height: '85%',
+  },
+  lightboxClose: {
+    position: 'absolute',
+    top: 56,
+    right: 20,
+  },
   medCard: {
     flexDirection: 'row',
     alignItems: 'center',
