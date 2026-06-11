@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import Colors from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
 import { useStorage, STORAGE_KEYS } from '../src/hooks/useStorage';
 
 const { width } = Dimensions.get('window');
@@ -32,6 +33,7 @@ interface Ultrasound {
 }
 
 export default function UltrasoundScreen() {
+  const { isDark, th } = useTheme();
   const router = useRouter();
   const [ultrasounds, setUltrasounds] = useStorage<Ultrasound[]>(STORAGE_KEYS.ULTRASOUNDS, []);
   const [modalVisible, setModalVisible] = useState(false);
@@ -131,7 +133,7 @@ export default function UltrasoundScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient
         colors={['#2D1B69', '#6D28D9']}
         style={styles.header}
@@ -144,7 +146,7 @@ export default function UltrasoundScreen() {
         <Text style={styles.headerCount}>{ultrasounds.length} photo{ultrasounds.length > 1 ? 's' : ''}</Text>
       </LinearGradient>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         <View style={styles.content}>
 
           {/* Add Buttons */}
@@ -164,13 +166,13 @@ export default function UltrasoundScreen() {
           </View>
 
           {/* Types Guide */}
-          <Text style={styles.sectionTitle}>📋 Types d'échographies</Text>
+          <Text style={[styles.sectionTitle, { color: th.text }]}>📋 Types d'échographies</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.typesScroll}>
             {echoTypes.map((type, idx) => (
-              <View key={idx} style={styles.typeCard}>
+              <View key={idx} style={[styles.typeCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <Text style={styles.typeLabel}>{type.label}</Text>
-                <Text style={styles.typeTitle}>{type.title}</Text>
-                {type.week && <Text style={styles.typeWeek}>Semaine {type.week}</Text>}
+                <Text style={[styles.typeTitle, { color: th.text }]}>{type.title}</Text>
+                {type.week && <Text style={[styles.typeWeek, { color: th.textMuted }]}>Semaine {type.week}</Text>}
               </View>
             ))}
           </ScrollView>
@@ -179,8 +181,8 @@ export default function UltrasoundScreen() {
           {ultrasounds.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyEmoji}>🖼️</Text>
-              <Text style={styles.emptyTitle}>Aucune échographie</Text>
-              <Text style={styles.emptyText}>
+              <Text style={[styles.emptyTitle, { color: th.text }]}>Aucune échographie</Text>
+              <Text style={[styles.emptyText, { color: th.textSub }]}>
                 Ajoutez vos premières photos de bébé !{'\n'}
                 Ces moments sont des souvenirs précieux.
               </Text>
@@ -192,7 +194,7 @@ export default function UltrasoundScreen() {
             </View>
           ) : (
             <>
-              <Text style={styles.sectionTitle}>🌸 Mes photos</Text>
+              <Text style={[styles.sectionTitle, { color: th.text }]}>🌸 Mes photos</Text>
               <View style={styles.grid}>
                 {ultrasounds.map((echo) => (
                   <TouchableOpacity
@@ -223,9 +225,9 @@ export default function UltrasoundScreen() {
 
       {/* Add Modal */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet">
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Ajouter une échographie</Text>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: th.bg }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: th.border }]}>
+            <Text style={[styles.modalTitle, { color: th.text }]}>Ajouter une échographie</Text>
             <TouchableOpacity onPress={() => { setModalVisible(false); setPendingUri(null); }}>
               <Ionicons name="close" size={26} color={Colors.text} />
             </TouchableOpacity>
@@ -236,31 +238,32 @@ export default function UltrasoundScreen() {
               <Image source={{ uri: pendingUri }} style={styles.previewImage} resizeMode="contain" />
             )}
 
-            <Text style={styles.inputLabel}>Titre *</Text>
-            <TextInput style={styles.input} value={newTitle} onChangeText={setNewTitle} placeholder="Ex: Première échographie" />
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Titre *</Text>
+            <TextInput style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]} placeholderTextColor={th.textMuted} value={newTitle} onChangeText={setNewTitle} placeholder="Ex: Première échographie" />
 
-            <Text style={styles.inputLabel}>Semaine de grossesse</Text>
-            <TextInput style={styles.input} value={newWeek} onChangeText={setNewWeek} placeholder="Ex: 12" keyboardType="number-pad" />
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Semaine de grossesse</Text>
+            <TextInput style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]} placeholderTextColor={th.textMuted} value={newWeek} onChangeText={setNewWeek} placeholder="Ex: 12" keyboardType="number-pad" />
 
-            <Text style={styles.inputLabel}>Date</Text>
-            <TextInput style={styles.input} value={newDate} onChangeText={setNewDate} placeholder="Ex: 15/03/2024" />
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Date</Text>
+            <TextInput style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]} placeholderTextColor={th.textMuted} value={newDate} onChangeText={setNewDate} placeholder="Ex: 15/03/2024" />
 
-            <Text style={styles.inputLabel}>Type</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Type</Text>
             <View style={styles.typeSelector}>
               {(['2D', '3D', '4D', 'Doppler'] as const).map(t => (
                 <TouchableOpacity
                   key={t}
-                  style={[styles.typeOption, newType === t && styles.typeOptionSelected]}
+                  style={[styles.typeOption, { backgroundColor: th.inputBg, borderColor: th.border }, newType === t && styles.typeOptionSelected]}
                   onPress={() => setNewType(t)}
                 >
-                  <Text style={[styles.typeOptionText, newType === t && { color: Colors.white }]}>{t}</Text>
+                  <Text style={[styles.typeOptionText, { color: th.textSub }, newType === t && { color: Colors.white }]}>{t}</Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text style={styles.inputLabel}>Note (optionnel)</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Note (optionnel)</Text>
             <TextInput
-              style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+              style={[styles.input, { height: 80, textAlignVertical: 'top', backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
+              placeholderTextColor={th.textMuted}
               multiline
               value={newNote}
               onChangeText={setNewNote}

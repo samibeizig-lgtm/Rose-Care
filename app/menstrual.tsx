@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
 import { useStorage, STORAGE_KEYS } from '../src/hooks/useStorage';
 import { addDays, format, parseISO, differenceInDays, parse, isValid } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -29,6 +30,7 @@ interface CycleEntry {
 const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
 
 export default function MenstrualScreen() {
+  const { isDark, th } = useTheme();
   const router = useRouter();
   const [cycles, setCycles] = useStorage<CycleEntry[]>(STORAGE_KEYS.MENSTRUAL_CYCLES, []);
   const [cycleLengthStorage, setCycleLengthStorage] = useStorage(STORAGE_KEYS.CYCLE_LENGTH, '28');
@@ -145,7 +147,7 @@ export default function MenstrualScreen() {
   ] as const;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]} style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={Colors.white} />
@@ -190,7 +192,7 @@ export default function MenstrualScreen() {
       </LinearGradient>
 
       {/* Tabs */}
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { backgroundColor: th.card, borderBottomColor: th.border }]}>
         {TABS.map(tab => (
           <TouchableOpacity
             key={tab.id}
@@ -209,7 +211,7 @@ export default function MenstrualScreen() {
         ))}
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         <View style={styles.content}>
 
           {activeTab === 'calendrier' && (
@@ -221,7 +223,7 @@ export default function MenstrualScreen() {
                 }}>
                   <Ionicons name="chevron-back" size={24} color={Colors.primary} />
                 </TouchableOpacity>
-                <Text style={styles.monthTitle}>{MONTHS[selectedMonth]} {selectedYear}</Text>
+                <Text style={[styles.monthTitle, { color: th.text }]}>{MONTHS[selectedMonth]} {selectedYear}</Text>
                 <TouchableOpacity onPress={() => {
                   if (selectedMonth === 11) { setSelectedMonth(0); setSelectedYear(y => y + 1); }
                   else setSelectedMonth(m => m + 1);
@@ -231,9 +233,9 @@ export default function MenstrualScreen() {
               </View>
 
               {/* Last period date quick setter */}
-              <TouchableOpacity style={styles.lastPeriodBtn} onPress={() => setLastPeriodPicker(true)}>
+              <TouchableOpacity style={[styles.lastPeriodBtn, { backgroundColor: th.card, borderColor: th.border }]} onPress={() => setLastPeriodPicker(true)}>
                 <Ionicons name="calendar-outline" size={16} color={Colors.primary} style={{ marginRight: 8 }} />
-                <Text style={styles.lastPeriodBtnLabel}>Dernières règles :</Text>
+                <Text style={[styles.lastPeriodBtnLabel, { color: th.textSub }]}>Dernières règles :</Text>
                 <Text style={styles.lastPeriodBtnValue}>
                   {lastPeriodStorage ? lastPeriodStorage : 'Non renseigné'}
                 </Text>
@@ -242,13 +244,13 @@ export default function MenstrualScreen() {
 
               {/* Legend */}
               <View style={styles.legend}>
-                <View style={styles.legendChip}><View style={[styles.legendDot, { backgroundColor: Colors.primary + 'CC' }]} /><Text style={styles.legendText}>Règles</Text></View>
-                <View style={styles.legendChip}><View style={[styles.legendDot, { backgroundColor: Colors.success }]} /><Text style={styles.legendText}>Fertile</Text></View>
-                <View style={styles.legendChip}><View style={[styles.legendDot, { backgroundColor: Colors.rose, borderRadius: 8 }]} /><Text style={styles.legendText}>Ovulation</Text></View>
-                <View style={styles.legendChip}><View style={[styles.legendDot, { backgroundColor: Colors.primaryLight + '80', borderWidth: 1, borderColor: Colors.primary }]} /><Text style={styles.legendText}>Prévision</Text></View>
+                <View style={[styles.legendChip, { backgroundColor: th.card, borderColor: th.border }]}><View style={[styles.legendDot, { backgroundColor: Colors.primary + 'CC' }]} /><Text style={[styles.legendText, { color: th.textSub }]}>Règles</Text></View>
+                <View style={[styles.legendChip, { backgroundColor: th.card, borderColor: th.border }]}><View style={[styles.legendDot, { backgroundColor: Colors.success }]} /><Text style={[styles.legendText, { color: th.textSub }]}>Fertile</Text></View>
+                <View style={[styles.legendChip, { backgroundColor: th.card, borderColor: th.border }]}><View style={[styles.legendDot, { backgroundColor: Colors.rose, borderRadius: 8 }]} /><Text style={[styles.legendText, { color: th.textSub }]}>Ovulation</Text></View>
+                <View style={[styles.legendChip, { backgroundColor: th.card, borderColor: th.border }]}><View style={[styles.legendDot, { backgroundColor: Colors.primaryLight + '80', borderWidth: 1, borderColor: Colors.primary }]} /><Text style={[styles.legendText, { color: th.textSub }]}>Prévision</Text></View>
               </View>
 
-              <View style={styles.calendarCard}>
+              <View style={[styles.calendarCard, { backgroundColor: th.card }]}>
                 <View style={styles.weekDays}>
                   {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((d, i) => (
                     <Text key={i} style={styles.weekDay}>{d}</Text>
@@ -271,6 +273,7 @@ export default function MenstrualScreen() {
                       ]}>
                         <Text style={[
                           styles.dayText,
+                          { color: th.text },
                           status === 'period' && { color: Colors.white },
                           status === 'fertile' && { color: Colors.white },
                           status === 'ovulation' && { color: Colors.white },
@@ -286,10 +289,10 @@ export default function MenstrualScreen() {
               </View>
 
               {nextPeriod && (
-                <View style={styles.predictionCard}>
+                <View style={[styles.predictionCard, { backgroundColor: th.card, borderColor: th.border }]}>
                   <View style={styles.predictionTitleRow}>
                     <Ionicons name="analytics-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
-                    <Text style={styles.predictionTitle}>Prévisions</Text>
+                    <Text style={[styles.predictionTitle, { color: th.text }]}>Prévisions</Text>
                   </View>
                   <View style={styles.predRow}>
                     <View style={[styles.predDot, { backgroundColor: Colors.primary }]} />
@@ -298,13 +301,13 @@ export default function MenstrualScreen() {
                   {ovulationDate && (
                     <View style={styles.predRow}>
                       <View style={[styles.predDot, { backgroundColor: Colors.rose }]} />
-                      <Text style={styles.predText}>Ovulation prévue : <Text style={{ fontWeight: '700', color: Colors.rose }}>{format(ovulationDate, 'dd MMMM yyyy', { locale: fr })}</Text></Text>
+                      <Text style={[styles.predText, { color: th.text }]}>Ovulation prévue : <Text style={{ fontWeight: '700', color: Colors.rose }}>{format(ovulationDate, 'dd MMMM yyyy', { locale: fr })}</Text></Text>
                     </View>
                   )}
                   {fertileStart && fertileEnd && (
                     <View style={styles.predRow}>
                       <View style={[styles.predDot, { backgroundColor: Colors.success }]} />
-                      <Text style={styles.predText}>Période fertile : <Text style={{ fontWeight: '700', color: Colors.success }}>{format(fertileStart, 'dd/MM', { locale: fr })} - {format(fertileEnd, 'dd/MM yyyy', { locale: fr })}</Text></Text>
+                      <Text style={[styles.predText, { color: th.text }]}>Période fertile : <Text style={{ fontWeight: '700', color: Colors.success }}>{format(fertileStart, 'dd/MM', { locale: fr })} - {format(fertileEnd, 'dd/MM yyyy', { locale: fr })}</Text></Text>
                     </View>
                   )}
                 </View>
@@ -333,19 +336,19 @@ export default function MenstrualScreen() {
                   <View style={styles.emptyIconBox}>
                     <Ionicons name="moon-outline" size={40} color={Colors.primary} />
                   </View>
-                  <Text style={styles.emptyText}>Aucun cycle enregistré</Text>
-                  <Text style={styles.emptySubtext}>Commencez à suivre votre cycle pour obtenir des prévisions précises.</Text>
+                  <Text style={[styles.emptyText, { color: th.textSub }]}>Aucun cycle enregistré</Text>
+                  <Text style={[styles.emptySubtext, { color: th.textMuted }]}>Commencez à suivre votre cycle pour obtenir des prévisions précises.</Text>
                 </View>
               ) : (
                 cycles.map((cycle) => (
-                  <View key={cycle.id} style={styles.cycleCard}>
+                  <View key={cycle.id} style={[styles.cycleCard, { backgroundColor: th.card, borderColor: th.border }]}>
                     <View style={styles.cycleDot} />
                     <View style={styles.cycleInfo}>
-                      <Text style={styles.cycleDate}>
+                      <Text style={[styles.cycleDate, { color: th.text }]}>
                         Début : {cycle.startDate}
                       </Text>
-                      {cycle.endDate && <Text style={styles.cycleEnd}>Fin : {cycle.endDate}</Text>}
-                      {cycle.note && <Text style={styles.cycleNote}>{cycle.note}</Text>}
+                      {cycle.endDate && <Text style={[styles.cycleEnd, { color: th.textSub }]}>Fin : {cycle.endDate}</Text>}
+                      {cycle.note && <Text style={[styles.cycleNote, { color: th.textMuted }]}>{cycle.note}</Text>}
                     </View>
                     <TouchableOpacity onPress={() => setCycles(cycles.filter(c => c.id !== cycle.id))}>
                       <Ionicons name="trash-outline" size={18} color={Colors.error} />
@@ -360,16 +363,16 @@ export default function MenstrualScreen() {
             <>
               <View style={styles.conseillsTitleRow}>
                 <Ionicons name="bulb-outline" size={20} color={Colors.primary} style={{ marginRight: 8 }} />
-                <Text style={styles.sectionTitle}>Comprendre son Cycle</Text>
+                <Text style={[styles.sectionTitle, { color: th.text }]}>Comprendre son Cycle</Text>
               </View>
               {periodTips.map((tip, idx) => (
-                <View key={idx} style={styles.tipCard}>
+                <View key={idx} style={[styles.tipCard, { backgroundColor: th.card, borderColor: th.border }]}>
                   <View style={styles.tipIconBox}>
                     <Ionicons name={tip.icon as any} size={20} color={Colors.primary} />
                   </View>
                   <View style={styles.tipContent}>
-                    <Text style={styles.tipTitle}>{tip.title}</Text>
-                    <Text style={styles.tipText}>{tip.tip}</Text>
+                    <Text style={[styles.tipTitle, { color: th.text }]}>{tip.title}</Text>
+                    <Text style={[styles.tipText, { color: th.textSub }]}>{tip.tip}</Text>
                   </View>
                 </View>
               ))}
@@ -381,9 +384,9 @@ export default function MenstrualScreen() {
 
       {/* Add Cycle Modal */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet">
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Nouveau Cycle</Text>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: th.bg }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: th.border }]}>
+            <Text style={[styles.modalTitle, { color: th.text }]}>Nouveau Cycle</Text>
             <TouchableOpacity onPress={() => {
               setModalVisible(false);
               setNewStartDate(null);
@@ -394,17 +397,17 @@ export default function MenstrualScreen() {
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.modalBody} keyboardShouldPersistTaps="handled">
-            <Text style={styles.inputLabel}>Date de début *</Text>
-            <TouchableOpacity style={styles.datePickerBtn} onPress={() => setStartDatePicker(true)}>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Date de début *</Text>
+            <TouchableOpacity style={[styles.datePickerBtn, { backgroundColor: th.inputBg, borderColor: th.border }]} onPress={() => setStartDatePicker(true)}>
               <Ionicons name="calendar-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
-              <Text style={[styles.datePickerText, !newStartDate && styles.datePickerPlaceholder]}>
+              <Text style={[styles.datePickerText, { color: th.text }, !newStartDate && styles.datePickerPlaceholder, !newStartDate && { color: th.textMuted }]}>
                 {newStartDate ? format(newStartDate, 'dd MMMM yyyy', { locale: fr }) : 'Sélectionner la date de début'}
               </Text>
               <Ionicons name="chevron-down-outline" size={14} color={Colors.textLight} />
             </TouchableOpacity>
 
-            <Text style={styles.inputLabel}>Date de fin (optionnel)</Text>
-            <TouchableOpacity style={styles.datePickerBtn} onPress={() => setEndDatePicker(true)}>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Date de fin (optionnel)</Text>
+            <TouchableOpacity style={[styles.datePickerBtn, { backgroundColor: th.inputBg, borderColor: th.border }]} onPress={() => setEndDatePicker(true)}>
               <Ionicons name="calendar-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
               <Text style={[styles.datePickerText, !newEndDate && styles.datePickerPlaceholder]}>
                 {newEndDate ? format(newEndDate, 'dd MMMM yyyy', { locale: fr }) : 'Sélectionner la date de fin'}
@@ -412,14 +415,14 @@ export default function MenstrualScreen() {
               <Ionicons name="chevron-down-outline" size={14} color={Colors.textLight} />
             </TouchableOpacity>
 
-            <Text style={styles.inputLabel}>Note</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Note</Text>
             <TextInput
-              style={styles.noteInput}
+              style={[styles.noteInput, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
               multiline
               value={newNote}
               onChangeText={setNewNote}
               placeholder="Symptômes, notes..."
-              placeholderTextColor={Colors.textMuted}
+              placeholderTextColor={th.textMuted}
             />
 
             <TouchableOpacity style={styles.saveBtn} onPress={addCycle}>

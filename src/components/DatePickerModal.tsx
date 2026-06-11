@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 const MONTHS_FR = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -34,6 +35,7 @@ export default function DatePickerModal({
   maxDate,
   minDate,
 }: Props) {
+  const { isDark, th } = useTheme();
   const today = new Date();
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -91,29 +93,29 @@ export default function DatePickerModal({
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: th.card }]}>
           <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-              <Ionicons name="close" size={22} color={Colors.text} />
+            <Text style={[styles.title, { color: th.text }]}>{title}</Text>
+            <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: th.border }]}>
+              <Ionicons name="close" size={22} color={th.text} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.monthNav}>
-            <TouchableOpacity onPress={prevMonth} style={styles.navBtn}>
+            <TouchableOpacity onPress={prevMonth} style={[styles.navBtn, { backgroundColor: th.infoBox }]}>
               <Ionicons name="chevron-back" size={22} color={Colors.primary} />
             </TouchableOpacity>
-            <Text style={styles.monthLabel}>
+            <Text style={[styles.monthLabel, { color: isDark ? Colors.primaryLight : Colors.primaryDeep }]}>
               {MONTHS_FR[viewMonth]} {viewYear}
             </Text>
-            <TouchableOpacity onPress={nextMonth} style={styles.navBtn}>
+            <TouchableOpacity onPress={nextMonth} style={[styles.navBtn, { backgroundColor: th.infoBox }]}>
               <Ionicons name="chevron-forward" size={22} color={Colors.primary} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.weekRow}>
             {DAYS_FR.map((d, i) => (
-              <Text key={i} style={styles.weekDay}>{d}</Text>
+              <Text key={i} style={[styles.weekDay, { color: th.textSub }]}>{d}</Text>
             ))}
           </View>
 
@@ -141,6 +143,7 @@ export default function DatePickerModal({
                 >
                   <Text style={[
                     styles.dayText,
+                    { color: th.text },
                     sel && styles.dayTextSelected,
                     tod && !sel && styles.dayTextToday,
                     dis && styles.dayTextDisabled,
@@ -153,7 +156,7 @@ export default function DatePickerModal({
           </View>
 
           <TouchableOpacity
-            style={styles.todayBtn}
+            style={[styles.todayBtn, { borderTopColor: th.border }]}
             onPress={() => {
               setViewMonth(today.getMonth());
               setViewYear(today.getFullYear());

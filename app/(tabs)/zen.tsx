@@ -16,6 +16,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { useFocusEffect } from 'expo-router';
 import { Audio } from 'expo-av';
 import {
@@ -29,6 +30,7 @@ const { width } = Dimensions.get('window');
 const WAVE_H = 50;
 
 export default function ZenScreen() {
+  const { isDark, th } = useTheme();
   const [activeTab, setActiveTab] = useState<'respiration' | 'hypnose' | 'affirmations' | 'yoga'>('respiration');
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [isBreathing, setIsBreathing] = useState(false);
@@ -62,8 +64,8 @@ export default function ZenScreen() {
       setIsSpeaking(sessionId);
       Speech.speak(text, {
         language: 'fr-FR',
-        pitch: 0.65,
-        rate: 0.40,
+        pitch: 0.55,
+        rate: 0.35,
         onDone: () => setIsSpeaking(null),
         onStopped: () => setIsSpeaking(null),
         onError: () => setIsSpeaking(null),
@@ -234,7 +236,7 @@ export default function ZenScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       {/* Header */}
       <LinearGradient colors={Colors.gradient.zen} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
         <View style={styles.headerRow}>
@@ -250,7 +252,7 @@ export default function ZenScreen() {
       </LinearGradient>
 
       {/* Tabs */}
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { backgroundColor: th.card, borderBottomColor: th.border }]}>
         {(['respiration', 'hypnose', 'affirmations', 'yoga'] as const).map(tab => (
           <TouchableOpacity
             key={tab}
@@ -269,7 +271,7 @@ export default function ZenScreen() {
         ))}
       </View>
 
-      <Animated.ScrollView showsVerticalScrollIndicator={false} style={{ opacity: fadeAnim }}>
+      <Animated.ScrollView showsVerticalScrollIndicator={false} style={{ opacity: fadeAnim, backgroundColor: th.bg }}>
 
         {/* BREATHING TAB */}
         {activeTab === 'respiration' && (
@@ -323,7 +325,7 @@ export default function ZenScreen() {
             {!isBreathing && breathingExercises.map((ex) => (
               <TouchableOpacity
                 key={ex.id}
-                style={[styles.exerciseCard, selectedExercise === ex.id && styles.exerciseCardSelected]}
+                style={[styles.exerciseCard, { backgroundColor: th.card, borderColor: th.border }, selectedExercise === ex.id && styles.exerciseCardSelected]}
                 onPress={() => setSelectedExercise(selectedExercise === ex.id ? null : ex.id)}
               >
                 <View style={styles.exerciseHeader}>
@@ -331,7 +333,7 @@ export default function ZenScreen() {
                     <Ionicons name={ex.ionicon as any} size={20} color={Colors.primary} />
                   </View>
                   <View style={styles.exerciseInfo}>
-                    <Text style={styles.exerciseTitle}>{ex.title}</Text>
+                    <Text style={[styles.exerciseTitle, { color: th.text }]}>{ex.title}</Text>
                     <Text style={styles.exerciseDuration}>
                       <Ionicons name="time-outline" size={11} color={Colors.textLight} /> {ex.duration}
                     </Text>
@@ -344,7 +346,7 @@ export default function ZenScreen() {
                 </View>
                 {selectedExercise === ex.id && (
                   <View style={styles.exerciseDetails}>
-                    <Text style={styles.exerciseDesc}>{ex.description}</Text>
+                    <Text style={[styles.exerciseDesc, { color: th.textSub }]}>{ex.description}</Text>
                     <View style={styles.benefitBadge}>
                       <Ionicons name="sparkles-outline" size={13} color={Colors.primary} style={{ marginRight: 4 }} />
                       <Text style={styles.benefitText}>{ex.benefit}</Text>
@@ -352,7 +354,7 @@ export default function ZenScreen() {
                     {ex.steps.map((step, idx) => (
                       <View key={idx} style={styles.stepRow}>
                         <View style={styles.stepNum}><Text style={styles.stepNumText}>{idx + 1}</Text></View>
-                        <Text style={styles.stepText}>{step}</Text>
+                        <Text style={[styles.stepText, { color: th.text }]}>{step}</Text>
                       </View>
                     ))}
                     {(ex.id === 'cohérence' || ex.id === '4-7-8') && (
@@ -373,8 +375,8 @@ export default function ZenScreen() {
         {/* HYPNOSE TAB */}
         {activeTab === 'hypnose' && (
           <View style={styles.content}>
-            <Text style={styles.sectionTitle}>Hypnose & Relaxation Guidée</Text>
-            <Text style={styles.sectionSubtitle}>
+            <Text style={[styles.sectionTitle, { color: th.text }]}>Hypnose & Relaxation Guidée</Text>
+            <Text style={[styles.sectionSubtitle, { color: th.textSub }]}>
               Des séances de relaxation et d'hypnose douce en français, spécialement conçues pour la grossesse.
             </Text>
 
@@ -400,7 +402,7 @@ export default function ZenScreen() {
             ].map((session) => (
               <TouchableOpacity
                 key={session.id}
-                style={styles.hypnoseCard}
+                style={[styles.hypnoseCard, { backgroundColor: th.card }]}
                 onPress={() => setSelectedExercise(selectedExercise === session.id ? null : session.id)}
                 activeOpacity={0.85}
               >
@@ -419,15 +421,15 @@ export default function ZenScreen() {
                   />
                 </LinearGradient>
                 {selectedExercise !== session.id && (
-                  <View style={styles.hypnoseDesc}>
-                    <Text style={styles.hypnoseDescText}>{session.desc}</Text>
+                  <View style={[styles.hypnoseDesc, { backgroundColor: th.card }]}>
+                    <Text style={[styles.hypnoseDescText, { color: th.textSub }]}>{session.desc}</Text>
                   </View>
                 )}
                 {selectedExercise === session.id && (
-                  <View style={styles.hypnoseScript}>
+                  <View style={[styles.hypnoseScript, { backgroundColor: th.surface }]}>
                     <Text style={styles.hypnoseScriptLabel}>Séance guidée :</Text>
                     <TouchableOpacity onPress={() => speakScript(session.id, session.script)} activeOpacity={0.8}>
-                      <Text style={[styles.hypnoseScriptText, isSpeaking === session.id && { opacity: 0.7 }]}>{session.script}</Text>
+                      <Text style={[styles.hypnoseScriptText, { color: th.text }, isSpeaking === session.id && { opacity: 0.7 }]}>{session.script}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.voiceBtn, isSpeaking === session.id && styles.voiceBtnActive]}
@@ -467,7 +469,7 @@ export default function ZenScreen() {
         {/* AFFIRMATIONS TAB */}
         {activeTab === 'affirmations' && (
           <View style={styles.content}>
-            <Text style={styles.sectionTitle}>Affirmations Positives</Text>
+            <Text style={[styles.sectionTitle, { color: th.text }]}>Affirmations Positives</Text>
 
             <TouchableOpacity onPress={changeAffirmation} style={styles.affirmationBig}>
               <LinearGradient
@@ -501,11 +503,11 @@ export default function ZenScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
-            <Text style={styles.allAffirmTitle}>Toutes les affirmations</Text>
+            <Text style={[styles.allAffirmTitle, { color: th.text }]}>Toutes les affirmations</Text>
             {affirmations.map((aff) => (
               <TouchableOpacity
                 key={aff.id}
-                style={styles.affirmCard}
+                style={[styles.affirmCard, { backgroundColor: th.card, borderColor: th.border }]}
                 onPress={() => {
                   const idx = affirmations.indexOf(aff);
                   Animated.timing(affirmFade, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
@@ -515,7 +517,7 @@ export default function ZenScreen() {
                 }}
               >
                 <View style={[styles.affirmCardAccent, { backgroundColor: affirmationColors[aff.category][0] }]} />
-                <Text style={styles.affirmCardText}>{aff.text}</Text>
+                <Text style={[styles.affirmCardText, { color: th.text }]}>{aff.text}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -524,26 +526,26 @@ export default function ZenScreen() {
         {/* YOGA TAB */}
         {activeTab === 'yoga' && (
           <View style={styles.content}>
-            <Text style={styles.sectionTitle}>Yoga Prénatal</Text>
-            <Text style={styles.sectionSubtitle}>
+            <Text style={[styles.sectionTitle, { color: th.text }]}>Yoga Prénatal</Text>
+            <Text style={[styles.sectionSubtitle, { color: th.textSub }]}>
               Le yoga prénatal améliore la flexibilité, soulage les douleurs et prépare le corps à l'accouchement.
             </Text>
 
-            <View style={styles.warningCard}>
+            <View style={[styles.warningCard, { backgroundColor: th.warningLight }]}>
               <Ionicons name="warning-outline" size={20} color={Colors.warning} style={{ flexShrink: 0 }} />
-              <Text style={styles.warningText}>
+              <Text style={[styles.warningText, { color: th.text }]}>
                 Consultez toujours votre médecin avant de commencer une nouvelle activité physique pendant la grossesse.
               </Text>
             </View>
 
             {yogaPoses.map((pose) => (
-              <View key={pose.id} style={styles.poseCard}>
+              <View key={pose.id} style={[styles.poseCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.poseHeader}>
                   <View style={styles.poseIconBox}>
                     <Ionicons name={pose.ionicon as any} size={22} color={Colors.primary} />
                   </View>
                   <View style={styles.poseInfo}>
-                    <Text style={styles.poseName}>{pose.name}</Text>
+                    <Text style={[styles.poseName, { color: th.text }]}>{pose.name}</Text>
                     <Text style={styles.poseDuration}>
                       <Ionicons name="time-outline" size={11} color={Colors.textLight} /> {pose.duration}
                     </Text>
@@ -560,11 +562,11 @@ export default function ZenScreen() {
                   <Ionicons name="sparkles-outline" size={13} color={Colors.primary} style={{ marginRight: 4 }} />
                   <Text style={styles.poseBenefitText}>{pose.benefit}</Text>
                 </View>
-                <Text style={styles.poseDesc}>{pose.description}</Text>
+                <Text style={[styles.poseDesc, { color: th.textSub }]}>{pose.description}</Text>
               </View>
             ))}
 
-            <View style={styles.yogaNote}>
+            <View style={[styles.yogaNote, { backgroundColor: th.card, borderColor: th.border }]}>
               <View style={styles.yogaNoteTitleRow}>
                 <Ionicons name="bulb-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
                 <Text style={styles.yogaNoteTitle}>Conseils généraux</Text>
@@ -578,7 +580,7 @@ export default function ZenScreen() {
               ].map((tip, idx) => (
                 <View key={idx} style={styles.yogaTipRow}>
                   <View style={styles.yogaTipBullet} />
-                  <Text style={styles.yogaTipText}>{tip}</Text>
+                  <Text style={[styles.yogaTipText, { color: th.text }]}>{tip}</Text>
                 </View>
               ))}
             </View>

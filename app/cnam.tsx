@@ -12,8 +12,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
 
 export default function CNAMScreen() {
+  const { isDark, th } = useTheme();
   const router = useRouter();
   const [expandedSection, setExpandedSection] = useState<string | null>('declaration');
 
@@ -139,7 +141,7 @@ export default function CNAMScreen() {
   const [checks, setChecks] = useState(checklist.map(() => false));
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={Colors.white} />
@@ -153,14 +155,14 @@ export default function CNAMScreen() {
         </Text>
       </LinearGradient>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         <View style={styles.content}>
 
           {/* Quick checklist */}
-          <View style={styles.checklistCard}>
+          <View style={[styles.checklistCard, { backgroundColor: th.card, borderColor: th.border }]}>
             <View style={styles.checklistTitleRow}>
               <Ionicons name="checkmark-done-outline" size={20} color={Colors.primary} style={{ marginRight: 8 }} />
-              <Text style={styles.checklistTitle}>Ma Checklist Administrative</Text>
+              <Text style={[styles.checklistTitle, { color: th.text }]}>Ma Checklist Administrative</Text>
             </View>
             {checklist.map((item, idx) => (
               <TouchableOpacity
@@ -175,7 +177,7 @@ export default function CNAMScreen() {
                 <View style={[styles.checkBox, checks[idx] && styles.checkBoxDone]}>
                   {checks[idx] && <Ionicons name="checkmark" size={14} color={Colors.white} />}
                 </View>
-                <Text style={[styles.checkText, checks[idx] && styles.checkTextDone]}>
+                <Text style={[styles.checkText, checks[idx] && styles.checkTextDone, { color: checks[idx] ? th.textMuted : th.text }]}>
                   {item}
                 </Text>
               </TouchableOpacity>
@@ -186,14 +188,14 @@ export default function CNAMScreen() {
           {cnaminSections.map((section) => (
             <TouchableOpacity
               key={section.id}
-              style={[styles.sectionCard, expandedSection === section.id && { borderColor: section.color }]}
+              style={[styles.sectionCard, { backgroundColor: th.card, borderColor: expandedSection === section.id ? section.color : th.border }]}
               onPress={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
             >
               <View style={styles.sectionHeader}>
                 <View style={[styles.sectionIconBox, { backgroundColor: section.color + '20' }]}>
                   <Ionicons name={section.icon} size={18} color={section.color} />
                 </View>
-                <Text style={styles.sectionTitle}>{section.title}</Text>
+                <Text style={[styles.sectionTitle, { color: th.text }]}>{section.title}</Text>
                 <Ionicons
                   name={expandedSection === section.id ? 'chevron-up' : 'chevron-down'}
                   size={18}
@@ -205,7 +207,7 @@ export default function CNAMScreen() {
                 <View style={styles.sectionBody}>
                   {section.content.map((item, idx) => (
                     <View key={idx} style={[
-                      item.type === 'info' ? styles.infoBox :
+                      item.type === 'info' ? [styles.infoBox, { backgroundColor: th.infoBox }] :
                       item.type === 'tableHeader' || item.type === 'tableRow' ? {} :
                       styles.contentRow,
                       item.type === 'subtitle' ? styles.subtitleRow : {},
@@ -217,13 +219,13 @@ export default function CNAMScreen() {
                               {section.content.slice(0, idx + 1).filter(c => c.type === 'step').length}
                             </Text>
                           </View>
-                          <Text style={styles.contentText}>{item.text}</Text>
+                          <Text style={[styles.contentText, { color: th.text }]}>{item.text}</Text>
                         </>
                       )}
                       {item.type === 'item' && (
                         <>
                           <View style={[styles.bullet, { backgroundColor: section.color }]} />
-                          <Text style={styles.contentText}>{item.text}</Text>
+                          <Text style={[styles.contentText, { color: th.text }]}>{item.text}</Text>
                         </>
                       )}
                       {item.type === 'subtitle' && (
@@ -232,7 +234,7 @@ export default function CNAMScreen() {
                       {item.type === 'info' && (
                         <View style={styles.infoContent}>
                           <Ionicons name="information-circle-outline" size={16} color={Colors.primary} style={{ marginRight: 6, marginTop: 1, flexShrink: 0 }} />
-                          <Text style={styles.infoText}>{item.text}</Text>
+                          <Text style={[styles.infoText, { color: th.text }]}>{item.text}</Text>
                         </View>
                       )}
                       {item.type === 'tableHeader' && (
@@ -242,9 +244,9 @@ export default function CNAMScreen() {
                         </View>
                       )}
                       {item.type === 'tableRow' && (
-                        <View style={[styles.tableDataRow, (item as any).alt && styles.tableDataRowAlt]}>
-                          <Text style={styles.tableCol1}>{(item as any).col1}</Text>
-                          <Text style={styles.tableCol2}>{(item as any).col2}</Text>
+                        <View style={[styles.tableDataRow, (item as any).alt && [styles.tableDataRowAlt, { backgroundColor: isDark ? th.surface : '#F5F0FF' }], { borderBottomColor: th.border }]}>
+                          <Text style={[styles.tableCol1, { color: th.text }]}>{(item as any).col1}</Text>
+                          <Text style={[styles.tableCol2, { color: th.textSub }]}>{(item as any).col2}</Text>
                         </View>
                       )}
                     </View>

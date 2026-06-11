@@ -18,6 +18,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { getWeekData } from '../../src/data/weeklyData';
 import ProgressBar from '../../src/components/ProgressBar';
@@ -145,6 +146,7 @@ function WheelCol({ items, selectedIndex, onSelect, colWidth }: { items: string[
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { isDark, th } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [profileModalVisible, setProfileModalVisible] = useState(false);
@@ -226,9 +228,10 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        style={{ backgroundColor: th.bg }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
       >
         {/* ─── Hero ─── */}
@@ -284,7 +287,7 @@ export default function HomeScreen() {
         </LinearGradient>
 
         {/* ─── White content ─── */}
-        <Animated.View style={[styles.content, cardStyle]}>
+        <Animated.View style={[styles.content, cardStyle, { backgroundColor: th.bg }]}>
 
           {/* Statistique grossesse motivationnelle */}
           {daysLeft !== null && daysLeft > 0 && (
@@ -297,17 +300,17 @@ export default function HomeScreen() {
             </View>
           )}
 
-          <Text style={styles.sectionLabel}>AUJOURD'HUI</Text>
+          <Text style={[styles.sectionLabel, { color: th.sectionLabel }]}>AUJOURD'HUI</Text>
 
           {/* Conseil du jour */}
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: th.card, borderColor: th.border }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconCircle, { backgroundColor: Colors.lilac }]}>
                 <Ionicons name="bulb-outline" size={18} color={Colors.primaryDeep} />
               </View>
-              <Text style={styles.cardTitle}>Conseil du jour</Text>
+              <Text style={[styles.cardTitle, { color: th.text }]}>Conseil du jour</Text>
             </View>
-            <Text style={styles.cardText}>{dailyTips[indices.tip]}</Text>
+            <Text style={[styles.cardText, { color: th.textSub }]}>{dailyTips[indices.tip]}</Text>
           </View>
 
           {/* Exercice du jour */}
@@ -326,20 +329,20 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           {/* Le saviez-vous */}
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: th.card, borderColor: th.border }]}>
             <View style={styles.cardHeader}>
               <View style={[styles.iconCircle, { backgroundColor: Colors.infoLight }]}>
                 <Ionicons name="information-circle-outline" size={18} color={Colors.info} />
               </View>
-              <Text style={styles.cardTitle}>Le saviez-vous ?</Text>
+              <Text style={[styles.cardTitle, { color: th.text }]}>Le saviez-vous ?</Text>
             </View>
-            <Text style={styles.cardText}>{dailyInfo[indices.info]}</Text>
+            <Text style={[styles.cardText, { color: th.textSub }]}>{dailyInfo[indices.info]}</Text>
           </View>
 
           {/* Baby dev */}
           {weekData && (
             <>
-              <Text style={styles.sectionLabel}>BÉBÉ CETTE SEMAINE</Text>
+              <Text style={[styles.sectionLabel, { color: th.sectionLabel }]}>BÉBÉ CETTE SEMAINE</Text>
               <TouchableOpacity
                 style={styles.devCard}
                 onPress={() => router.push(`/pregnancy/week/${currentWeek}` as any)}
@@ -361,37 +364,37 @@ export default function HomeScreen() {
                 </LinearGradient>
               </TouchableOpacity>
 
-              <View style={styles.card}>
+              <View style={[styles.card, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.cardHeader}>
                   <View style={[styles.iconCircle, { backgroundColor: Colors.lilac }]}>
                     <Ionicons name="sparkles-outline" size={18} color={Colors.primaryDeep} />
                   </View>
-                  <Text style={styles.cardTitle}>Conseil semaine {currentWeek}</Text>
+                  <Text style={[styles.cardTitle, { color: th.text }]}>Conseil semaine {currentWeek}</Text>
                 </View>
-                <Text style={styles.cardText}>{weekData.nutritionTip}</Text>
+                <Text style={[styles.cardText, { color: th.textSub }]}>{weekData.nutritionTip}</Text>
               </View>
 
-              <View style={styles.card}>
+              <View style={[styles.card, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.cardHeader}>
                   <View style={[styles.iconCircle, { backgroundColor: Colors.roseLight }]}>
                     <Ionicons name="heart-outline" size={18} color={Colors.roseDark} />
                   </View>
-                  <Text style={styles.cardTitle}>Message pour toi</Text>
+                  <Text style={[styles.cardTitle, { color: th.text }]}>Message pour toi</Text>
                 </View>
-                <Text style={[styles.cardText, { fontStyle: 'italic' }]}>{weekData.emotionalNote}</Text>
+                <Text style={[styles.cardText, { color: th.textSub, fontStyle: 'italic' }]}>{weekData.emotionalNote}</Text>
               </View>
             </>
           )}
 
           {/* Rendez-vous */}
-          <Text style={styles.sectionLabel}>RENDEZ-VOUS</Text>
-          <TouchableOpacity style={styles.reminderCard} onPress={() => router.push('/(tabs)/health' as any)} activeOpacity={0.85}>
+          <Text style={[styles.sectionLabel, { color: th.sectionLabel }]}>RENDEZ-VOUS</Text>
+          <TouchableOpacity style={[styles.reminderCard, { backgroundColor: th.card }]} onPress={() => router.push('/(tabs)/health' as any)} activeOpacity={0.85}>
             <View style={[styles.iconCircle, { backgroundColor: Colors.lilac, width: 48, height: 48, borderRadius: 24 }]}>
               <Ionicons name="calendar-outline" size={22} color={Colors.primary} />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.reminderTitle}>Prochain rendez-vous</Text>
-              <Text style={styles.reminderSub}>
+              <Text style={[styles.reminderTitle, { color: th.text }]}>Prochain rendez-vous</Text>
+              <Text style={[styles.reminderSub, { color: th.textSub }]}>
                 {currentWeek < 14 ? 'Bilan du 1er trimestre' : currentWeek < 22 ? 'Échographie morphologique' : currentWeek < 28 ? 'Test glycémie (HGPO)' : currentWeek < 32 ? 'Écho 3ème trimestre' : 'Consultation mensuelle'}
               </Text>
             </View>
@@ -401,8 +404,8 @@ export default function HomeScreen() {
           {/* Progression trimestres */}
           {currentWeek > 0 && (
             <>
-              <Text style={styles.sectionLabel}>PROGRESSION</Text>
-              <View style={styles.card}>
+              <Text style={[styles.sectionLabel, { color: th.sectionLabel }]}>PROGRESSION</Text>
+              <View style={[styles.card, { backgroundColor: th.card, borderColor: th.border }]}>
                 <ProgressBar progress={Math.min(1, currentWeek / 12)} color={Colors.primary} label="1er Trimestre (S1–S12)" showPercent />
                 <View style={{ height: 12 }} />
                 <ProgressBar progress={currentWeek <= 12 ? 0 : Math.min(1, (currentWeek - 12) / 15)} color={Colors.primaryLight} label="2ème Trimestre (S13–S27)" showPercent />
@@ -422,33 +425,33 @@ export default function HomeScreen() {
       {/* ─── Profile edit modal ─── */}
       <Modal visible={profileModalVisible} transparent animationType="slide" onRequestClose={() => setProfileModalVisible(false)}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalSheet}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Mon Profil</Text>
+          <View style={[styles.modalSheet, { backgroundColor: th.card }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: th.border }]}>
+              <Text style={[styles.modalTitle, { color: th.text }]}>Mon Profil</Text>
               <TouchableOpacity onPress={() => setProfileModalVisible(false)}>
-                <Ionicons name="close" size={24} color={Colors.text} />
+                <Ionicons name="close" size={24} color={th.text} />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.inputLabel}>Prénom</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Prénom</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
               value={editPrenom}
               onChangeText={setEditPrenom}
               placeholder="Votre prénom"
-              placeholderTextColor={Colors.textMuted}
+              placeholderTextColor={th.textMuted}
             />
 
-            <Text style={styles.inputLabel}>Nom</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Nom</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
               value={editNom}
               onChangeText={setEditNom}
               placeholder="Votre nom"
-              placeholderTextColor={Colors.textMuted}
+              placeholderTextColor={th.textMuted}
             />
 
-            <Text style={styles.inputLabel}>Date de naissance</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Date de naissance</Text>
             <View style={styles.wheelRow}>
               <WheelCol items={DAYS} selectedIndex={editDayIdx} onSelect={setEditDayIdx} colWidth={colW} />
               <WheelCol items={MONTHS} selectedIndex={editMonthIdx} onSelect={setEditMonthIdx} colWidth={colW} />

@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import * as Notifications from 'expo-notifications';
 import Colors from '../../src/theme/colors';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { useFocusEffect } from 'expo-router';
 import { useStorage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { format } from 'date-fns';
@@ -68,6 +69,7 @@ const MOOD_OPTIONS = ['😊 Bien', '😴 Fatiguée', '🤢 Nausées', '😰 Anxi
 const FREQUENCY_OPTIONS = ['1x par jour', '2x par jour', '3x par jour', 'Le matin', 'Le soir', 'Avant les repas', 'Après les repas'];
 
 export default function HealthScreen() {
+  const { isDark, th } = useTheme();
   const [records, setRecords] = useStorage<HealthRecord[]>(STORAGE_KEYS.HEALTH_RECORDS, []);
   const [echographies, setEchographies] = useStorage<Echographie[]>('echographies', []);
   const [medications, setMedications] = useStorage<Medication[]>('medications', []);
@@ -300,9 +302,9 @@ export default function HealthScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       {/* Header + Tabs */}
-      <View style={styles.tabsHeader}>
+      <View style={[styles.tabsHeader, { backgroundColor: th.card }]}>
         <LinearGradient colors={Colors.gradient.primary} style={styles.headerGradient}>
           <View style={styles.headerRow}>
             <Ionicons name="medkit-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
@@ -312,7 +314,7 @@ export default function HealthScreen() {
             <Path d={`M0,${WAVE_H} Q${width * 0.5},0 ${width},${WAVE_H} Z`} fill="#FFFFFF" />
           </Svg>
         </LinearGradient>
-        <View style={styles.tabsRow}>
+        <View style={[styles.tabsRow, { backgroundColor: th.card, borderBottomColor: th.border }]}>
           {([
             { id: 'suivi', label: 'Suivi', icon: 'bar-chart-outline' },
             { id: 'echographies', label: 'Échos', icon: 'images-outline' },
@@ -337,7 +339,7 @@ export default function HealthScreen() {
         </View>
       </View>
 
-      <Animated.ScrollView showsVerticalScrollIndicator={false} style={{ opacity: fadeAnim }}>
+      <Animated.ScrollView showsVerticalScrollIndicator={false} style={{ opacity: fadeAnim, backgroundColor: th.bg }}>
         {activeTab === 'suivi' && (
           <View style={styles.content}>
             {/* Health Cards */}
@@ -372,10 +374,10 @@ export default function HealthScreen() {
 
             {/* Weight LineChart */}
             {weightRecords.length >= 2 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="trending-up-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Évolution du Poids</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Évolution du Poids</Text>
                 </View>
                 <LineChart
                   data={{
@@ -401,10 +403,10 @@ export default function HealthScreen() {
               </View>
             )}
             {weightRecords.length === 1 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="trending-up-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Évolution du Poids</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Évolution du Poids</Text>
                 </View>
                 <View style={styles.bpRow}>
                   <Text style={styles.recordDate}>{format(new Date(weightRecords[0].date), 'dd/MM HH:mm', { locale: fr })}</Text>
@@ -416,10 +418,10 @@ export default function HealthScreen() {
 
             {/* BP LineChart */}
             {bpRecords.length >= 2 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="heart-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Tension Artérielle (systolique)</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Tension Artérielle (systolique)</Text>
                 </View>
                 <LineChart
                   data={{
@@ -460,10 +462,10 @@ export default function HealthScreen() {
               </View>
             )}
             {bpRecords.length === 1 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="heart-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Tension Artérielle</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Tension Artérielle</Text>
                 </View>
                 <View style={styles.bpRow}>
                   <Text style={styles.recordDate}>{format(new Date(bpRecords[0].date), 'dd/MM HH:mm', { locale: fr })}</Text>
@@ -477,10 +479,10 @@ export default function HealthScreen() {
 
             {/* Glucose LineChart */}
             {glucoseRecords.length >= 2 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="water-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Glycémie</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Glycémie</Text>
                 </View>
                 <LineChart
                   data={{
@@ -515,10 +517,10 @@ export default function HealthScreen() {
               </View>
             )}
             {glucoseRecords.length === 1 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="water-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Glycémie</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Glycémie</Text>
                 </View>
                 <View style={styles.bpRow}>
                   <Text style={styles.recordDate}>{format(new Date(glucoseRecords[0].date), 'dd/MM HH:mm', { locale: fr })}</Text>
@@ -532,10 +534,10 @@ export default function HealthScreen() {
 
             {/* Temperature LineChart */}
             {temperatureRecords.length >= 2 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="thermometer-outline" size={18} color="#EF4444" style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Température</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Température</Text>
                 </View>
                 <LineChart
                   data={{
@@ -570,10 +572,10 @@ export default function HealthScreen() {
               </View>
             )}
             {temperatureRecords.length === 1 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="thermometer-outline" size={18} color="#EF4444" style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Température</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Température</Text>
                 </View>
                 <View style={styles.bpRow}>
                   <Text style={styles.recordDate}>{format(new Date(temperatureRecords[0].date), 'dd/MM HH:mm', { locale: fr })}</Text>
@@ -587,10 +589,10 @@ export default function HealthScreen() {
 
             {/* Recent Moods */}
             {records.filter(r => r.type === 'mood').length > 0 && (
-              <View style={styles.chartCard}>
+              <View style={[styles.chartCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.chartTitleRow}>
                   <Ionicons name="happy-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
-                  <Text style={styles.chartTitle}>Mon Humeur</Text>
+                  <Text style={[styles.chartTitle, { color: th.text }]}>Mon Humeur</Text>
                 </View>
                 {records.filter(r => r.type === 'mood').slice(0, 5).map((r) => (
                   <View key={r.id} style={styles.bpRow}>
@@ -620,13 +622,13 @@ export default function HealthScreen() {
               </View>
             ) : (
               echographies.map((echo) => (
-                <View key={echo.id} style={styles.echoCard}>
+                <View key={echo.id} style={[styles.echoCard, { backgroundColor: th.card, borderColor: th.border }]}>
                   <View style={styles.echoIconBox}>
                     <Ionicons name="scan-outline" size={28} color={Colors.primary} />
                   </View>
                   <View style={styles.echoInfo}>
-                    <Text style={styles.echoTitle}>{echo.title}</Text>
-                    <Text style={styles.echoMeta}>📅 {echo.date}{echo.week ? ` · SA ${echo.week}` : ''}</Text>
+                    <Text style={[styles.echoTitle, { color: th.text }]}>{echo.title}</Text>
+                    <Text style={[styles.echoMeta, { color: th.textSub }]}>📅 {echo.date}{echo.week ? ` · SA ${echo.week}` : ''}</Text>
                     {echo.note && <Text style={styles.echoNote}>{echo.note}</Text>}
                   </View>
                 </View>
@@ -657,13 +659,13 @@ export default function HealthScreen() {
               </View>
             ) : (
               medications.map((med) => (
-                <View key={med.id} style={[styles.medCard, !med.active && { opacity: 0.5 }]}>
+                <View key={med.id} style={[styles.medCard, { backgroundColor: th.card, borderColor: th.border }, !med.active && { opacity: 0.5 }]}>
                   <View style={[styles.medIconBox, { backgroundColor: med.active ? '#D1FAE5' : Colors.border }]}>
                     <Ionicons name="medical-outline" size={22} color={med.active ? '#059669' : Colors.textMuted} />
                   </View>
                   <View style={styles.medInfo}>
-                    <Text style={styles.medName}>{med.name}</Text>
-                    <Text style={styles.medDosage}>{med.dosage} · {med.frequency}</Text>
+                    <Text style={[styles.medName, { color: th.text }]}>{med.name}</Text>
+                    <Text style={[styles.medDosage, { color: th.textSub }]}>{med.dosage} · {med.frequency}</Text>
                     <View style={styles.medTimeRow}>
                       <Ionicons name="alarm-outline" size={13} color={Colors.textMuted} />
                       <Text style={styles.medTime}>{med.time}</Text>
@@ -686,7 +688,7 @@ export default function HealthScreen() {
         {activeTab === 'conseils' && (
           <View style={styles.content}>
             {prenatalAdvice.map((section, idx) => (
-              <View key={idx} style={styles.adviceCard}>
+              <View key={idx} style={[styles.adviceCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <TouchableOpacity
                   style={[styles.adviceHeader, { backgroundColor: section.color + '15' }]}
                   onPress={() => setExpandedAdvice(expandedAdvice === idx ? null : idx)}
@@ -703,7 +705,7 @@ export default function HealthScreen() {
                 {expandedAdvice === idx && section.items.map((item, i) => (
                   <View key={i} style={styles.adviceItem}>
                     <View style={[styles.adviseBullet, { backgroundColor: section.color }]} />
-                    <Text style={styles.adviceText}>{item}</Text>
+                    <Text style={[styles.adviceText, { color: th.text }]}>{item}</Text>
                   </View>
                 ))}
               </View>
@@ -716,9 +718,9 @@ export default function HealthScreen() {
 
       {/* Modal */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet">
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: th.bg }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: th.border }]}>
+            <Text style={[styles.modalTitle, { color: th.text }]}>
               {modalType === 'weight' ? 'Ajouter le Poids' :
                modalType === 'bp' ? 'Ajouter la Tension' :
                modalType === 'glucose' ? 'Ajouter la Glycémie' :
@@ -736,12 +738,12 @@ export default function HealthScreen() {
           <ScrollView style={styles.modalBody}>
             {modalType === 'weight' && (
               <>
-                <Text style={styles.inputLabel}>Poids (kg)</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Poids (kg)</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   keyboardType="decimal-pad"
                   placeholder="Ex: 65.5"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
@@ -751,22 +753,22 @@ export default function HealthScreen() {
 
             {modalType === 'bp' && (
               <>
-                <Text style={styles.inputLabel}>Tension systolique (haute)</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Tension systolique (haute)</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   keyboardType="number-pad"
                   placeholder="Ex: 120"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
                 />
-                <Text style={styles.inputLabel}>Tension diastolique (basse)</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Tension diastolique (basse)</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   keyboardType="number-pad"
                   placeholder="Ex: 80"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputValue2}
                   onChangeText={setInputValue2}
                 />
@@ -780,12 +782,12 @@ export default function HealthScreen() {
 
             {modalType === 'glucose' && (
               <>
-                <Text style={styles.inputLabel}>Glycémie (mg/dL)</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Glycémie (mg/dL)</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   keyboardType="decimal-pad"
                   placeholder="Ex: 85"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
@@ -819,12 +821,12 @@ export default function HealthScreen() {
 
             {modalType === 'symptoms' && (
               <>
-                <Text style={styles.inputLabel}>Décrivez vos symptômes</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Décrivez vos symptômes</Text>
                 <TextInput
-                  style={[styles.input, { height: 120, textAlignVertical: 'top' }]}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border, height: 120, textAlignVertical: 'top' }]}
                   multiline
                   placeholder="Ex: Nausées le matin, maux de dos, fatigue..."
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
@@ -834,12 +836,12 @@ export default function HealthScreen() {
 
             {modalType === 'temperature' && (
               <>
-                <Text style={styles.inputLabel}>Température (°C)</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Température (°C)</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   keyboardType="decimal-pad"
                   placeholder="Ex: 37.2"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputValue}
                   onChangeText={setInputValue}
                   autoFocus
@@ -854,38 +856,38 @@ export default function HealthScreen() {
 
             {modalType === 'echographie' && (
               <>
-                <Text style={styles.inputLabel}>Titre *</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Titre *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   placeholder="Ex: Échographie morphologique"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={echoTitle}
                   onChangeText={setEchoTitle}
                   autoFocus
                 />
-                <Text style={styles.inputLabel}>Date *</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Date *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   placeholder="Ex: 15/07/2024"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={echoDate}
                   onChangeText={setEchoDate}
                 />
-                <Text style={styles.inputLabel}>Semaine d'aménorrhée</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Semaine d'aménorrhée</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   placeholder="Ex: 22"
                   keyboardType="number-pad"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={echoWeek}
                   onChangeText={setEchoWeek}
                 />
-                <Text style={styles.inputLabel}>Observations</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Observations</Text>
                 <TextInput
-                  style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border, height: 80, textAlignVertical: 'top' }]}
                   multiline
                   placeholder="Mesures, position, sexe, remarques..."
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputNote}
                   onChangeText={setInputNote}
                 />
@@ -894,24 +896,24 @@ export default function HealthScreen() {
 
             {modalType === 'medication' && (
               <>
-                <Text style={styles.inputLabel}>Nom du médicament *</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Nom du médicament *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   placeholder="Ex: Acide folique"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={medName}
                   onChangeText={setMedName}
                   autoFocus
                 />
-                <Text style={styles.inputLabel}>Dosage *</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Dosage *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   placeholder="Ex: 400 mcg / 1 comprimé"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={medDosage}
                   onChangeText={setMedDosage}
                 />
-                <Text style={styles.inputLabel}>Fréquence</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Fréquence</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
                   <View style={{ flexDirection: 'row', gap: 8 }}>
                     {FREQUENCY_OPTIONS.map(f => (
@@ -925,20 +927,20 @@ export default function HealthScreen() {
                     ))}
                   </View>
                 </ScrollView>
-                <Text style={styles.inputLabel}>Heure du rappel</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Heure du rappel</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
                   placeholder="Ex: 08:00"
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={medTime}
                   onChangeText={setMedTime}
                 />
-                <Text style={styles.inputLabel}>Note (optionnel)</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Note (optionnel)</Text>
                 <TextInput
-                  style={[styles.input, { height: 60, textAlignVertical: 'top' }]}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border, height: 60, textAlignVertical: 'top' }]}
                   multiline
                   placeholder="Instructions particulières..."
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputNote}
                   onChangeText={setInputNote}
                 />
@@ -947,12 +949,12 @@ export default function HealthScreen() {
 
             {modalType !== 'echographie' && modalType !== 'medication' && (
               <>
-                <Text style={styles.inputLabel}>Note (optionnel)</Text>
+                <Text style={[styles.inputLabel, { color: th.textSub }]}>Note (optionnel)</Text>
                 <TextInput
-                  style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+                  style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border, height: 80, textAlignVertical: 'top' }]}
                   multiline
                   placeholder="Remarques..."
-                  placeholderTextColor={Colors.textMuted}
+                  placeholderTextColor={th.textMuted}
                   value={inputNote}
                   onChangeText={setInputNote}
                 />

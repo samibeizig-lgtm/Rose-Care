@@ -6,9 +6,9 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import Constants from 'expo-constants';
 import Colors from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
+import { BUILD_HASH, BUILD_VERSION } from '../constants/buildInfo';
 
 const { width, height } = Dimensions.get('window');
 const DRAWER_W = width * 0.72;
@@ -55,7 +55,6 @@ export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMe
   const { isDark, toggleTheme } = useTheme();
   const slideX = useRef(new Animated.Value(-DRAWER_W)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
-  const appVersion = Constants.expoConfig?.version ?? '1.0.0';
 
   const dark = {
     bg: '#1C1C2E',
@@ -165,7 +164,7 @@ export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMe
 
           <View style={[styles.drawerFooter, isDark && { borderTopColor: dark.border }]}>
             <Ionicons name="heart" size={14} color={Colors.rose} />
-            <Text style={[styles.footerText, isDark && { color: dark.sub }]}> Rose Care v{appVersion}</Text>
+            <Text style={[styles.footerText, isDark && { color: dark.sub }]}> Rose Care v{BUILD_VERSION} ({BUILD_HASH})</Text>
           </View>
         </Animated.View>
       </View>

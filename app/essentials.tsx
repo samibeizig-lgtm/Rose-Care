@@ -12,10 +12,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
 import { babyKitCategories, momBagCategories, chamberDecorItems, KitItem } from '../src/data/babyKitData';
 import { useStorage, STORAGE_KEYS } from '../src/hooks/useStorage';
 
 export default function EssentialsScreen() {
+  const { isDark, th } = useTheme();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'bebe' | 'maman' | 'chambre'>('bebe');
   const [babyChecks, setBabyChecks] = useStorage<Record<string, boolean>>(STORAGE_KEYS.BABY_KIT_CHECKS, {});
@@ -56,7 +58,7 @@ export default function EssentialsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient
         colors={[Colors.gradient.primary[0], Colors.gradient.primary[1]]}
         style={styles.header}
@@ -89,7 +91,7 @@ export default function EssentialsScreen() {
       </LinearGradient>
 
       {/* Tabs */}
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { backgroundColor: th.card, borderBottomColor: th.border }]}>
         {(['bebe', 'maman', 'chambre'] as const).map(tab => (
           <TouchableOpacity
             key={tab}
@@ -108,16 +110,16 @@ export default function EssentialsScreen() {
         ))}
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         <View style={styles.content}>
 
           {/* Baby Kit */}
           {activeTab === 'bebe' && (
             <>
               {/* Progress Bar */}
-              <View style={styles.progressCard}>
+              <View style={[styles.progressCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.progressBarLabels}>
-                  <Text style={styles.progressBarLabel}>Progression</Text>
+                  <Text style={[styles.progressBarLabel, { color: th.textSub }]}>Progression</Text>
                   <Text style={styles.progressBarPct}>{Math.round(babyStats.progress * 100)}%</Text>
                 </View>
                 <View style={styles.progressTrack}>
@@ -139,7 +141,7 @@ export default function EssentialsScreen() {
                 const catChecked = cat.items.filter(i => babyChecks[i.id]).length;
                 const isExpanded = expandedCat === cat.id;
                 return (
-                  <View key={cat.id} style={styles.categoryCard}>
+                  <View key={cat.id} style={[styles.categoryCard, { backgroundColor: th.card, borderColor: th.border }]}>
                     <TouchableOpacity
                       style={styles.categoryHeader}
                       onPress={() => setExpandedCat(isExpanded ? null : cat.id)}
@@ -147,7 +149,7 @@ export default function EssentialsScreen() {
                       <View style={styles.categoryIconWrap}>
                         <Ionicons name={cat.icon as any} size={18} color={Colors.primary} />
                       </View>
-                      <Text style={styles.categoryTitle}>{cat.title}</Text>
+                      <Text style={[styles.categoryTitle, { color: th.text }]}>{cat.title}</Text>
                       <Text style={styles.categoryStat}>{catChecked}/{cat.items.length}</Text>
                       <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={Colors.textLight} />
                     </TouchableOpacity>
@@ -163,14 +165,14 @@ export default function EssentialsScreen() {
                         </View>
                         <View style={styles.itemInfo}>
                           <View style={styles.itemNameRow}>
-                            <Text style={[styles.itemName, babyChecks[item.id] && styles.itemNameDone]}>{item.name}</Text>
+                            <Text style={[styles.itemName, babyChecks[item.id] && styles.itemNameDone, { color: babyChecks[item.id] ? th.textMuted : th.text }]}>{item.name}</Text>
                             <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(item.priority) + '20' }]}>
                               <Text style={[styles.priorityText, { color: getPriorityColor(item.priority) }]}>
                                 {getPriorityLabel(item.priority)}
                               </Text>
                             </View>
                           </View>
-                          {item.quantity && <Text style={styles.itemQty}>Quantité : {item.quantity}</Text>}
+                          {item.quantity && <Text style={[styles.itemQty, { color: th.textSub }]}>Quantité : {item.quantity}</Text>}
                           {item.note && (
                             <View style={styles.itemNoteRow}>
                               <Ionicons name="bulb-outline" size={12} color={Colors.warning} style={{ marginRight: 4 }} />
@@ -189,9 +191,9 @@ export default function EssentialsScreen() {
           {/* Mom Bag */}
           {activeTab === 'maman' && (
             <>
-              <View style={styles.progressCard}>
+              <View style={[styles.progressCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.progressBarLabels}>
-                  <Text style={styles.progressBarLabel}>Valise prête à</Text>
+                  <Text style={[styles.progressBarLabel, { color: th.textSub }]}>Valise prête à</Text>
                   <Text style={styles.progressBarPct}>{Math.round(momStats.progress * 100)}%</Text>
                 </View>
                 <View style={styles.progressTrack}>
@@ -199,9 +201,9 @@ export default function EssentialsScreen() {
                 </View>
               </View>
 
-              <View style={styles.tipCard}>
+              <View style={[styles.tipCard, { backgroundColor: th.warningLight }]}>
                 <Ionicons name="bulb-outline" size={16} color={Colors.warning} style={{ marginRight: 8, flexShrink: 0 }} />
-                <Text style={styles.tipText}>
+                <Text style={[styles.tipText, { color: th.text }]}>
                   Préparez votre valise à partir de la semaine 35. Gardez-la dans le coffre de la voiture à partir de 37 SA.
                 </Text>
               </View>
@@ -219,7 +221,7 @@ export default function EssentialsScreen() {
                 const catChecked = cat.items.filter(i => momChecks[i.id]).length;
                 const isExpanded = expandedCat === cat.id;
                 return (
-                  <View key={cat.id} style={styles.categoryCard}>
+                  <View key={cat.id} style={[styles.categoryCard, { backgroundColor: th.card, borderColor: th.border }]}>
                     <TouchableOpacity
                       style={styles.categoryHeader}
                       onPress={() => setExpandedCat(isExpanded ? null : cat.id)}
@@ -227,7 +229,7 @@ export default function EssentialsScreen() {
                       <View style={styles.categoryIconWrap}>
                         <Ionicons name={cat.icon as any} size={18} color={Colors.primary} />
                       </View>
-                      <Text style={styles.categoryTitle}>{cat.title}</Text>
+                      <Text style={[styles.categoryTitle, { color: th.text }]}>{cat.title}</Text>
                       <Text style={styles.categoryStat}>{catChecked}/{cat.items.length}</Text>
                       <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={Colors.textLight} />
                     </TouchableOpacity>
@@ -243,14 +245,14 @@ export default function EssentialsScreen() {
                         </View>
                         <View style={styles.itemInfo}>
                           <View style={styles.itemNameRow}>
-                            <Text style={[styles.itemName, momChecks[item.id] && styles.itemNameDone]}>{item.name}</Text>
+                            <Text style={[styles.itemName, momChecks[item.id] && styles.itemNameDone, { color: momChecks[item.id] ? th.textMuted : th.text }]}>{item.name}</Text>
                             <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(item.priority) + '20' }]}>
                               <Text style={[styles.priorityText, { color: getPriorityColor(item.priority) }]}>
                                 {getPriorityLabel(item.priority)}
                               </Text>
                             </View>
                           </View>
-                          {item.quantity && <Text style={styles.itemQty}>Quantité : {item.quantity}</Text>}
+                          {item.quantity && <Text style={[styles.itemQty, { color: th.textSub }]}>Quantité : {item.quantity}</Text>}
                           {item.note && (
                             <View style={styles.itemNoteRow}>
                               <Ionicons name="bulb-outline" size={12} color={Colors.warning} style={{ marginRight: 4 }} />
@@ -271,7 +273,7 @@ export default function EssentialsScreen() {
             <>
               <View style={styles.chambreTitleRow}>
                 <Ionicons name="home-outline" size={20} color={Colors.primary} style={{ marginRight: 8 }} />
-                <Text style={styles.chambreTitle}>Décorer la Chambre de Bébé</Text>
+                <Text style={[styles.chambreTitle, { color: th.text }]}>Décorer la Chambre de Bébé</Text>
               </View>
               {chamberDecorItems.map((cat, idx) => (
                 <View key={idx} style={styles.chambreCard}>
@@ -282,18 +284,18 @@ export default function EssentialsScreen() {
                     <Ionicons name={cat.icon as any} size={20} color="rgba(255,255,255,0.9)" />
                     <Text style={styles.chambreCategory}>{cat.category}</Text>
                   </LinearGradient>
-                  <View style={styles.chambreItems}>
+                  <View style={[styles.chambreItems, { backgroundColor: th.card }]}>
                     {cat.items.map((item, i) => (
                       <View key={i} style={styles.chambreItem}>
                         <View style={styles.chambreItemBullet} />
-                        <Text style={styles.chambreItemText}>{item}</Text>
+                        <Text style={[styles.chambreItemText, { color: th.text }]}>{item}</Text>
                       </View>
                     ))}
                   </View>
                 </View>
               ))}
 
-              <View style={styles.safetyCard}>
+              <View style={[styles.safetyCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.safetyTitleRow}>
                   <Ionicons name="shield-checkmark-outline" size={18} color={Colors.warning} style={{ marginRight: 8 }} />
                   <Text style={styles.safetyTitle}>Sécurité dans la chambre</Text>
@@ -308,7 +310,7 @@ export default function EssentialsScreen() {
                 ].map((tip, i) => (
                   <View key={i} style={styles.safetyRow}>
                     <Ionicons name="checkmark-circle-outline" size={16} color={Colors.success} style={{ flexShrink: 0 }} />
-                    <Text style={styles.safetyText}>{tip}</Text>
+                    <Text style={[styles.safetyText, { color: th.text }]}>{tip}</Text>
                   </View>
                 ))}
               </View>

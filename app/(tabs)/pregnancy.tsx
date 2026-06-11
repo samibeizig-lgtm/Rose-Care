@@ -15,6 +15,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { pregnancyWeeks } from '../../src/data/weeklyData';
 import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { differenceInWeeks, parseISO, addDays, parse, isValid, format } from 'date-fns';
@@ -32,6 +33,7 @@ const TRIMESTER_COLORS: Record<1 | 2 | 3, [string, string]> = {
 
 export default function PregnancyScreen() {
   const router = useRouter();
+  const { isDark, th } = useTheme();
   const [selectedTrimester, setSelectedTrimester] = useState<1 | 2 | 3 | null>(null);
   const [pregnancyStart, setPregnancyStart] = useStorage(STORAGE_KEYS.PREGNANCY_START, '');
   const [lastPeriodDate, setLastPeriodDate] = useStorage(STORAGE_KEYS.LAST_PERIOD_DATE, '');
@@ -96,8 +98,8 @@ export default function PregnancyScreen() {
       : '3ème Trimestre';
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         {/* Header */}
         <LinearGradient
           colors={Colors.gradient.primary}
@@ -125,7 +127,7 @@ export default function PregnancyScreen() {
         <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }]}>
 
           {/* DDP Card */}
-          <View style={styles.ddpCard}>
+          <View style={[styles.ddpCard, { backgroundColor: th.card, borderColor: th.border }]}>
             <View style={styles.ddpHeader}>
               <View style={styles.ddpIconBox}>
                 <Ionicons name="calendar-outline" size={20} color={Colors.primary} />
@@ -133,7 +135,7 @@ export default function PregnancyScreen() {
               <View style={styles.ddpInfo}>
                 <Text style={styles.ddpLabel}>Date des dernières règles</Text>
                 {lastPeriodDate ? (
-                  <Text style={styles.ddpValue}>{lastPeriodDate}</Text>
+                  <Text style={[styles.ddpValue, { color: th.text }]}>{lastPeriodDate}</Text>
                 ) : (
                   <Text style={styles.ddpEmpty}>Non renseignée</Text>
                 )}
@@ -199,21 +201,21 @@ export default function PregnancyScreen() {
           </View>
 
           {/* Trimester Filter */}
-          <Text style={styles.sectionTitle}>Semaine par Semaine</Text>
+          <Text style={[styles.sectionTitle, { color: th.text }]}>Semaine par Semaine</Text>
           <View style={styles.filterRow}>
             <TouchableOpacity
-              style={[styles.filterBtn, !selectedTrimester && styles.filterBtnActive]}
+              style={[styles.filterBtn, { backgroundColor: th.card, borderColor: th.border }, !selectedTrimester && styles.filterBtnActive]}
               onPress={() => setSelectedTrimester(null)}
             >
-              <Text style={[styles.filterBtnText, !selectedTrimester && styles.filterBtnTextActive]}>Tout</Text>
+              <Text style={[styles.filterBtnText, { color: th.textSub }, !selectedTrimester && styles.filterBtnTextActive]}>Tout</Text>
             </TouchableOpacity>
             {([1, 2, 3] as const).map(t => (
               <TouchableOpacity
                 key={t}
-                style={[styles.filterBtn, selectedTrimester === t && styles.filterBtnActive]}
+                style={[styles.filterBtn, { backgroundColor: th.card, borderColor: th.border }, selectedTrimester === t && styles.filterBtnActive]}
                 onPress={() => setSelectedTrimester(selectedTrimester === t ? null : t)}
               >
-                <Text style={[styles.filterBtnText, selectedTrimester === t && styles.filterBtnTextActive]}>
+                <Text style={[styles.filterBtnText, { color: th.textSub }, selectedTrimester === t && styles.filterBtnTextActive]}>
                   T{t}
                 </Text>
               </TouchableOpacity>
@@ -246,9 +248,9 @@ export default function PregnancyScreen() {
                       </View>
                     </LinearGradient>
                   ) : (
-                    <View style={[styles.weekPlain, isPassed && { backgroundColor: Colors.lilac }]}>
+                    <View style={[styles.weekPlain, { backgroundColor: th.card, borderColor: th.border }, isPassed && { backgroundColor: Colors.lilac }]}>
                       <Text style={styles.weekEmoji}>{week.fruitEmoji}</Text>
-                      <Text style={[styles.weekNum, isPassed && { color: Colors.primary }]}>S{week.week}</Text>
+                      <Text style={[styles.weekNum, { color: th.text }, isPassed && { color: Colors.primary }]}>S{week.week}</Text>
                     </View>
                   )}
                 </TouchableOpacity>

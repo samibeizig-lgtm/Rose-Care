@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
+import { useTheme } from '../../src/theme/ThemeContext';
 import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { addDays, format, parse, isValid } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -91,6 +92,7 @@ interface FertileWindow {
 }
 
 export default function FertiliteScreen() {
+  const { isDark, th } = useTheme();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -162,7 +164,7 @@ export default function FertiliteScreen() {
   const sections = ['Cycle', 'Conseils', 'Traitements', 'FAQ'];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       {/* Header */}
       <LinearGradient colors={Colors.gradient.primary} style={styles.header}>
         <Text style={styles.headerTitle}>Fertilité</Text>
@@ -185,28 +187,28 @@ export default function FertiliteScreen() {
         </Svg>
       </LinearGradient>
 
-      <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body} style={{ opacity: fadeAnim }}>
+      <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body} style={{ opacity: fadeAnim, backgroundColor: th.bg }}>
 
         {/* Cycle phases */}
         {activeSection === 0 && (
           <View>
-            <Text style={styles.sectionTitle}>Les phases du cycle menstruel</Text>
-            <Text style={styles.sectionDesc}>
+            <Text style={[styles.sectionTitle, { color: th.text }]}>Les phases du cycle menstruel</Text>
+            <Text style={[styles.sectionDesc, { color: th.textSub }]}>
               Un cycle moyen dure 28 jours, mais peut varier de 21 à 35 jours. Connaître ses phases est essentiel pour identifier la fenêtre fertile.
             </Text>
             {cyclePhases.map((phase, i) => (
-              <View key={i} style={styles.phaseCard}>
+              <View key={i} style={[styles.phaseCard, { backgroundColor: th.card }]}>
                 <View style={styles.phaseIconBox}>
                   <Ionicons name={phase.icon as any} size={22} color={Colors.white} />
                 </View>
                 <View style={styles.phaseText}>
                   <View style={styles.phaseTop}>
-                    <Text style={styles.phaseName}>{phase.name}</Text>
+                    <Text style={[styles.phaseName, { color: th.text }]}>{phase.name}</Text>
                     <View style={styles.phaseDaysBadge}>
                       <Text style={styles.phaseDays}>{phase.days}</Text>
                     </View>
                   </View>
-                  <Text style={styles.phaseDesc}>{phase.desc}</Text>
+                  <Text style={[styles.phaseDesc, { color: th.textSub }]}>{phase.desc}</Text>
                 </View>
               </View>
             ))}
@@ -246,23 +248,23 @@ export default function FertiliteScreen() {
         {/* Conception tips */}
         {activeSection === 1 && (
           <View>
-            <Text style={styles.sectionTitle}>Optimiser ses chances de concevoir</Text>
-            <Text style={styles.sectionDesc}>
+            <Text style={[styles.sectionTitle, { color: th.text }]}>Optimiser ses chances de concevoir</Text>
+            <Text style={[styles.sectionDesc, { color: th.textSub }]}>
               Des habitudes simples peuvent considérablement améliorer votre fertilité naturelle.
             </Text>
             {conceptionTips.map((tip, i) => (
-              <View key={i} style={styles.tipCard}>
+              <View key={i} style={[styles.tipCard, { backgroundColor: th.card }]}>
                 <View style={styles.tipIcon}>
                   <Ionicons name={tip.icon as any} size={20} color={Colors.primary} />
                 </View>
                 <View style={styles.tipContent}>
-                  <Text style={styles.tipTitle}>{tip.title}</Text>
-                  <Text style={styles.tipDesc}>{tip.desc}</Text>
+                  <Text style={[styles.tipTitle, { color: th.text }]}>{tip.title}</Text>
+                  <Text style={[styles.tipDesc, { color: th.textSub }]}>{tip.desc}</Text>
                 </View>
               </View>
             ))}
 
-            <View style={styles.infoBox}>
+            <View style={[styles.infoBox, { backgroundColor: th.infoBox }]}>
               <Ionicons name="information-circle-outline" size={20} color={Colors.primaryLight} style={{ marginBottom: 8 }} />
               <Text style={styles.infoText}>
                 En Tunisie, le suivi de fertilité est pris en charge partiellement par la CNAM. Consultez l'onglet CNAM pour les détails.
@@ -274,23 +276,23 @@ export default function FertiliteScreen() {
         {/* Fertility treatments */}
         {activeSection === 2 && (
           <View>
-            <Text style={styles.sectionTitle}>Parcours de fertilité médicalisé</Text>
-            <Text style={styles.sectionDesc}>
+            <Text style={[styles.sectionTitle, { color: th.text }]}>Parcours de fertilité médicalisé</Text>
+            <Text style={[styles.sectionDesc, { color: th.textSub }]}>
               Si la conception naturelle n'aboutit pas, des traitements médicaux existent. Votre médecin vous guidera vers la solution adaptée.
             </Text>
             {fertilityTreatments.map((t, i) => (
-              <View key={i} style={styles.treatCard}>
+              <View key={i} style={[styles.treatCard, { backgroundColor: th.card }]}>
                 <View style={styles.treatHeader}>
                   <View>
                     <Text style={styles.treatAbbr}>{t.name}</Text>
-                    <Text style={styles.treatFull}>{t.full}</Text>
+                    <Text style={[styles.treatFull, { color: th.textSub }]}>{t.full}</Text>
                   </View>
                   <View style={styles.successBadge}>
                     <Text style={styles.successLabel}>Taux</Text>
                     <Text style={styles.successRate}>{t.success}</Text>
                   </View>
                 </View>
-                <Text style={styles.treatDesc}>{t.desc}</Text>
+                <Text style={[styles.treatDesc, { color: th.textSub }]}>{t.desc}</Text>
               </View>
             ))}
 
@@ -307,16 +309,16 @@ export default function FertiliteScreen() {
         {/* FAQ */}
         {activeSection === 3 && (
           <View>
-            <Text style={styles.sectionTitle}>Questions fréquentes</Text>
+            <Text style={[styles.sectionTitle, { color: th.text }]}>Questions fréquentes</Text>
             {faqs.map((faq, i) => (
               <TouchableOpacity
                 key={i}
-                style={styles.faqCard}
+                style={[styles.faqCard, { backgroundColor: th.card }]}
                 onPress={() => setExpandedFaq(expandedFaq === i ? null : i)}
                 activeOpacity={0.8}
               >
                 <View style={styles.faqQuestion}>
-                  <Text style={styles.faqQ}>{faq.q}</Text>
+                  <Text style={[styles.faqQ, { color: th.text }]}>{faq.q}</Text>
                   <Ionicons
                     name={expandedFaq === i ? 'chevron-up' : 'chevron-down'}
                     size={18}
@@ -324,7 +326,7 @@ export default function FertiliteScreen() {
                   />
                 </View>
                 {expandedFaq === i && (
-                  <Text style={styles.faqA}>{faq.a}</Text>
+                  <Text style={[styles.faqA, { color: th.textSub, borderTopColor: th.border }]}>{faq.a}</Text>
                 )}
               </TouchableOpacity>
             ))}
@@ -336,12 +338,12 @@ export default function FertiliteScreen() {
 
       {/* Calculator Modal */}
       <Modal visible={calcModalVisible} animationType="slide" presentationStyle="pageSheet">
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: th.bg }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: th.border, backgroundColor: th.card }]}>
             <TouchableOpacity onPress={() => setCalcModalVisible(false)} style={styles.modalClose}>
               <Ionicons name="arrow-back" size={22} color={Colors.primary} />
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Calculateur fertile</Text>
+            <Text style={[styles.modalTitle, { color: th.text }]}>Calculateur fertile</Text>
             <View style={{ width: 40 }} />
           </View>
 
@@ -353,8 +355,8 @@ export default function FertiliteScreen() {
               </Text>
             </View>
 
-            <Text style={styles.inputLabel}>Date des dernières règles *</Text>
-            <TouchableOpacity style={styles.datePickerBtn} onPress={() => setDatePickerVisible(true)}>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Date des dernières règles *</Text>
+            <TouchableOpacity style={[styles.datePickerBtn, { backgroundColor: th.inputBg, borderColor: th.border }]} onPress={() => setDatePickerVisible(true)}>
               <Ionicons name="calendar-outline" size={18} color={Colors.primary} style={styles.inputIcon} />
               <Text style={[styles.datePickerText, !selectedDate && styles.datePickerPlaceholder]}>
                 {selectedDate ? format(selectedDate, 'dd MMMM yyyy', { locale: fr }) : 'Sélectionner une date'}
@@ -371,13 +373,13 @@ export default function FertiliteScreen() {
               maxDate={new Date()}
             />
 
-            <Text style={styles.inputLabel}>Durée de votre cycle (jours)</Text>
-            <View style={styles.inputRow}>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Durée de votre cycle (jours)</Text>
+            <View style={[styles.inputRow, { backgroundColor: th.inputBg, borderColor: th.border }]}>
               <Ionicons name="repeat-outline" size={18} color={Colors.textLight} style={styles.inputIcon} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: th.text }]}
                 placeholder="28"
-                placeholderTextColor={Colors.textMuted}
+                placeholderTextColor={th.textMuted}
                 value={cycleLengthInput}
                 onChangeText={setCycleLengthInput}
                 keyboardType="number-pad"

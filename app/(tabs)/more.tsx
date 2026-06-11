@@ -15,11 +15,13 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import Colors from '../../src/theme/colors';
+import { useTheme } from '../../src/theme/ThemeContext';
 
 const { width } = Dimensions.get('window');
 const WAVE_H = 50;
 
 export default function MoreScreen() {
+  const { isDark, th } = useTheme();
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -48,7 +50,7 @@ export default function MoreScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient
         colors={Colors.gradient.primary}
         style={styles.header}
@@ -67,7 +69,7 @@ export default function MoreScreen() {
         </Svg>
       </LinearGradient>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }]}>
 
           {/* Menu Grid */}
@@ -95,18 +97,18 @@ export default function MoreScreen() {
           </View>
 
           {/* Emergency Contacts */}
-          <Text style={styles.sectionTitle}>Contacts d'urgence</Text>
+          <Text style={[styles.sectionTitle, { color: th.text }]}>Contacts d'urgence</Text>
           {contactLinks.map((contact, idx) => (
             <TouchableOpacity
               key={idx}
-              style={styles.contactRow}
+              style={[styles.contactRow, { backgroundColor: th.card, borderColor: th.border }]}
               onPress={() => Linking.openURL(`tel:${contact.number.replace(/\s/g, '')}`)}
             >
               <View style={[styles.contactIconWrap, { backgroundColor: contact.color + '14' }]}>
                 <Ionicons name={contact.icon} size={22} color={contact.color} />
               </View>
               <View style={styles.contactText}>
-                <Text style={styles.contactLabel}>{contact.label}</Text>
+                <Text style={[styles.contactLabel, { color: th.text }]}>{contact.label}</Text>
                 <Text style={[styles.contactNumber, { color: contact.color }]}>{contact.number}</Text>
               </View>
               <View style={[styles.callBtn, { backgroundColor: contact.color + '14' }]}>

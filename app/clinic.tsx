@@ -15,8 +15,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
 
 export default function ClinicScreen() {
+  const { isDark, th } = useTheme();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'info' | 'doctors' | 'events' | 'deco'>('info');
 
@@ -146,7 +148,7 @@ export default function ClinicScreen() {
   ] as const;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={Colors.white} />
@@ -169,7 +171,7 @@ export default function ClinicScreen() {
       </LinearGradient>
 
       {/* Tabs */}
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { backgroundColor: th.card, borderBottomColor: th.border }]}>
         {TABS.map(tab => (
           <TouchableOpacity
             key={tab.id}
@@ -188,7 +190,7 @@ export default function ClinicScreen() {
         ))}
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         <View style={styles.content}>
 
           {activeTab === 'info' && (
@@ -196,31 +198,31 @@ export default function ClinicScreen() {
               {/* Stats */}
               <View style={styles.statsRow}>
                 {stats.map((s, i) => (
-                  <View key={i} style={styles.statBox}>
+                  <View key={i} style={[styles.statBox, { backgroundColor: th.card, borderColor: th.border }]}>
                     <Ionicons name={s.icon} size={20} color={Colors.rose} style={{ marginBottom: 6 }} />
                     <Text style={styles.statValue}>{s.value}</Text>
-                    <Text style={styles.statLabel}>{s.label}</Text>
+                    <Text style={[styles.statLabel, { color: th.textMuted }]}>{s.label}</Text>
                   </View>
                 ))}
               </View>
 
               {/* Contact Info */}
-              <View style={styles.infoCard}>
+              <View style={[styles.infoCard, { backgroundColor: th.card, borderColor: th.border }]}>
                 <View style={styles.infoCardTitleRow}>
                   <Ionicons name="location-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
-                  <Text style={styles.infoCardTitle}>Coordonnées</Text>
+                  <Text style={[styles.infoCardTitle, { color: th.text }]}>Coordonnées</Text>
                 </View>
                 {infoRows.map((row, idx) => (
                   <TouchableOpacity
                     key={idx}
-                    style={[styles.infoRow, idx === infoRows.length - 1 && { borderBottomWidth: 0 }]}
+                    style={[styles.infoRow, idx === infoRows.length - 1 && { borderBottomWidth: 0 }, { borderBottomColor: th.border }]}
                     onPress={() => row.url && Linking.openURL(row.url)}
                     disabled={!row.url}
                   >
                     <View style={styles.infoIconBox}>
                       <Ionicons name={row.icon} size={16} color={Colors.primary} />
                     </View>
-                    <Text style={[styles.infoText, row.url ? { color: Colors.primary, textDecorationLine: 'underline' } : {}]}>{row.text}</Text>
+                    <Text style={[styles.infoText, { color: row.url ? Colors.primary : th.text }, row.url ? { textDecorationLine: 'underline' } : {}]}>{row.text}</Text>
                     {row.url && <Ionicons name="open-outline" size={14} color={Colors.textMuted} />}
                   </TouchableOpacity>
                 ))}
@@ -229,16 +231,16 @@ export default function ClinicScreen() {
               {/* Services */}
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="sparkles-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
-                <Text style={styles.sectionTitle}>Nos Services</Text>
+                <Text style={[styles.sectionTitle, { color: th.text }]}>Nos Services</Text>
               </View>
               <View style={styles.servicesGrid}>
                 {services.map((s, idx) => (
-                  <View key={idx} style={styles.serviceCard}>
+                  <View key={idx} style={[styles.serviceCard, { backgroundColor: th.card, borderColor: th.border }]}>
                     <View style={styles.serviceIconBox}>
                       <Ionicons name={s.icon} size={22} color={Colors.primary} />
                     </View>
-                    <Text style={styles.serviceName}>{s.name}</Text>
-                    <Text style={styles.serviceDesc}>{s.desc}</Text>
+                    <Text style={[styles.serviceName, { color: th.text }]}>{s.name}</Text>
+                    <Text style={[styles.serviceDesc, { color: th.textSub }]}>{s.desc}</Text>
                   </View>
                 ))}
               </View>
@@ -262,16 +264,16 @@ export default function ClinicScreen() {
             <>
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="people-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
-                <Text style={styles.sectionTitle}>Notre Équipe Médicale</Text>
+                <Text style={[styles.sectionTitle, { color: th.text }]}>Notre Équipe Médicale</Text>
               </View>
               {doctors.map((doc, idx) => (
-                <View key={idx} style={styles.doctorCard}>
+                <View key={idx} style={[styles.doctorCard, { backgroundColor: th.card, borderColor: th.border }]}>
                   <View style={styles.doctorHeader}>
                     <View style={styles.doctorAvatar}>
                       <Ionicons name="person-circle-outline" size={36} color={Colors.primary} />
                     </View>
                     <View style={styles.doctorInfo}>
-                      <Text style={styles.doctorName}>{doc.name}</Text>
+                      <Text style={[styles.doctorName, { color: th.text }]}>{doc.name}</Text>
                       <Text style={styles.doctorSpecialty}>{doc.specialty}</Text>
                       <View style={styles.doctorExpRow}>
                         <Ionicons name="star-outline" size={12} color={Colors.mauve} style={{ marginRight: 4 }} />
@@ -288,7 +290,7 @@ export default function ClinicScreen() {
                   </View>
                   <View style={styles.doctorSchedule}>
                     <Ionicons name="time-outline" size={14} color={Colors.textSecondary} />
-                    <Text style={styles.doctorScheduleText}>{doc.schedule}</Text>
+                    <Text style={[styles.doctorScheduleText, { color: th.textSub }]}>{doc.schedule}</Text>
                   </View>
                   <TouchableOpacity style={styles.rdvBtn} onPress={() => Linking.openURL('tel:+21671100900')}>
                     <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.rdvBtnGrad}>
@@ -305,10 +307,10 @@ export default function ClinicScreen() {
             <>
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="calendar-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
-                <Text style={styles.sectionTitle}>Événements & Activités</Text>
+                <Text style={[styles.sectionTitle, { color: th.text }]}>Événements & Activités</Text>
               </View>
               {events.map((ev, idx) => (
-                <View key={idx} style={styles.eventCard}>
+                <View key={idx} style={[styles.eventCard, { backgroundColor: th.card, borderColor: th.border }]}>
                   <View style={[styles.eventAccent, { backgroundColor: ev.color }]} />
                   <View style={styles.eventContent}>
                     <View style={styles.eventHeader}>
@@ -316,11 +318,11 @@ export default function ClinicScreen() {
                         <Ionicons name={ev.icon} size={20} color={ev.color} />
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text style={styles.eventTitle}>{ev.title}</Text>
+                        <Text style={[styles.eventTitle, { color: th.text }]}>{ev.title}</Text>
                         <Text style={[styles.eventDate, { color: ev.color }]}>{ev.date}</Text>
                       </View>
                     </View>
-                    <Text style={styles.eventDesc}>{ev.desc}</Text>
+                    <Text style={[styles.eventDesc, { color: th.textSub }]}>{ev.desc}</Text>
                     <TouchableOpacity style={[styles.inscribeBtn, { backgroundColor: ev.color + '15', borderColor: ev.color }]}>
                       <Text style={[styles.inscribeBtnText, { color: ev.color }]}>S'inscrire</Text>
                     </TouchableOpacity>
@@ -334,9 +336,9 @@ export default function ClinicScreen() {
             <>
               <View style={styles.sectionTitleRow}>
                 <Ionicons name="bed-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />
-                <Text style={styles.sectionTitle}>Nos Chambres & Suites</Text>
+                <Text style={[styles.sectionTitle, { color: th.text }]}>Nos Chambres & Suites</Text>
               </View>
-              <Text style={styles.decoSubtitle}>
+              <Text style={[styles.decoSubtitle, { color: th.textSub }]}>
                 Un environnement chaleureux et élégant pour vivre ce moment unique dans tout le confort.
               </Text>
               {decoRooms.map((room, idx) => (
@@ -347,11 +349,11 @@ export default function ClinicScreen() {
                     </View>
                     <Text style={styles.roomName}>{room.name}</Text>
                   </LinearGradient>
-                  <View style={styles.roomFeatures}>
+                  <View style={[styles.roomFeatures, { backgroundColor: th.card }]}>
                     {room.features.map((f, i) => (
                       <View key={i} style={styles.featureRow}>
                         <Ionicons name="checkmark-circle-outline" size={16} color={Colors.success} />
-                        <Text style={styles.featureText}>{f}</Text>
+                        <Text style={[styles.featureText, { color: th.text }]}>{f}</Text>
                       </View>
                     ))}
                   </View>

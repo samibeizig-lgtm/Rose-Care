@@ -9,6 +9,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Colors from '../../../src/theme/colors';
+import { useTheme } from '../../../src/theme/ThemeContext';
 import { getWeekData } from '../../../src/data/weeklyData';
 
 const SECTION_COLORS = {
@@ -21,6 +22,7 @@ const SECTION_COLORS = {
 };
 
 export default function WeekDetailScreen() {
+  const { isDark, th } = useTheme();
   const { week } = useLocalSearchParams<{ week: string }>();
   const router = useRouter();
   const weekNumber = parseInt(week || '1');
@@ -62,7 +64,7 @@ export default function WeekDetailScreen() {
   ];
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, { backgroundColor: th.bg }]} showsVerticalScrollIndicator={false}>
       {/* Hero */}
       <LinearGradient
         colors={[trimesterColor, Colors.primaryLight]}
@@ -122,17 +124,19 @@ export default function WeekDetailScreen() {
             activeOpacity={0.9}
           >
             <LinearGradient
-              colors={expandedSection === section.id ? section.colors : ['#FFF', '#FFF']}
-              style={styles.sectionHeader}
+              colors={expandedSection === section.id ? section.colors : [th.card, th.card]}
+              style={[styles.sectionHeader, { borderColor: th.border }]}
             >
               <Text style={[
                 styles.sectionTitle,
+                { color: th.text },
                 expandedSection === section.id && { color: Colors.white }
               ]}>
                 {section.title}
               </Text>
               <Text style={[
                 styles.sectionChevron,
+                { color: th.textMuted },
                 expandedSection === section.id && { color: Colors.white }
               ]}>
                 {expandedSection === section.id ? '▲' : '▼'}
@@ -140,11 +144,11 @@ export default function WeekDetailScreen() {
             </LinearGradient>
 
             {expandedSection === section.id && (
-              <View style={styles.sectionBody}>
+              <View style={[styles.sectionBody, { backgroundColor: th.card, borderColor: th.border }]}>
                 {section.items.map((item, idx) => (
                   <View key={idx} style={styles.listItem}>
                     <View style={[styles.bullet, { backgroundColor: section.colors[0] }]} />
-                    <Text style={styles.listItemText}>{item}</Text>
+                    <Text style={[styles.listItemText, { color: th.text }]}>{item}</Text>
                   </View>
                 ))}
               </View>
@@ -163,26 +167,26 @@ export default function WeekDetailScreen() {
 
         {/* Medical Note */}
         <View style={styles.infoCard}>
-          <View style={styles.medicalCard}>
+          <View style={[styles.medicalCard, { backgroundColor: th.infoBox }]}>
             <Text style={styles.infoIcon}>🩺</Text>
             <Text style={styles.medicalTitle}>Note médicale</Text>
-            <Text style={styles.medicalText}>{data.medicalNote}</Text>
+            <Text style={[styles.medicalText, { color: th.text }]}>{data.medicalNote}</Text>
           </View>
         </View>
 
         {/* Emotional Note */}
-        <View style={styles.emotionCard}>
-          <Text style={styles.emotionText}>{data.emotionalNote}</Text>
+        <View style={[styles.emotionCard, { backgroundColor: th.infoBox, borderColor: th.border }]}>
+          <Text style={[styles.emotionText, { color: th.text }]}>{data.emotionalNote}</Text>
         </View>
 
         {/* Navigation Bottom */}
         <View style={styles.bottomNav}>
           {weekNumber > 1 && (
             <TouchableOpacity
-              style={[styles.bottomNavBtn, { marginRight: 8 }]}
+              style={[styles.bottomNavBtn, { marginRight: 8, backgroundColor: th.card, borderColor: th.border }]}
               onPress={() => router.replace(`/pregnancy/week/${weekNumber - 1}` as any)}
             >
-              <Text style={styles.bottomNavText}>← Semaine {weekNumber - 1}</Text>
+              <Text style={[styles.bottomNavText, { color: th.text }]}>← Semaine {weekNumber - 1}</Text>
             </TouchableOpacity>
           )}
           {weekNumber < 40 && (

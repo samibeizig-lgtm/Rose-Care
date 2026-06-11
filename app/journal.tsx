@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
 import { useStorage, STORAGE_KEYS } from '../src/hooks/useStorage';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -32,6 +33,7 @@ const MOOD_EMOJIS = ['🥰', '😊', '😴', '🤢', '😰', '💪', '😢', '�
 const TAGS = ['Symptômes', 'Bébé bouge', 'Rêve', 'Émotion', 'Rendez-vous', 'Milestone', 'Conseil', 'Envie'];
 
 export default function JournalScreen() {
+  const { isDark, th } = useTheme();
   const router = useRouter();
   const [entries, setEntries] = useStorage<JournalEntry[]>(STORAGE_KEYS.NOTES, []);
   const [modalVisible, setModalVisible] = useState(false);
@@ -85,7 +87,7 @@ export default function JournalScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient
         colors={['#2D1B69', '#6D28D9']}
         style={styles.header}
@@ -98,7 +100,7 @@ export default function JournalScreen() {
         <Text style={styles.headerCount}>{entries.length} entrée{entries.length > 1 ? 's' : ''}</Text>
       </LinearGradient>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         <View style={styles.content}>
 
           {/* Add Button */}
@@ -110,19 +112,19 @@ export default function JournalScreen() {
           </TouchableOpacity>
 
           {/* Prompts */}
-          <Text style={styles.sectionTitle}>💭 Besoin d'inspiration ?</Text>
+          <Text style={[styles.sectionTitle, { color: th.text }]}>💭 Besoin d'inspiration ?</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.promptsScroll}>
             {journalPrompts.map((prompt, idx) => (
               <TouchableOpacity
                 key={idx}
-                style={styles.promptCard}
+                style={[styles.promptCard, { backgroundColor: th.card, borderColor: th.border }]}
                 onPress={() => {
                   setTitle(prompt.substring(0, 40));
                   setContent('');
                   setModalVisible(true);
                 }}
               >
-                <Text style={styles.promptText}>{prompt}</Text>
+                <Text style={[styles.promptText, { color: th.text }]}>{prompt}</Text>
                 <Text style={styles.promptCta}>Écrire →</Text>
               </TouchableOpacity>
             ))}
@@ -132,28 +134,28 @@ export default function JournalScreen() {
           {entries.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyEmoji}>📖</Text>
-              <Text style={styles.emptyTitle}>Votre journal vous attend</Text>
-              <Text style={styles.emptyText}>Écrivez vos pensées, vos émotions, vos espoirs. Ces pages deviendront un trésor pour vous et votre enfant.</Text>
+              <Text style={[styles.emptyTitle, { color: th.text }]}>Votre journal vous attend</Text>
+              <Text style={[styles.emptyText, { color: th.textSub }]}>Écrivez vos pensées, vos émotions, vos espoirs. Ces pages deviendront un trésor pour vous et votre enfant.</Text>
             </View>
           ) : (
             entries.map((entry) => (
               <TouchableOpacity
                 key={entry.id}
-                style={styles.entryCard}
+                style={[styles.entryCard, { backgroundColor: th.card, borderColor: th.border }]}
                 onPress={() => setViewEntry(entry)}
               >
                 <View style={styles.entryHeader}>
                   <Text style={styles.entryMood}>{entry.mood}</Text>
                   <View style={styles.entryMeta}>
-                    <Text style={styles.entryTitle}>{entry.title}</Text>
-                    <Text style={styles.entryDate}>
+                    <Text style={[styles.entryTitle, { color: th.text }]}>{entry.title}</Text>
+                    <Text style={[styles.entryDate, { color: th.textMuted }]}>
                       {format(new Date(entry.date), 'dd MMMM yyyy', { locale: fr })}
                       {entry.week ? ` • Semaine ${entry.week}` : ''}
                     </Text>
                   </View>
                   <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
                 </View>
-                <Text style={styles.entryPreview} numberOfLines={2}>{entry.content}</Text>
+                <Text style={[styles.entryPreview, { color: th.textSub }]} numberOfLines={2}>{entry.content}</Text>
                 {entry.tags.length > 0 && (
                   <View style={styles.entryTags}>
                     {entry.tags.map(tag => (
@@ -172,10 +174,10 @@ export default function JournalScreen() {
 
       {/* New Entry Modal */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet">
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: th.bg }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: th.border }]}>
             <TouchableOpacity onPress={() => { setModalVisible(false); setTitle(''); setContent(''); }}>
-              <Text style={styles.cancelText}>Annuler</Text>
+              <Text style={[styles.cancelText, { color: th.textSub }]}>Annuler</Text>
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Nouvelle Entrée</Text>
             <TouchableOpacity onPress={saveEntry}>
@@ -184,7 +186,7 @@ export default function JournalScreen() {
           </View>
 
           <ScrollView style={styles.modalBody}>
-            <Text style={styles.inputLabel}>Mon humeur</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Mon humeur</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moodRow}>
               {MOOD_EMOJIS.map(emoji => (
                 <TouchableOpacity
@@ -197,15 +199,16 @@ export default function JournalScreen() {
               ))}
             </ScrollView>
 
-            <Text style={styles.inputLabel}>Titre *</Text>
-            <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder="Titre de votre entrée" />
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Titre *</Text>
+            <TextInput style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]} placeholderTextColor={th.textMuted} value={title} onChangeText={setTitle} placeholder="Titre de votre entrée" />
 
-            <Text style={styles.inputLabel}>Semaine de grossesse (optionnel)</Text>
-            <TextInput style={styles.input} value={week} onChangeText={setWeek} placeholder="Ex: 24" keyboardType="number-pad" />
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Semaine de grossesse (optionnel)</Text>
+            <TextInput style={[styles.input, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]} placeholderTextColor={th.textMuted} value={week} onChangeText={setWeek} placeholder="Ex: 24" keyboardType="number-pad" />
 
-            <Text style={styles.inputLabel}>Mon texte *</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Mon texte *</Text>
             <TextInput
-              style={[styles.input, styles.contentInput]}
+              style={[styles.input, styles.contentInput, { backgroundColor: th.inputBg, color: th.text, borderColor: th.border }]}
+              placeholderTextColor={th.textMuted}
               value={content}
               onChangeText={setContent}
               multiline
@@ -213,7 +216,7 @@ export default function JournalScreen() {
               textAlignVertical="top"
             />
 
-            <Text style={styles.inputLabel}>Tags</Text>
+            <Text style={[styles.inputLabel, { color: th.textSub }]}>Tags</Text>
             <View style={styles.tagsGrid}>
               {TAGS.map(tag => (
                 <TouchableOpacity
@@ -232,12 +235,12 @@ export default function JournalScreen() {
       {/* View Entry Modal */}
       {viewEntry && (
         <Modal visible={!!viewEntry} animationType="slide" presentationStyle="pageSheet">
-          <SafeAreaView style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
+          <SafeAreaView style={[styles.modalContainer, { backgroundColor: th.bg }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: th.border }]}>
               <TouchableOpacity onPress={() => setViewEntry(null)}>
                 <Ionicons name="close" size={26} color={Colors.text} />
               </TouchableOpacity>
-              <Text style={styles.modalTitle} numberOfLines={1}>{viewEntry.title}</Text>
+              <Text style={[styles.modalTitle, { color: th.text }]} numberOfLines={1}>{viewEntry.title}</Text>
               <TouchableOpacity onPress={() => deleteEntry(viewEntry.id)}>
                 <Ionicons name="trash" size={22} color={Colors.error} />
               </TouchableOpacity>
@@ -246,8 +249,8 @@ export default function JournalScreen() {
               <View style={styles.viewMeta}>
                 <Text style={styles.viewMood}>{viewEntry.mood}</Text>
                 <View>
-                  <Text style={styles.viewDate}>{format(new Date(viewEntry.date), 'dd MMMM yyyy', { locale: fr })}</Text>
-                  {viewEntry.week && <Text style={styles.viewWeek}>Semaine {viewEntry.week}</Text>}
+                  <Text style={[styles.viewDate, { color: th.text }]}>{format(new Date(viewEntry.date), 'dd MMMM yyyy', { locale: fr })}</Text>
+                  {viewEntry.week && <Text style={[styles.viewWeek, { color: th.textMuted }]}>Semaine {viewEntry.week}</Text>}
                 </View>
               </View>
               {viewEntry.tags.length > 0 && (
@@ -259,7 +262,7 @@ export default function JournalScreen() {
                   ))}
                 </View>
               )}
-              <Text style={styles.viewContent}>{viewEntry.content}</Text>
+              <Text style={[styles.viewContent, { color: th.text }]}>{viewEntry.content}</Text>
             </ScrollView>
           </SafeAreaView>
         </Modal>
