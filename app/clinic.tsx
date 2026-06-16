@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   Dimensions,
+  Image,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -150,6 +151,11 @@ export default function ClinicScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.header}>
+        <Image
+          source={require('../assets/images/health-banner.jpg')}
+          style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
+          resizeMode="cover"
+        />
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={Colors.white} />
         </TouchableOpacity>

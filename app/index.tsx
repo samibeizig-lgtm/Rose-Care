@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -49,7 +49,13 @@ export default function WelcomeScreen() {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
-        />
+        >
+          <Image
+            source={require('../assets/images/welcome-bg.jpg')}
+            style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
+            resizeMode="cover"
+          />
+        </LinearGradient>
         <View style={styles.topContent}>
           <View style={styles.smallBadge}>
             <Ionicons name="heart" size={12} color="rgba(255,255,255,0.8)" />
@@ -105,6 +111,11 @@ export default function WelcomeScreen() {
             </TouchableOpacity>
           </>
         )}
+        <Image
+          source={require('../assets/images/welcome-bg.jpg')}
+          style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 200, opacity: 0.07 }}
+          resizeMode="cover"
+        />
       </View>
 
       {/* ─── Floating circle ─── */}

@@ -8,6 +8,7 @@ import {
   Linking,
   Dimensions,
   Animated,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -56,6 +57,11 @@ export default function MoreScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
+        <Image
+          source={require('../../assets/images/health-banner.jpg')}
+          style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
+          resizeMode="cover"
+        />
         <View style={styles.headerRow}>
           <Ionicons name="grid-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
           <View>

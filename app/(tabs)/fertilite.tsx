@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
-  TouchableOpacity, Dimensions, Modal, TextInput, Alert, Animated,
+  TouchableOpacity, Dimensions, Modal, TextInput, Alert, Animated, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -167,6 +167,11 @@ export default function FertiliteScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       {/* Header */}
       <LinearGradient colors={Colors.gradient.primary} style={styles.header}>
+        <Image
+          source={require('../../assets/images/fertility-banner.jpg')}
+          style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
+          resizeMode="cover"
+        />
         <Text style={styles.headerTitle}>Fertilité</Text>
         <Text style={styles.headerSub}>Comprendre et optimiser votre fertilité</Text>
 

@@ -11,6 +11,7 @@ import {
   TextInput,
   FlatList,
   Animated,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -236,6 +237,11 @@ export default function HomeScreen() {
       >
         {/* ─── Hero ─── */}
         <LinearGradient colors={Colors.gradient.primary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+          <Image
+            source={require('../../assets/images/home-hero.jpg')}
+            style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
+            resizeMode="cover"
+          />
           <View style={styles.heroTop}>
             <TouchableOpacity style={styles.menuBtn} onPress={() => setDrawerOpen(true)}>
               <Ionicons name="menu" size={26} color={Colors.white} />

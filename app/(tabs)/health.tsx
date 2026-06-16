@@ -336,6 +336,11 @@ export default function HealthScreen() {
       {/* Header + Tabs */}
       <View style={[styles.tabsHeader, { backgroundColor: th.card }]}>
         <LinearGradient colors={Colors.gradient.primary} style={styles.headerGradient}>
+          <Image
+            source={require('../../assets/images/health-banner.jpg')}
+            style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
+            resizeMode="cover"
+          />
           <View style={styles.headerRow}>
             <Ionicons name="medkit-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
             <Text style={styles.headerTitle}>Suivi Santé</Text>

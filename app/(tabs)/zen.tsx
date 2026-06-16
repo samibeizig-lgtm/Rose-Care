@@ -9,6 +9,7 @@ import {
   Easing,
   Dimensions,
   Alert,
+  Image,
 } from 'react-native';
 import * as Speech from 'expo-speech';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -258,6 +259,11 @@ export default function ZenScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       {/* Header */}
       <LinearGradient colors={Colors.gradient.zen} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
+        <Image
+          source={require('../../assets/images/zen-banner.jpg')}
+          style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
+          resizeMode="cover"
+        />
         <View style={styles.headerRow}>
           <Ionicons name="leaf-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
           <View>

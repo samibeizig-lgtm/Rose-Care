@@ -8,6 +8,7 @@ import {
   Dimensions,
   Alert,
   Animated,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -107,6 +108,11 @@ export default function PregnancyScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.header}
         >
+          <Image
+            source={require('../../assets/images/pregnancy-banner.jpg')}
+            style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
+            resizeMode="cover"
+          />
           <Text style={styles.headerTitle}>Ma Grossesse</Text>
           <Text style={styles.headerSubtitle}>Suivi semaine par semaine</Text>
 

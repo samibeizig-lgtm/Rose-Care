@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -72,6 +73,11 @@ export default function WeekDetailScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
+        <Image
+          source={require('../../../assets/images/pregnancy-banner.jpg')}
+          style={[StyleSheet.absoluteFillObject, { opacity: 0.18 }]}
+          resizeMode="cover"
+        />
         <View style={styles.heroNav}>
           {weekNumber > 1 && (
             <TouchableOpacity style={styles.navBtn} onPress={() => router.replace(`/pregnancy/week/${weekNumber - 1}` as any)}>
@@ -87,7 +93,9 @@ export default function WeekDetailScreen() {
         </View>
 
         <View style={styles.heroCenter}>
-          <Text style={styles.heroEmoji}>{data.fruitEmoji}</Text>
+          <View style={{ width: 96, height: 96, borderRadius: 48, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginRight: 16, borderWidth: 2, borderColor: 'rgba(255,255,255,0.4)' }}>
+            <Text style={styles.heroEmoji}>{data.fruitEmoji}</Text>
+          </View>
           <View style={styles.heroBadge}>
             <Text style={styles.heroBadgeText}>Semaine {weekNumber}</Text>
             <Text style={styles.heroTrimester}>{data.trimester}ème trimestre</Text>
@@ -236,8 +244,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   heroEmoji: {
-    fontSize: 56,
-    marginRight: 16,
+    fontSize: 72,
   },
   heroBadge: {},
   heroBadgeText: {
