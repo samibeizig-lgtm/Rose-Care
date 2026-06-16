@@ -111,11 +111,13 @@ export default function WelcomeScreen() {
             </TouchableOpacity>
           </>
         )}
-        <Image
-          source={require('../assets/images/welcome-bg.jpg')}
-          style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 200, opacity: 0.07 }}
-          resizeMode="cover"
-        />
+        <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 200 }}>
+          <Image
+            source={require('../assets/images/welcome-bg.jpg')}
+            style={{ width: '100%', height: '100%', opacity: 0.07 }}
+            resizeMode="cover"
+          />
+        </View>
       </View>
 
       {/* ─── Floating circle ─── */}
