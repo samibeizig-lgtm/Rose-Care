@@ -19,7 +19,7 @@ on:
 
 jobs:
   build-android:
-    name: Build Android APK via EAS Cloud
+    name: Build Android APK (local — no EAS quota)
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
@@ -32,6 +32,15 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
@@ -49,67 +58,52 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build APK via EAS Cloud
+      - name: Build APK locally (no EAS Cloud quota used)
         id: eas_build
         run: |
           PROFILE="${{ github.event.inputs.profile }}"
           [ -z "$PROFILE" ] && PROFILE="preview"
-          echo "Building with profile: $PROFILE"
+          echo "Building locally with profile: $PROFILE"
 
-          # EAS CLI streams progress to stderr; --json writes final JSON to stdout.
-          # We capture stdout into BUILD_JSON and let stderr flow to the log so any
-          # error messages are visible. We do NOT suppress errors with || true.
-          BUILD_JSON=$(eas build \
+          # --local builds on this runner instead of EAS Cloud servers.
+          # EXPO_TOKEN is still used to pull keystore credentials.
+          eas build \
+            --local \
             --platform android \
             --profile "$PROFILE" \
-            --non-interactive \
-            --wait \
-            --json)
+            --non-interactive
 
-          echo "Raw EAS output:"
-          echo "$BUILD_JSON"
+          # Find the generated APK (eas build --local puts it in the project root)
+          APK=$(find . -maxdepth 2 -name "*.apk" ! -path "*/node_modules/*" ! -path "*/.gradle/*" | head -1)
 
-          # EAS may return an array (multiple builds) or a single object
-          APK_URL=$(echo "$BUILD_JSON" | jq -r '
-            if type == "array" then .[0] else . end
-            | .artifacts.buildUrl // .artifacts.url // ""
-          ')
-
-          echo "APK URL: $APK_URL"
-
-          if [ -z "$APK_URL" ] || [ "$APK_URL" = "null" ]; then
-            echo "::error::EAS build succeeded but returned no download URL. Check the EAS dashboard."
+          if [ -z "$APK" ]; then
+            echo "::error::No APK found after local build. Check Gradle output above."
             exit 1
           fi
 
-          echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
+          echo "Found APK: $APK"
+          cp "$APK" "rose-care-${PROFILE}.apk"
+          ls -lh rose-care-*.apk
+
           echo "profile=$PROFILE" >> $GITHUB_OUTPUT
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Download APK from EAS
-        run: |
-          URL="${{ steps.eas_build.outputs.apk_url }}"
-          PROFILE="${{ steps.eas_build.outputs.profile }}"
-          echo "Downloading APK from: $URL"
-          curl -fL "$URL" -o "rose-care-${PROFILE}.apk"
-          ls -lh *.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: rose-care-${{ steps.eas_build.outputs.profile }}-${{ github.run_number }}
-          path: "*.apk"
+          path: "rose-care-*.apk"
           if-no-files-found: error
           retention-days: 30
 
       - name: Summary
         run: |
           PROFILE="${{ steps.eas_build.outputs.profile }}"
-          echo "### ✅ APK built successfully" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ APK built successfully (local build)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Profile:** $PROFILE" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **EAS URL:** ${{ steps.eas_build.outputs.apk_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Built on:** GitHub Actions runner (no EAS Cloud quota consumed)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Download the APK from the **Artifacts** section above." >> $GITHUB_STEP_SUMMARY
