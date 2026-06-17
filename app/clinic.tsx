@@ -151,11 +151,6 @@ export default function ClinicScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       <LinearGradient colors={['#2D1B69', '#6D28D9']} style={styles.header}>
-        <Image
-          source={require('../assets/images/health-banner.jpg')}
-          style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
-          resizeMode="cover"
-        />
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Ionicons name="arrow-back" size={24} color={Colors.white} />
         </TouchableOpacity>
@@ -201,6 +196,22 @@ export default function ClinicScreen() {
 
           {activeTab === 'info' && (
             <>
+              {/* Image banner */}
+              <View style={styles.imageBanner}>
+                <Image
+                  source={require('../assets/images/health-banner.jpg')}
+                  style={StyleSheet.absoluteFillObject}
+                  resizeMode="cover"
+                />
+                <LinearGradient
+                  colors={['transparent', 'rgba(0,0,0,0.72)']}
+                  style={StyleSheet.absoluteFillObject}
+                />
+                <View style={styles.imageBannerInner}>
+                  <Text style={styles.imageBannerTitle}>Clinique La Rose</Text>
+                  <Text style={styles.imageBannerSub}>Votre maternité de référence à Tunis</Text>
+                </View>
+              </View>
               {/* Stats */}
               <View style={styles.statsRow}>
                 {stats.map((s, i) => (
@@ -457,4 +468,28 @@ const styles = StyleSheet.create({
   featureText: { fontSize: 14, color: Colors.text },
   decoNote: { backgroundColor: Colors.lilac, borderRadius: 16, padding: 16, alignItems: 'center' },
   decoNoteText: { fontSize: 14, color: Colors.primaryDark, lineHeight: 22, textAlign: 'center' },
+  imageBanner: {
+    height: 180,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  imageBannerInner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 18,
+  },
+  imageBannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  imageBannerSub: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 13,
+    lineHeight: 19,
+  },
 });

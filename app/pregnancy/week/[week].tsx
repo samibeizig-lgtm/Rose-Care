@@ -73,11 +73,6 @@ export default function WeekDetailScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Image
-          source={require('../../../assets/images/pregnancy-banner.jpg')}
-          style={[StyleSheet.absoluteFillObject, { opacity: 0.18 }]}
-          resizeMode="cover"
-        />
         <View style={styles.heroNav}>
           {weekNumber > 1 && (
             <TouchableOpacity style={styles.navBtn} onPress={() => router.replace(`/pregnancy/week/${weekNumber - 1}` as any)}>

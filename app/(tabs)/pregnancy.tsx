@@ -108,11 +108,6 @@ export default function PregnancyScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.header}
         >
-          <Image
-            source={require('../../assets/images/pregnancy-banner.jpg')}
-            style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
-            resizeMode="cover"
-          />
           <Text style={styles.headerTitle}>Ma Grossesse</Text>
           <Text style={styles.headerSubtitle}>Suivi semaine par semaine</Text>
 
@@ -131,6 +126,23 @@ export default function PregnancyScreen() {
         </LinearGradient>
 
         <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }]}>
+
+          {/* Image banner */}
+          <View style={styles.imageBanner}>
+            <Image
+              source={require('../../assets/images/pregnancy-banner.jpg')}
+              style={StyleSheet.absoluteFillObject}
+              resizeMode="cover"
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.72)']}
+              style={StyleSheet.absoluteFillObject}
+            />
+            <View style={styles.imageBannerInner}>
+              <Text style={styles.imageBannerTitle}>Ma Grossesse</Text>
+              <Text style={styles.imageBannerSub}>Suivez le développement de votre bébé semaine par semaine</Text>
+            </View>
+          </View>
 
           {/* DDP Card */}
           <View style={[styles.ddpCard, { backgroundColor: th.card, borderColor: th.border }]}>
@@ -539,5 +551,29 @@ const styles = StyleSheet.create({
     height: 16,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  imageBanner: {
+    height: 180,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  imageBannerInner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 18,
+  },
+  imageBannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  imageBannerSub: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 13,
+    lineHeight: 19,
   },
 });

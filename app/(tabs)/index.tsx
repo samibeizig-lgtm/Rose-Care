@@ -237,11 +237,6 @@ export default function HomeScreen() {
       >
         {/* ─── Hero ─── */}
         <LinearGradient colors={Colors.gradient.primary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
-          <Image
-            source={require('../../assets/images/home-hero.jpg')}
-            style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
-            resizeMode="cover"
-          />
           <View style={styles.heroTop}>
             <TouchableOpacity style={styles.menuBtn} onPress={() => setDrawerOpen(true)}>
               <Ionicons name="menu" size={26} color={Colors.white} />
@@ -294,6 +289,23 @@ export default function HomeScreen() {
 
         {/* ─── White content ─── */}
         <Animated.View style={[styles.content, cardStyle, { backgroundColor: th.bg }]}>
+
+          {/* Image banner */}
+          <View style={styles.imageBanner}>
+            <Image
+              source={require('../../assets/images/home-hero.jpg')}
+              style={StyleSheet.absoluteFillObject}
+              resizeMode="cover"
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.72)']}
+              style={StyleSheet.absoluteFillObject}
+            />
+            <View style={styles.imageBannerInner}>
+              <Text style={styles.imageBannerTitle}>Rose Care</Text>
+              <Text style={styles.imageBannerSub}>Votre compagnon de grossesse semaine par semaine</Text>
+            </View>
+          </View>
 
           {/* Statistique grossesse motivationnelle */}
           {daysLeft !== null && daysLeft > 0 && (
@@ -611,4 +623,28 @@ const styles = StyleSheet.create({
   saveBtn: { borderRadius: 14, overflow: 'hidden' },
   saveBtnGrad: { paddingVertical: 15, alignItems: 'center' },
   saveBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
+  imageBanner: {
+    height: 180,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  imageBannerInner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 18,
+  },
+  imageBannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  imageBannerSub: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 13,
+    lineHeight: 19,
+  },
 });

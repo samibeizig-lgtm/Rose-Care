@@ -57,11 +57,6 @@ export default function MoreScreen() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Image
-          source={require('../../assets/images/health-banner.jpg')}
-          style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
-          resizeMode="cover"
-        />
         <View style={styles.headerRow}>
           <Ionicons name="grid-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
           <View>
@@ -76,6 +71,23 @@ export default function MoreScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false} style={{ backgroundColor: th.bg }}>
         <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }]}>
+
+          {/* Image banner */}
+          <View style={styles.imageBanner}>
+            <Image
+              source={require('../../assets/images/health-banner.jpg')}
+              style={StyleSheet.absoluteFillObject}
+              resizeMode="cover"
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.72)']}
+              style={StyleSheet.absoluteFillObject}
+            />
+            <View style={styles.imageBannerInner}>
+              <Text style={styles.imageBannerTitle}>Mes Ressources</Text>
+              <Text style={styles.imageBannerSub}>Dossier CNAM, contacts d'urgence et informations utiles</Text>
+            </View>
+          </View>
 
           {/* Menu Grid */}
           <View style={styles.menuGrid}>
@@ -301,5 +313,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.primary,
     fontWeight: '600',
+  },
+  imageBanner: {
+    height: 180,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  imageBannerInner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 18,
+  },
+  imageBannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  imageBannerSub: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 13,
+    lineHeight: 19,
   },
 });

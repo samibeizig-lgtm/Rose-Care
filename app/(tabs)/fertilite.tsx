@@ -167,11 +167,6 @@ export default function FertiliteScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       {/* Header */}
       <LinearGradient colors={Colors.gradient.primary} style={styles.header}>
-        <Image
-          source={require('../../assets/images/fertility-banner.jpg')}
-          style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
-          resizeMode="cover"
-        />
         <Text style={styles.headerTitle}>Fertilité</Text>
         <Text style={styles.headerSub}>Comprendre et optimiser votre fertilité</Text>
 
@@ -193,6 +188,23 @@ export default function FertiliteScreen() {
       </LinearGradient>
 
       <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body} style={{ opacity: fadeAnim, backgroundColor: th.bg }}>
+
+        {/* Image banner */}
+        <View style={styles.imageBanner}>
+          <Image
+            source={require('../../assets/images/fertility-banner.jpg')}
+            style={StyleSheet.absoluteFillObject}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.72)']}
+            style={StyleSheet.absoluteFillObject}
+          />
+          <View style={styles.imageBannerInner}>
+            <Text style={styles.imageBannerTitle}>Fertilité & Cycle</Text>
+            <Text style={styles.imageBannerSub}>Comprenez votre cycle pour optimiser vos chances de conception</Text>
+          </View>
+        </View>
 
         {/* Cycle phases */}
         {activeSection === 0 && (
@@ -852,5 +864,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
     lineHeight: 18,
+  },
+  imageBanner: {
+    height: 180,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  imageBannerInner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 18,
+  },
+  imageBannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  imageBannerSub: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 13,
+    lineHeight: 19,
   },
 });

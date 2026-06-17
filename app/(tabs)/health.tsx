@@ -336,11 +336,6 @@ export default function HealthScreen() {
       {/* Header + Tabs */}
       <View style={[styles.tabsHeader, { backgroundColor: th.card }]}>
         <LinearGradient colors={Colors.gradient.primary} style={styles.headerGradient}>
-          <Image
-            source={require('../../assets/images/health-banner.jpg')}
-            style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
-            resizeMode="cover"
-          />
           <View style={styles.headerRow}>
             <Ionicons name="medkit-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
             <Text style={styles.headerTitle}>Suivi Santé</Text>
@@ -377,6 +372,22 @@ export default function HealthScreen() {
       <Animated.ScrollView showsVerticalScrollIndicator={false} style={{ opacity: fadeAnim, backgroundColor: th.bg }}>
         {activeTab === 'suivi' && (
           <View style={styles.content}>
+            {/* Image banner */}
+            <View style={styles.imageBanner}>
+              <Image
+                source={require('../../assets/images/health-banner.jpg')}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.72)']}
+                style={StyleSheet.absoluteFillObject}
+              />
+              <View style={styles.imageBannerInner}>
+                <Text style={styles.imageBannerTitle}>Suivi Santé</Text>
+                <Text style={styles.imageBannerSub}>Suivez vos constantes vitales tout au long de la grossesse</Text>
+              </View>
+            </View>
             {/* Health Cards */}
             <View style={styles.cardsGrid}>
               {healthCards.map((card) => (
@@ -1631,4 +1642,28 @@ const styles = StyleSheet.create({
   freqChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   freqChipText: { fontSize: 13, color: Colors.text, fontWeight: '500' },
   freqChipTextActive: { color: Colors.white, fontWeight: '700' },
+  imageBanner: {
+    height: 180,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  imageBannerInner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 18,
+  },
+  imageBannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  imageBannerSub: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 13,
+    lineHeight: 19,
+  },
 });

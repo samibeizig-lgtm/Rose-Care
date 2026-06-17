@@ -259,11 +259,6 @@ export default function ZenScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: th.bg }]} edges={['top']}>
       {/* Header */}
       <LinearGradient colors={Colors.gradient.zen} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
-        <Image
-          source={require('../../assets/images/zen-banner.jpg')}
-          style={[StyleSheet.absoluteFillObject, { opacity: 0.22 }]}
-          resizeMode="cover"
-        />
         <View style={styles.headerRow}>
           <Ionicons name="leaf-outline" size={22} color={Colors.lavender} style={{ marginRight: 10 }} />
           <View>
@@ -301,6 +296,22 @@ export default function ZenScreen() {
         {/* BREATHING TAB */}
         {activeTab === 'respiration' && (
           <View style={styles.content}>
+            {/* Image banner */}
+            <View style={styles.imageBanner}>
+              <Image
+                source={require('../../assets/images/zen-banner.jpg')}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.72)']}
+                style={StyleSheet.absoluteFillObject}
+              />
+              <View style={styles.imageBannerInner}>
+                <Text style={styles.imageBannerTitle}>Espace Respiration</Text>
+                <Text style={styles.imageBannerSub}>Techniques de respiration pour réduire le stress prénatal</Text>
+              </View>
+            </View>
             {(isBreathing || selectedExercise) && (
               <View style={styles.breathingCenter}>
                 <View style={styles.breathingCircleOuter}>
@@ -551,6 +562,22 @@ export default function ZenScreen() {
         {/* YOGA TAB */}
         {activeTab === 'yoga' && (
           <View style={styles.content}>
+            {/* Image banner */}
+            <View style={styles.imageBanner}>
+              <Image
+                source={require('../../assets/images/zen-banner.jpg')}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.72)']}
+                style={StyleSheet.absoluteFillObject}
+              />
+              <View style={styles.imageBannerInner}>
+                <Text style={styles.imageBannerTitle}>Yoga Prénatal</Text>
+                <Text style={styles.imageBannerSub}>Postures douces adaptées à chaque trimestre</Text>
+              </View>
+            </View>
             <Text style={[styles.sectionTitle, { color: th.text }]}>Yoga Prénatal</Text>
             <Text style={[styles.sectionSubtitle, { color: th.textSub }]}>
               Le yoga prénatal améliore la flexibilité, soulage les douleurs et prépare le corps à l'accouchement.
@@ -1276,5 +1303,29 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.text,
     lineHeight: 20,
+  },
+  imageBanner: {
+    height: 180,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  imageBannerInner: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 18,
+  },
+  imageBannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  imageBannerSub: {
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: 13,
+    lineHeight: 19,
   },
 });
