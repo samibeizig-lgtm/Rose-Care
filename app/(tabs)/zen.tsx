@@ -301,7 +301,7 @@ export default function ZenScreen() {
               <Image
                 source={require('../../assets/images/zen-banner.jpg')}
                 style={StyleSheet.absoluteFillObject}
-                resizeMode="cover"
+                resizeMode="contain"
               />
               <LinearGradient
                 colors={['transparent', 'rgba(0,0,0,0.65)']}
@@ -567,7 +567,7 @@ export default function ZenScreen() {
               <Image
                 source={require('../../assets/images/zen-banner.jpg')}
                 style={StyleSheet.absoluteFillObject}
-                resizeMode="cover"
+                resizeMode="contain"
               />
               <LinearGradient
                 colors={['transparent', 'rgba(0,0,0,0.65)']}
@@ -1305,11 +1305,12 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   imageBanner: {
-    height: 180,
+    height: 240,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 4,
+    backgroundColor: '#0D0D1A',
   },
   bannerCircle1: {
     position: 'absolute',

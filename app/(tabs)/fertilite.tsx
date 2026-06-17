@@ -13,7 +13,7 @@ import { useStorage, storage, STORAGE_KEYS } from '../../src/hooks/useStorage';
 import { addDays, format, parse, isValid } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import DatePickerModal from '../../src/components/DatePickerModal';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const WAVE_H = 50;
@@ -93,6 +93,7 @@ interface FertileWindow {
 
 export default function FertiliteScreen() {
   const { isDark, th } = useTheme();
+  const router = useRouter();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -194,7 +195,7 @@ export default function FertiliteScreen() {
           <Image
             source={require('../../assets/images/fertility-banner.jpg')}
             style={StyleSheet.absoluteFillObject}
-            resizeMode="cover"
+            resizeMode="contain"
           />
           <LinearGradient
             colors={['transparent', 'rgba(0,0,0,0.65)']}
@@ -205,6 +206,22 @@ export default function FertiliteScreen() {
             <Text style={styles.imageBannerSub}>Comprenez votre cycle · Optimisez vos chances</Text>
           </View>
         </View>
+
+        {/* Calendrier menstruel */}
+        <TouchableOpacity
+          style={[styles.calendarCard, { backgroundColor: th.card, borderColor: th.border }]}
+          onPress={() => router.push('/menstrual' as any)}
+          activeOpacity={0.85}
+        >
+          <LinearGradient colors={['#5B21B6', '#7F00FF']} style={styles.calendarIconBg}>
+            <Ionicons name="calendar-outline" size={24} color="#FFFFFF" />
+          </LinearGradient>
+          <View style={{ flex: 1, marginLeft: 14 }}>
+            <Text style={[styles.calendarCardTitle, { color: th.text }]}>Calendrier Menstruel</Text>
+            <Text style={[styles.calendarCardSub, { color: th.textSub }]}>Suivez vos cycles et fenêtres fertiles</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={th.textSub || '#9CA3AF'} />
+        </TouchableOpacity>
 
         {/* Cycle phases */}
         {activeSection === 0 && (
@@ -866,11 +883,12 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   imageBanner: {
-    height: 180,
+    height: 240,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 4,
+    backgroundColor: '#0D0D1A',
   },
   bannerCircle1: {
     position: 'absolute',
@@ -912,5 +930,34 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.82)',
     fontSize: 13,
     lineHeight: 19,
+  },
+  calendarCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 20,
+    borderWidth: 1,
+    shadowColor: '#4B0082',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  calendarIconBg: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  calendarCardTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 3,
+  },
+  calendarCardSub: {
+    fontSize: 12,
+    lineHeight: 17,
   },
 });

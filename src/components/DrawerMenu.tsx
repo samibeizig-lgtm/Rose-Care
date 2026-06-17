@@ -5,7 +5,6 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import Colors from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { BUILD_HASH, BUILD_VERSION } from '../constants/buildInfo';
@@ -19,39 +18,7 @@ interface DrawerMenuProps {
   onOpenProfile?: () => void;
 }
 
-const MENU_ITEMS = [
-  {
-    icon: 'bag-outline' as const,
-    label: 'Trousse & Valise',
-    subtitle: 'Essentiels maternité',
-    route: '/essentials',
-    colors: ['#7C3AED', '#A78BFA'] as [string, string],
-  },
-  {
-    icon: 'calendar-outline' as const,
-    label: 'Calendrier Menstruel',
-    subtitle: 'Suivi du cycle',
-    route: '/menstrual',
-    colors: ['#5B21B6', '#7F00FF'] as [string, string],
-  },
-  {
-    icon: 'book-outline' as const,
-    label: 'Journal de Grossesse',
-    subtitle: 'Notes & souvenirs',
-    route: '/journal',
-    colors: ['#4B0082', '#7F00FF'] as [string, string],
-  },
-  {
-    icon: 'business-outline' as const,
-    label: 'Clinique La Rose',
-    subtitle: 'Info & médecins',
-    route: '/clinic',
-    colors: ['#5B00B5', '#9933FF'] as [string, string],
-  },
-];
-
 export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMenuProps) {
-  const router = useRouter();
   const { isDark, toggleTheme } = useTheme();
   const slideX = useRef(new Animated.Value(-DRAWER_W)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
@@ -80,11 +47,6 @@ export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMe
     ]).start();
   }, [visible]);
 
-  const navigate = (route: string) => {
-    onClose();
-    setTimeout(() => router.push(route as any), 300);
-  };
-
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
       <View style={styles.root}>
@@ -109,26 +71,7 @@ export default function DrawerMenu({ visible, onClose, onOpenProfile }: DrawerMe
           </LinearGradient>
 
           <View style={styles.drawerBody}>
-            <Text style={[styles.drawerSectionLabel, isDark && { color: dark.section }]}>NAVIGATION</Text>
-            {MENU_ITEMS.map((item) => (
-              <TouchableOpacity
-                key={item.label}
-                style={[styles.menuItem, isDark && { borderBottomColor: dark.border }]}
-                onPress={() => navigate(item.route)}
-                activeOpacity={0.7}
-              >
-                <LinearGradient colors={item.colors} style={styles.menuIconGrad}>
-                  <Ionicons name={item.icon} size={20} color="#FFFFFF" />
-                </LinearGradient>
-                <View style={styles.menuItemText}>
-                  <Text style={[styles.menuItemLabel, isDark && { color: dark.text }]}>{item.label}</Text>
-                  <Text style={[styles.menuItemSub, isDark && { color: dark.sub }]}>{item.subtitle}</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={16} color={isDark ? dark.sub : Colors.textMuted} />
-              </TouchableOpacity>
-            ))}
-
-            <Text style={[styles.drawerSectionLabel, { marginTop: 20 }, isDark && { color: dark.section }]}>MON COMPTE</Text>
+            <Text style={[styles.drawerSectionLabel, isDark && { color: dark.section }]}>MON COMPTE</Text>
             <TouchableOpacity
               style={[styles.menuItem, isDark && { borderBottomColor: dark.border }]}
               onPress={() => { onClose(); setTimeout(() => onOpenProfile?.(), 300); }}

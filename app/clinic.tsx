@@ -201,7 +201,7 @@ export default function ClinicScreen() {
                 <Image
                   source={require('../assets/images/health-banner.jpg')}
                   style={StyleSheet.absoluteFillObject}
-                  resizeMode="cover"
+                  resizeMode="contain"
                 />
                 <LinearGradient
                   colors={['transparent', 'rgba(0,0,0,0.65)']}
@@ -469,11 +469,12 @@ const styles = StyleSheet.create({
   decoNote: { backgroundColor: Colors.lilac, borderRadius: 16, padding: 16, alignItems: 'center' },
   decoNoteText: { fontSize: 14, color: Colors.primaryDark, lineHeight: 22, textAlign: 'center' },
   imageBanner: {
-    height: 180,
+    height: 240,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 4,
+    backgroundColor: '#0D0D1A',
   },
   bannerCircle1: {
     position: 'absolute',

@@ -42,6 +42,14 @@ export default function MoreScreen() {
       icon: 'document-text-outline' as const,
       description: 'Prise en charge, congé maternité',
     },
+    {
+      title: 'Clinique La Rose',
+      color: Colors.primary,
+      gradient: ['#5B00B5', '#9933FF'] as [string, string],
+      route: '/clinic',
+      icon: 'business-outline' as const,
+      description: 'Info, médecins & services',
+    },
   ];
 
   const contactLinks = [
@@ -77,7 +85,7 @@ export default function MoreScreen() {
             <Image
               source={require('../../assets/images/health-banner.jpg')}
               style={StyleSheet.absoluteFillObject}
-              resizeMode="cover"
+              resizeMode="contain"
             />
             <LinearGradient
               colors={['transparent', 'rgba(0,0,0,0.65)']}
@@ -315,11 +323,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   imageBanner: {
-    height: 180,
+    height: 240,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 16,
+    backgroundColor: '#0D0D1A',
   },
   bannerCircle1: {
     position: 'absolute',

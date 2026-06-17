@@ -132,7 +132,7 @@ export default function PregnancyScreen() {
             <Image
               source={require('../../assets/images/pregnancy-banner.jpg')}
               style={StyleSheet.absoluteFillObject}
-              resizeMode="cover"
+              resizeMode="contain"
             />
             <LinearGradient
               colors={['transparent', 'rgba(0,0,0,0.65)']}
@@ -142,6 +142,26 @@ export default function PregnancyScreen() {
               <Text style={styles.imageBannerTitle}>Ma Grossesse 🤰</Text>
               <Text style={styles.imageBannerSub}>Développement bébé · Semaine par semaine</Text>
             </View>
+          </View>
+
+          {/* Quick access cards */}
+          <View style={styles.quickRow}>
+            <TouchableOpacity style={[styles.quickCard, { backgroundColor: th.card, borderColor: th.border }]} onPress={() => router.push('/essentials' as any)} activeOpacity={0.85}>
+              <LinearGradient colors={['#7C3AED', '#A78BFA']} style={styles.quickIconBg}>
+                <Ionicons name="bag-outline" size={22} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={[styles.quickCardTitle, { color: th.text }]}>Trousse & Valise</Text>
+              <Text style={[styles.quickCardSub, { color: th.textSub }]}>Essentiels maternité</Text>
+              <Ionicons name="chevron-forward" size={14} color={th.textSub} style={{ marginTop: 'auto' }} />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.quickCard, { backgroundColor: th.card, borderColor: th.border }]} onPress={() => router.push('/journal' as any)} activeOpacity={0.85}>
+              <LinearGradient colors={['#4B0082', '#7F00FF']} style={styles.quickIconBg}>
+                <Ionicons name="book-outline" size={22} color="#FFFFFF" />
+              </LinearGradient>
+              <Text style={[styles.quickCardTitle, { color: th.text }]}>Journal</Text>
+              <Text style={[styles.quickCardSub, { color: th.textSub }]}>Notes & souvenirs</Text>
+              <Ionicons name="chevron-forward" size={14} color={th.textSub} style={{ marginTop: 'auto' }} />
+            </TouchableOpacity>
           </View>
 
           {/* DDP Card */}
@@ -553,11 +573,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageBanner: {
-    height: 180,
+    height: 240,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 16,
+    backgroundColor: '#0D0D1A',
   },
   bannerCircle1: {
     position: 'absolute',
@@ -599,5 +620,37 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.82)',
     fontSize: 13,
     lineHeight: 19,
+  },
+  quickRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
+  },
+  quickCard: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    gap: 8,
+    shadowColor: '#4B0082',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  quickIconBg: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickCardTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  quickCardSub: {
+    fontSize: 12,
+    lineHeight: 16,
   },
 });

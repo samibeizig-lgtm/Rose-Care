@@ -295,7 +295,7 @@ export default function HomeScreen() {
             <Image
               source={require('../../assets/images/home-hero.jpg')}
               style={StyleSheet.absoluteFillObject}
-              resizeMode="cover"
+              resizeMode="contain"
             />
             <LinearGradient
               colors={['transparent', 'rgba(0,0,0,0.65)']}
@@ -624,11 +624,12 @@ const styles = StyleSheet.create({
   saveBtnGrad: { paddingVertical: 15, alignItems: 'center' },
   saveBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
   imageBanner: {
-    height: 180,
+    height: 240,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 16,
+    backgroundColor: '#0D0D1A',
   },
   bannerCircle1: {
     position: 'absolute',
