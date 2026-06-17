@@ -84,7 +84,7 @@ export default function MoreScreen() {
           <View style={styles.imageBanner}>
             <Image
               source={require('../../assets/images/health-banner.jpg')}
-              style={StyleSheet.absoluteFillObject}
+              style={styles.bannerImage}
               resizeMode="cover"
             />
             <LinearGradient
@@ -323,11 +323,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   imageBanner: {
-    aspectRatio: 1200 / 630,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 16,
+  },
+  bannerImage: {
+    width: '100%',
+    aspectRatio: 1200 / 630,
   },
   bannerCircle1: {
     position: 'absolute',

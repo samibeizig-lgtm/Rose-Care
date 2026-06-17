@@ -194,7 +194,7 @@ export default function FertiliteScreen() {
         <View style={styles.imageBanner}>
           <Image
             source={require('../../assets/images/fertility-banner.jpg')}
-            style={StyleSheet.absoluteFillObject}
+            style={styles.bannerImage}
             resizeMode="cover"
           />
           <LinearGradient
@@ -883,11 +883,14 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   imageBanner: {
-    aspectRatio: 1200 / 630,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 4,
+  },
+  bannerImage: {
+    width: '100%',
+    aspectRatio: 1200 / 630,
   },
   bannerCircle1: {
     position: 'absolute',
