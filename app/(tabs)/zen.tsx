@@ -301,7 +301,7 @@ export default function ZenScreen() {
               <Image
                 source={require('../../assets/images/zen-banner.jpg')}
                 style={styles.bannerImage}
-                resizeMode="cover"
+                resizeMode="contain"
               />
               <LinearGradient
                 colors={['transparent', 'rgba(0,0,0,0.7)']}
@@ -567,7 +567,7 @@ export default function ZenScreen() {
               <Image
                 source={require('../../assets/images/zen-banner.jpg')}
                 style={styles.bannerImage}
-                resizeMode="cover"
+                resizeMode="contain"
               />
               <LinearGradient
                 colors={['transparent', 'rgba(0,0,0,0.7)']}

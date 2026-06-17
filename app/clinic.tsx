@@ -201,7 +201,7 @@ export default function ClinicScreen() {
                 <Image
                   source={require('../assets/images/health-banner.jpg')}
                   style={styles.bannerImage}
-                  resizeMode="cover"
+                  resizeMode="contain"
                 />
                 <LinearGradient
                   colors={['transparent', 'rgba(0,0,0,0.7)']}

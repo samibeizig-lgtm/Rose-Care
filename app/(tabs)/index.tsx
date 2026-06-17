@@ -295,7 +295,7 @@ export default function HomeScreen() {
             <Image
               source={require('../../assets/images/home-hero.jpg')}
               style={styles.bannerImage}
-              resizeMode="cover"
+              resizeMode="contain"
             />
             <LinearGradient
               colors={['transparent', 'rgba(0,0,0,0.7)']}
