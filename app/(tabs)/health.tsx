@@ -376,7 +376,7 @@ export default function HealthScreen() {
             <View style={styles.imageBanner}>
               <Image
                 source={require('../../assets/images/health-banner.jpg')}
-                style={{ width: '100%', aspectRatio: 3/2 }}
+                style={StyleSheet.absoluteFillObject}
                 resizeMode="cover"
               />
               <LinearGradient
@@ -1643,6 +1643,7 @@ const styles = StyleSheet.create({
   freqChipText: { fontSize: 13, color: Colors.text, fontWeight: '500' },
   freqChipTextActive: { color: Colors.white, fontWeight: '700' },
   imageBanner: {
+    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

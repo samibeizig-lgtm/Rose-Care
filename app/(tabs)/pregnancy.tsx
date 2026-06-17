@@ -131,7 +131,7 @@ export default function PregnancyScreen() {
           <View style={styles.imageBanner}>
             <Image
               source={require('../../assets/images/pregnancy-banner.jpg')}
-              style={{ width: '100%', aspectRatio: 3/2 }}
+              style={StyleSheet.absoluteFillObject}
               resizeMode="cover"
             />
             <LinearGradient
@@ -573,6 +573,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageBanner: {
+    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

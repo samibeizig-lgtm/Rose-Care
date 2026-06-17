@@ -294,7 +294,7 @@ export default function HomeScreen() {
           <View style={styles.imageBanner}>
             <Image
               source={require('../../assets/images/home-hero.jpg')}
-              style={{ width: '100%', aspectRatio: 3/2 }}
+              style={StyleSheet.absoluteFillObject}
               resizeMode="cover"
             />
             <LinearGradient
@@ -624,6 +624,7 @@ const styles = StyleSheet.create({
   saveBtnGrad: { paddingVertical: 15, alignItems: 'center' },
   saveBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
   imageBanner: {
+    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

@@ -300,7 +300,7 @@ export default function ZenScreen() {
             <View style={styles.imageBanner}>
               <Image
                 source={require('../../assets/images/zen-banner.jpg')}
-                style={{ width: '100%', aspectRatio: 3/2 }}
+                style={StyleSheet.absoluteFillObject}
                 resizeMode="cover"
               />
               <LinearGradient
@@ -566,7 +566,7 @@ export default function ZenScreen() {
             <View style={styles.imageBanner}>
               <Image
                 source={require('../../assets/images/zen-banner.jpg')}
-                style={{ width: '100%', aspectRatio: 3/2 }}
+                style={StyleSheet.absoluteFillObject}
                 resizeMode="cover"
               />
               <LinearGradient
@@ -1305,6 +1305,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   imageBanner: {
+    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
