@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
   saveBtnGrad: { paddingVertical: 15, alignItems: 'center' },
   saveBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
   imageBanner: {
-    aspectRatio: 3 / 2,
+    aspectRatio: 1200 / 630,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

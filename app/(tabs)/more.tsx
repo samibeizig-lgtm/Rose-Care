@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   imageBanner: {
-    aspectRatio: 3 / 2,
+    aspectRatio: 1200 / 630,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
