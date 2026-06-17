@@ -294,12 +294,12 @@ export default function HomeScreen() {
           <View style={styles.imageBanner}>
             <Image
               source={require('../../assets/images/home-hero.jpg')}
-              style={StyleSheet.absoluteFillObject}
-              resizeMode="contain"
+              style={{ width: '100%', aspectRatio: 3/2 }}
+              resizeMode="cover"
             />
             <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.65)']}
-              style={StyleSheet.absoluteFillObject}
+              colors={['transparent', 'rgba(0,0,0,0.7)']}
+              style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 110 }}
             />
             <View style={styles.imageBannerInner}>
               <Text style={styles.imageBannerTitle}>Rose Care 🌸</Text>
@@ -624,12 +624,10 @@ const styles = StyleSheet.create({
   saveBtnGrad: { paddingVertical: 15, alignItems: 'center' },
   saveBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
   imageBanner: {
-    height: 240,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 16,
-    backgroundColor: '#0D0D1A',
   },
   bannerCircle1: {
     position: 'absolute',
