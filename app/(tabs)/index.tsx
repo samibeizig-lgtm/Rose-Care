@@ -11,6 +11,7 @@ import {
   TextInput,
   FlatList,
   Animated,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -290,20 +291,21 @@ export default function HomeScreen() {
         <Animated.View style={[styles.content, cardStyle, { backgroundColor: th.bg }]}>
 
           {/* Banner */}
-          <LinearGradient
-            colors={['#4B0082', '#7C3AED', '#C084FC']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.imageBanner}
-          >
-            <View style={styles.bannerCircle1} pointerEvents="none" />
-            <View style={styles.bannerCircle2} pointerEvents="none" />
-            <Ionicons name="heart" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
+          <View style={styles.imageBanner}>
+            <Image
+              source={require('../../assets/images/home-hero.jpg')}
+              style={StyleSheet.absoluteFillObject}
+              resizeMode="cover"
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.65)']}
+              style={StyleSheet.absoluteFillObject}
+            />
             <View style={styles.imageBannerInner}>
               <Text style={styles.imageBannerTitle}>Rose Care 🌸</Text>
               <Text style={styles.imageBannerSub}>Votre compagnon de grossesse semaine par semaine</Text>
             </View>
-          </LinearGradient>
+          </View>
 
           {/* Statistique grossesse motivationnelle */}
           {daysLeft !== null && daysLeft > 0 && (

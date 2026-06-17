@@ -9,6 +9,7 @@ import {
   Easing,
   Dimensions,
   Alert,
+  Image,
 } from 'react-native';
 import * as Speech from 'expo-speech';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -296,20 +297,21 @@ export default function ZenScreen() {
         {activeTab === 'respiration' && (
           <View style={styles.content}>
             {/* Banner */}
-            <LinearGradient
-              colors={['#0C1B33', '#1A3A6B', '#2E86AB']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.imageBanner}
-            >
-              <View style={styles.bannerCircle1} pointerEvents="none" />
-              <View style={styles.bannerCircle2} pointerEvents="none" />
-              <Ionicons name="water-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
+            <View style={styles.imageBanner}>
+              <Image
+                source={require('../../assets/images/zen-banner.jpg')}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.65)']}
+                style={StyleSheet.absoluteFillObject}
+              />
               <View style={styles.imageBannerInner}>
                 <Text style={styles.imageBannerTitle}>Espace Respiration 🌬️</Text>
                 <Text style={styles.imageBannerSub}>Cohérence cardiaque · 4-7-8 · Détente profonde</Text>
               </View>
-            </LinearGradient>
+            </View>
             {(isBreathing || selectedExercise) && (
               <View style={styles.breathingCenter}>
                 <View style={styles.breathingCircleOuter}>
@@ -561,20 +563,21 @@ export default function ZenScreen() {
         {activeTab === 'yoga' && (
           <View style={styles.content}>
             {/* Banner */}
-            <LinearGradient
-              colors={['#4C1D95', '#7C3AED', '#A78BFA']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.imageBanner}
-            >
-              <View style={styles.bannerCircle1} pointerEvents="none" />
-              <View style={styles.bannerCircle2} pointerEvents="none" />
-              <Ionicons name="body-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
+            <View style={styles.imageBanner}>
+              <Image
+                source={require('../../assets/images/zen-banner.jpg')}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.65)']}
+                style={StyleSheet.absoluteFillObject}
+              />
               <View style={styles.imageBannerInner}>
                 <Text style={styles.imageBannerTitle}>Yoga Prénatal 🧘‍♀️</Text>
                 <Text style={styles.imageBannerSub}>Postures douces adaptées à chaque trimestre</Text>
               </View>
-            </LinearGradient>
+            </View>
             <Text style={[styles.sectionTitle, { color: th.text }]}>Yoga Prénatal</Text>
             <Text style={[styles.sectionSubtitle, { color: th.textSub }]}>
               Le yoga prénatal améliore la flexibilité, soulage les douleurs et prépare le corps à l'accouchement.

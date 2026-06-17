@@ -8,6 +8,7 @@ import {
   Dimensions,
   Alert,
   Animated,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -127,20 +128,21 @@ export default function PregnancyScreen() {
         <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }] }]}>
 
           {/* Banner */}
-          <LinearGradient
-            colors={['#1E1B4B', '#4338CA', '#818CF8']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.imageBanner}
-          >
-            <View style={styles.bannerCircle1} pointerEvents="none" />
-            <View style={styles.bannerCircle2} pointerEvents="none" />
-            <Ionicons name="flower-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
+          <View style={styles.imageBanner}>
+            <Image
+              source={require('../../assets/images/pregnancy-banner.jpg')}
+              style={StyleSheet.absoluteFillObject}
+              resizeMode="cover"
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.65)']}
+              style={StyleSheet.absoluteFillObject}
+            />
             <View style={styles.imageBannerInner}>
               <Text style={styles.imageBannerTitle}>Ma Grossesse 🤰</Text>
               <Text style={styles.imageBannerSub}>Développement bébé · Semaine par semaine</Text>
             </View>
-          </LinearGradient>
+          </View>
 
           {/* DDP Card */}
           <View style={[styles.ddpCard, { backgroundColor: th.card, borderColor: th.border }]}>

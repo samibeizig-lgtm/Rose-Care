@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
-  TouchableOpacity, Dimensions, Modal, TextInput, Alert, Animated,
+  TouchableOpacity, Dimensions, Modal, TextInput, Alert, Animated, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -190,20 +190,21 @@ export default function FertiliteScreen() {
       <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body} style={{ opacity: fadeAnim, backgroundColor: th.bg }}>
 
         {/* Banner */}
-        <LinearGradient
-          colors={['#9D174D', '#DB2777', '#F472B6']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.imageBanner}
-        >
-          <View style={styles.bannerCircle1} pointerEvents="none" />
-          <View style={styles.bannerCircle2} pointerEvents="none" />
-          <Ionicons name="sparkles-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
+        <View style={styles.imageBanner}>
+          <Image
+            source={require('../../assets/images/fertility-banner.jpg')}
+            style={StyleSheet.absoluteFillObject}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.65)']}
+            style={StyleSheet.absoluteFillObject}
+          />
           <View style={styles.imageBannerInner}>
             <Text style={styles.imageBannerTitle}>Fertilité & Cycle 🌺</Text>
             <Text style={styles.imageBannerSub}>Comprenez votre cycle · Optimisez vos chances</Text>
           </View>
-        </LinearGradient>
+        </View>
 
         {/* Cycle phases */}
         {activeSection === 0 && (

@@ -373,20 +373,21 @@ export default function HealthScreen() {
         {activeTab === 'suivi' && (
           <View style={styles.content}>
             {/* Banner */}
-            <LinearGradient
-              colors={['#064E3B', '#047857', '#34D399']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.imageBanner}
-            >
-              <View style={styles.bannerCircle1} pointerEvents="none" />
-              <View style={styles.bannerCircle2} pointerEvents="none" />
-              <Ionicons name="pulse-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
+            <View style={styles.imageBanner}>
+              <Image
+                source={require('../../assets/images/health-banner.jpg')}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="cover"
+              />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.65)']}
+                style={StyleSheet.absoluteFillObject}
+              />
               <View style={styles.imageBannerInner}>
                 <Text style={styles.imageBannerTitle}>Suivi Santé 💊</Text>
                 <Text style={styles.imageBannerSub}>Constantes vitales · Rendez-vous · Échographies</Text>
               </View>
-            </LinearGradient>
+            </View>
             {/* Health Cards */}
             <View style={styles.cardsGrid}>
               {healthCards.map((card) => (
