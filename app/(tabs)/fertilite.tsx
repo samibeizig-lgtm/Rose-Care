@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   ScrollView, View, Text, StyleSheet,
-  TouchableOpacity, Dimensions, Modal, TextInput, Alert, Animated, Image,
+  TouchableOpacity, Dimensions, Modal, TextInput, Alert, Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -189,22 +189,21 @@ export default function FertiliteScreen() {
 
       <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.body} style={{ opacity: fadeAnim, backgroundColor: th.bg }}>
 
-        {/* Image banner */}
-        <View style={styles.imageBanner}>
-          <Image
-            source={require('../../assets/images/fertility-banner.jpg')}
-            style={StyleSheet.absoluteFillObject}
-            resizeMode="cover"
-          />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.72)']}
-            style={StyleSheet.absoluteFillObject}
-          />
+        {/* Banner */}
+        <LinearGradient
+          colors={['#9D174D', '#DB2777', '#F472B6']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.imageBanner}
+        >
+          <View style={styles.bannerCircle1} pointerEvents="none" />
+          <View style={styles.bannerCircle2} pointerEvents="none" />
+          <Ionicons name="sparkles-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
           <View style={styles.imageBannerInner}>
-            <Text style={styles.imageBannerTitle}>Fertilité & Cycle</Text>
-            <Text style={styles.imageBannerSub}>Comprenez votre cycle pour optimiser vos chances de conception</Text>
+            <Text style={styles.imageBannerTitle}>Fertilité & Cycle 🌺</Text>
+            <Text style={styles.imageBannerSub}>Comprenez votre cycle · Optimisez vos chances</Text>
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Cycle phases */}
         {activeSection === 0 && (
@@ -870,6 +869,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
+    marginTop: 4,
+  },
+  bannerCircle1: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.09)',
+    top: -50,
+    right: -30,
+  },
+  bannerCircle2: {
+    position: 'absolute',
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    bottom: -35,
+    left: 15,
+  },
+  bannerIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 18,
   },
   imageBannerInner: {
     position: 'absolute',

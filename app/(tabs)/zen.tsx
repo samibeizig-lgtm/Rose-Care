@@ -9,7 +9,6 @@ import {
   Easing,
   Dimensions,
   Alert,
-  Image,
 } from 'react-native';
 import * as Speech from 'expo-speech';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -296,22 +295,21 @@ export default function ZenScreen() {
         {/* BREATHING TAB */}
         {activeTab === 'respiration' && (
           <View style={styles.content}>
-            {/* Image banner */}
-            <View style={styles.imageBanner}>
-              <Image
-                source={require('../../assets/images/zen-banner.jpg')}
-                style={StyleSheet.absoluteFillObject}
-                resizeMode="cover"
-              />
-              <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.72)']}
-                style={StyleSheet.absoluteFillObject}
-              />
+            {/* Banner */}
+            <LinearGradient
+              colors={['#0C1B33', '#1A3A6B', '#2E86AB']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.imageBanner}
+            >
+              <View style={styles.bannerCircle1} pointerEvents="none" />
+              <View style={styles.bannerCircle2} pointerEvents="none" />
+              <Ionicons name="water-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
               <View style={styles.imageBannerInner}>
-                <Text style={styles.imageBannerTitle}>Espace Respiration</Text>
-                <Text style={styles.imageBannerSub}>Techniques de respiration pour réduire le stress prénatal</Text>
+                <Text style={styles.imageBannerTitle}>Espace Respiration 🌬️</Text>
+                <Text style={styles.imageBannerSub}>Cohérence cardiaque · 4-7-8 · Détente profonde</Text>
               </View>
-            </View>
+            </LinearGradient>
             {(isBreathing || selectedExercise) && (
               <View style={styles.breathingCenter}>
                 <View style={styles.breathingCircleOuter}>
@@ -562,22 +560,21 @@ export default function ZenScreen() {
         {/* YOGA TAB */}
         {activeTab === 'yoga' && (
           <View style={styles.content}>
-            {/* Image banner */}
-            <View style={styles.imageBanner}>
-              <Image
-                source={require('../../assets/images/zen-banner.jpg')}
-                style={StyleSheet.absoluteFillObject}
-                resizeMode="cover"
-              />
-              <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.72)']}
-                style={StyleSheet.absoluteFillObject}
-              />
+            {/* Banner */}
+            <LinearGradient
+              colors={['#4C1D95', '#7C3AED', '#A78BFA']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.imageBanner}
+            >
+              <View style={styles.bannerCircle1} pointerEvents="none" />
+              <View style={styles.bannerCircle2} pointerEvents="none" />
+              <Ionicons name="body-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
               <View style={styles.imageBannerInner}>
-                <Text style={styles.imageBannerTitle}>Yoga Prénatal</Text>
+                <Text style={styles.imageBannerTitle}>Yoga Prénatal 🧘‍♀️</Text>
                 <Text style={styles.imageBannerSub}>Postures douces adaptées à chaque trimestre</Text>
               </View>
-            </View>
+            </LinearGradient>
             <Text style={[styles.sectionTitle, { color: th.text }]}>Yoga Prénatal</Text>
             <Text style={[styles.sectionSubtitle, { color: th.textSub }]}>
               Le yoga prénatal améliore la flexibilité, soulage les douleurs et prépare le corps à l'accouchement.
@@ -1309,6 +1306,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
+    marginTop: 4,
+  },
+  bannerCircle1: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.09)',
+    top: -50,
+    right: -30,
+  },
+  bannerCircle2: {
+    position: 'absolute',
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    bottom: -35,
+    left: 15,
+  },
+  bannerIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 18,
   },
   imageBannerInner: {
     position: 'absolute',

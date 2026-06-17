@@ -11,7 +11,6 @@ import {
   TextInput,
   FlatList,
   Animated,
-  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -290,22 +289,21 @@ export default function HomeScreen() {
         {/* ─── White content ─── */}
         <Animated.View style={[styles.content, cardStyle, { backgroundColor: th.bg }]}>
 
-          {/* Image banner */}
-          <View style={styles.imageBanner}>
-            <Image
-              source={require('../../assets/images/home-hero.jpg')}
-              style={StyleSheet.absoluteFillObject}
-              resizeMode="cover"
-            />
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.72)']}
-              style={StyleSheet.absoluteFillObject}
-            />
+          {/* Banner */}
+          <LinearGradient
+            colors={['#4B0082', '#7C3AED', '#C084FC']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.imageBanner}
+          >
+            <View style={styles.bannerCircle1} pointerEvents="none" />
+            <View style={styles.bannerCircle2} pointerEvents="none" />
+            <Ionicons name="heart" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
             <View style={styles.imageBannerInner}>
-              <Text style={styles.imageBannerTitle}>Rose Care</Text>
+              <Text style={styles.imageBannerTitle}>Rose Care 🌸</Text>
               <Text style={styles.imageBannerSub}>Votre compagnon de grossesse semaine par semaine</Text>
             </View>
-          </View>
+          </LinearGradient>
 
           {/* Statistique grossesse motivationnelle */}
           {daysLeft !== null && daysLeft > 0 && (
@@ -628,6 +626,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
+    marginTop: 16,
+  },
+  bannerCircle1: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.09)',
+    top: -50,
+    right: -30,
+  },
+  bannerCircle2: {
+    position: 'absolute',
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    bottom: -35,
+    left: 15,
+  },
+  bannerIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 18,
   },
   imageBannerInner: {
     position: 'absolute',

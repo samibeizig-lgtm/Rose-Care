@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Linking,
   Dimensions,
-  Image,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -196,22 +195,21 @@ export default function ClinicScreen() {
 
           {activeTab === 'info' && (
             <>
-              {/* Image banner */}
-              <View style={styles.imageBanner}>
-                <Image
-                  source={require('../assets/images/health-banner.jpg')}
-                  style={StyleSheet.absoluteFillObject}
-                  resizeMode="cover"
-                />
-                <LinearGradient
-                  colors={['transparent', 'rgba(0,0,0,0.72)']}
-                  style={StyleSheet.absoluteFillObject}
-                />
+              {/* Banner */}
+              <LinearGradient
+                colors={['#0F4C75', '#1B6CA8', '#3498DB']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.imageBanner}
+              >
+                <View style={styles.bannerCircle1} pointerEvents="none" />
+                <View style={styles.bannerCircle2} pointerEvents="none" />
+                <Ionicons name="medkit-outline" size={64} color="rgba(255,255,255,0.18)" style={styles.bannerIcon} />
                 <View style={styles.imageBannerInner}>
-                  <Text style={styles.imageBannerTitle}>Clinique La Rose</Text>
+                  <Text style={styles.imageBannerTitle}>Clinique La Rose 🏥</Text>
                   <Text style={styles.imageBannerSub}>Votre maternité de référence à Tunis</Text>
                 </View>
-              </View>
+              </LinearGradient>
               {/* Stats */}
               <View style={styles.statsRow}>
                 {stats.map((s, i) => (
@@ -473,6 +471,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
+    marginTop: 4,
+  },
+  bannerCircle1: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.09)',
+    top: -50,
+    right: -30,
+  },
+  bannerCircle2: {
+    position: 'absolute',
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    bottom: -35,
+    left: 15,
+  },
+  bannerIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 18,
   },
   imageBannerInner: {
     position: 'absolute',
