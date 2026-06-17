@@ -883,7 +883,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   imageBanner: {
-    height: 180,
+    aspectRatio: 3 / 2,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
