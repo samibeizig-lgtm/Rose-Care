@@ -376,8 +376,8 @@ export default function HealthScreen() {
             <View style={styles.imageBanner}>
               <Image
                 source={require('../../assets/images/health-banner.jpg')}
-                style={styles.bannerImage}
-                resizeMode="contain"
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="stretch"
               />
               <LinearGradient
                 colors={['transparent', 'rgba(0,0,0,0.7)']}
@@ -780,7 +780,7 @@ export default function HealthScreen() {
       <Modal visible={!!lightboxPhoto} transparent animationType="fade" onRequestClose={() => setLightboxPhoto(null)}>
         <TouchableOpacity style={styles.lightboxOverlay} activeOpacity={1} onPress={() => setLightboxPhoto(null)}>
           {lightboxPhoto && (
-            <Image source={{ uri: lightboxPhoto }} style={styles.lightboxImage} resizeMode="contain" />
+            <Image source={{ uri: lightboxPhoto }} style={styles.lightboxImage} resizeMode="stretch" />
           )}
           <TouchableOpacity style={styles.lightboxClose} onPress={() => setLightboxPhoto(null)}>
             <Ionicons name="close-circle" size={36} color="#FFFFFF" />
@@ -1643,14 +1643,11 @@ const styles = StyleSheet.create({
   freqChipText: { fontSize: 13, color: Colors.text, fontWeight: '500' },
   freqChipTextActive: { color: Colors.white, fontWeight: '700' },
   imageBanner: {
+    aspectRatio: 1200 / 630,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
     marginTop: 4,
-  },
-  bannerImage: {
-    width: '100%',
-    aspectRatio: 1200 / 630,
   },
   bannerCircle1: {
     position: 'absolute',
