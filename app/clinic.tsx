@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
+const BANNER_H = Math.round((width - 32) * 630 / 1200);
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -200,7 +201,7 @@ export default function ClinicScreen() {
               <View style={styles.imageBanner}>
                 <Image
                   source={require('../assets/images/health-banner.jpg')}
-                  style={StyleSheet.absoluteFillObject}
+                  style={{ width: width - 32, height: BANNER_H }}
                   resizeMode="stretch"
                 />
                 <LinearGradient
@@ -469,8 +470,6 @@ const styles = StyleSheet.create({
   decoNote: { backgroundColor: Colors.lilac, borderRadius: 16, padding: 16, alignItems: 'center' },
   decoNoteText: { fontSize: 14, color: Colors.primaryDark, lineHeight: 22, textAlign: 'center' },
   imageBanner: {
-    width: '100%',
-    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

@@ -24,6 +24,7 @@ import { fr } from 'date-fns/locale';
 import DatePickerModal from '../../src/components/DatePickerModal';
 
 const { width } = Dimensions.get('window');
+const BANNER_H = Math.round((width - 32) * 630 / 1200);
 const WAVE_H = 50;
 
 const TRIMESTER_COLORS: Record<1 | 2 | 3, [string, string]> = {
@@ -131,7 +132,7 @@ export default function PregnancyScreen() {
           <View style={styles.imageBanner}>
             <Image
               source={require('../../assets/images/pregnancy-banner.jpg')}
-              style={StyleSheet.absoluteFillObject}
+              style={{ width: width - 32, height: BANNER_H }}
               resizeMode="stretch"
             />
             <LinearGradient
@@ -573,8 +574,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageBanner: {
-    width: '100%',
-    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

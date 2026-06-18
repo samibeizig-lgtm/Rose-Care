@@ -19,6 +19,7 @@ import Colors from '../../src/theme/colors';
 import { useTheme } from '../../src/theme/ThemeContext';
 
 const { width } = Dimensions.get('window');
+const BANNER_H = Math.round((width - 32) * 630 / 1200);
 const WAVE_H = 50;
 
 export default function MoreScreen() {
@@ -84,7 +85,7 @@ export default function MoreScreen() {
           <View style={styles.imageBanner}>
             <Image
               source={require('../../assets/images/health-banner.jpg')}
-              style={StyleSheet.absoluteFillObject}
+              style={{ width: width - 32, height: BANNER_H }}
               resizeMode="stretch"
             />
             <LinearGradient
@@ -323,8 +324,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   imageBanner: {
-    width: '100%',
-    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

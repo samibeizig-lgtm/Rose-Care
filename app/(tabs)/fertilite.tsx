@@ -16,6 +16,7 @@ import DatePickerModal from '../../src/components/DatePickerModal';
 import { useFocusEffect, useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
+const BANNER_H = Math.round((width - 32) * 630 / 1200);
 const WAVE_H = 50;
 
 const cyclePhases = [
@@ -194,7 +195,7 @@ export default function FertiliteScreen() {
         <View style={styles.imageBanner}>
           <Image
             source={require('../../assets/images/fertility-banner.jpg')}
-            style={StyleSheet.absoluteFillObject}
+            style={{ width: width - 32, height: BANNER_H }}
             resizeMode="stretch"
           />
           <LinearGradient
@@ -883,8 +884,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   imageBanner: {
-    width: '100%',
-    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

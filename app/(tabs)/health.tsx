@@ -28,6 +28,7 @@ import { fr } from 'date-fns/locale';
 import { LineChart } from 'react-native-chart-kit';
 
 const { width } = Dimensions.get('window');
+const BANNER_H = Math.round((width - 32) * 630 / 1200);
 const WAVE_H = 50;
 
 Notifications.setNotificationHandler({
@@ -376,7 +377,7 @@ export default function HealthScreen() {
             <View style={styles.imageBanner}>
               <Image
                 source={require('../../assets/images/health-banner.jpg')}
-                style={StyleSheet.absoluteFillObject}
+                style={{ width: width - 32, height: BANNER_H }}
                 resizeMode="stretch"
               />
               <LinearGradient
@@ -1643,8 +1644,6 @@ const styles = StyleSheet.create({
   freqChipText: { fontSize: 13, color: Colors.text, fontWeight: '500' },
   freqChipTextActive: { color: Colors.white, fontWeight: '700' },
   imageBanner: {
-    width: '100%',
-    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

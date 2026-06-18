@@ -28,6 +28,7 @@ import {
 } from '../../src/data/zenData';
 
 const { width } = Dimensions.get('window');
+const BANNER_H = Math.round((width - 32) * 630 / 1200);
 const WAVE_H = 50;
 
 export default function ZenScreen() {
@@ -300,7 +301,7 @@ export default function ZenScreen() {
             <View style={styles.imageBanner}>
               <Image
                 source={require('../../assets/images/zen-banner.jpg')}
-                style={StyleSheet.absoluteFillObject}
+                style={{ width: width - 32, height: BANNER_H }}
                 resizeMode="stretch"
               />
               <LinearGradient
@@ -566,7 +567,7 @@ export default function ZenScreen() {
             <View style={styles.imageBanner}>
               <Image
                 source={require('../../assets/images/zen-banner.jpg')}
-                style={StyleSheet.absoluteFillObject}
+                style={{ width: width - 32, height: BANNER_H }}
                 resizeMode="stretch"
               />
               <LinearGradient
@@ -1305,8 +1306,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   imageBanner: {
-    width: '100%',
-    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

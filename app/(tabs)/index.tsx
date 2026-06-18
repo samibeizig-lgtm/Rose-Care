@@ -28,6 +28,7 @@ import { differenceInWeeks, parseISO, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const { width } = Dimensions.get('window');
+const BANNER_H = Math.round((width - 32) * 630 / 1200);
 const WAVE_H = 50;
 
 const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
@@ -294,7 +295,7 @@ export default function HomeScreen() {
           <View style={styles.imageBanner}>
             <Image
               source={require('../../assets/images/home-hero.jpg')}
-              style={StyleSheet.absoluteFillObject}
+              style={{ width: width - 32, height: BANNER_H }}
               resizeMode="stretch"
             />
             <LinearGradient
@@ -624,8 +625,6 @@ const styles = StyleSheet.create({
   saveBtnGrad: { paddingVertical: 15, alignItems: 'center' },
   saveBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', letterSpacing: 1 },
   imageBanner: {
-    width: '100%',
-    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
