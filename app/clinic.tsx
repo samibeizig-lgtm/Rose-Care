@@ -469,7 +469,8 @@ const styles = StyleSheet.create({
   decoNote: { backgroundColor: Colors.lilac, borderRadius: 16, padding: 16, alignItems: 'center' },
   decoNoteText: { fontSize: 14, color: Colors.primaryDark, lineHeight: 22, textAlign: 'center' },
   imageBanner: {
-    aspectRatio: 1200 / 630,
+    width: '100%',
+    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,

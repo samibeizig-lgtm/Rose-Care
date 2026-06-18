@@ -1643,7 +1643,8 @@ const styles = StyleSheet.create({
   freqChipText: { fontSize: 13, color: Colors.text, fontWeight: '500' },
   freqChipTextActive: { color: Colors.white, fontWeight: '700' },
   imageBanner: {
-    aspectRatio: 1200 / 630,
+    width: '100%',
+    height: 180,
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 20,
